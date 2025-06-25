@@ -1,0 +1,265 @@
+/* Главная секция */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 500px;
+  align-items: center;
+}
+
+.hero-left {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+.hero-image:hover {
+  transform: scale(1.02);
+}
+
+.hero-right {
+  flex: 1;
+  padding: 20px;
+  min-width: 300px;
+}
+
+.hero-right h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: #333;
+  line-height: 1.2;
+}
+
+.hero-right h3 {
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  color: #666;
+  font-weight: 400;
+}
+
+.hero-right p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+}
+
+.features li {
+  margin: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #444;
+}
+
+.btn-primary {
+  background: #ffc107;
+  color: #333;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+.btn-primary:hover {
+  background: #e6ac00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Каталог товаров (превью) */
+.catalog-preview {
+  padding: 60px 20px;
+  background: white;
+}
+
+.catalog-preview h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.products-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.product-preview {
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.product-preview:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.product-preview img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-preview h3 {
+  padding: 15px 20px 10px 20px;
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}
+
+.product-preview p {
+  padding: 0 20px 20px 20px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #ffc107;
+  margin: 0;
+}
+
+.catalog-link {
+  text-align: center;
+}
+
+.btn-secondary {
+  background: #333;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+/* Преимущества */
+.advantages {
+  padding: 60px 20px;
+  background: #f8f9fa;
+}
+
+.advantages h2 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.advantage-item {
+  text-align: center;
+  padding: 30px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.advantage-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.advantage-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.advantage-item h3 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.advantage-item p {
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .hero {
+    padding: 40px 20px;
+    flex-direction: column;
+  }
+  
+  .hero-left,
+  .hero-right {
+    flex: none;
+    width: 100%;
+  }
+  
+  .hero-right h1 {
+    font-size: 2rem;
+  }
+  
+  .hero-right h3 {
+    font-size: 1.1rem;
+  }
+  
+  .catalog-preview,
+  .advantages {
+    padding: 40px 20px;
+  }
+  
+  .catalog-preview h2,
+  .advantages h2 {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+  
+  .products-preview {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .advantages-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .advantage-item {
+    padding: 25px 15px;
+  }
+} 

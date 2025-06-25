@@ -1,0 +1,76 @@
+/* Мини-шапка */
+.top-bar {
+  background: #333;
+  color: white;
+  font-size: 14px;
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-bar-left span,
+.top-bar-right span {
+  margin-right: 20px;
+}
+
+.top-bar-right span:last-child {
+  margin-right: 0;
+}
+
+/* Основная шапка */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f1f1f1;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.nav {
+  display: flex;
+  gap: 30px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav a:hover {
+  color: #ffc107;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+  
+  .top-bar-left span,
+  .top-bar-right span {
+    margin-right: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .nav {
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+} 

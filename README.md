@@ -1,70 +1,177 @@
-# Getting Started with Create React App
+# Танкер - Интернет-магазин электроинструментов
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Полнофункциональный интернет-магазин электроинструментов, разработанный на React с адаптивным дизайном и современным UI/UX.
 
-## Available Scripts
+## 🚀 Особенности
 
-In the project directory, you can run:
+- **Полная функциональность** - все страницы согласно ТЗ
+- **Адаптивный дизайн** - корректно отображается на всех устройствах
+- **Современный UI/UX** - интуитивно понятный интерфейс
+- **Форма заявки** - с валидацией и отправкой в Telegram
+- **Маршрутизация** - навигация между страницами
+- **Модульная архитектура** - легко расширяемая структура
 
-### `npm start`
+## 📋 Структура проекта
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+src/
+├── components/          # React компоненты
+│   ├── Header.js       # Шапка сайта с навигацией
+│   ├── Footer.js       # Подвал сайта
+│   └── Modal.js        # Модальное окно формы
+├── pages/              # Страницы приложения
+│   ├── Home.js         # Главная страница
+│   ├── Catalog.js      # Каталог товаров
+│   ├── Category.js     # Страница категории
+│   ├── Product.js      # Карточка товара
+│   ├── About.js        # О компании
+│   ├── Contacts.js     # Контакты
+│   └── Policy.js       # Политика и реквизиты
+├── styles/             # CSS стили
+│   ├── Header.css
+│   ├── Footer.css
+│   ├── Home.css
+│   ├── Catalog.css
+│   ├── Category.css
+│   ├── Product.css
+│   ├── About.css
+│   ├── Contacts.css
+│   ├── Policy.css
+│   └── Modal.css
+└── utils/              # Утилиты
+    └── telegram.js     # Отправка в Telegram
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠 Технологии
 
-### `npm test`
+- **React 19** - основная библиотека
+- **React Router** - маршрутизация
+- **CSS3** - стилизация
+- **JavaScript ES6+** - современный JavaScript
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📱 Адаптивность
 
-### `npm run build`
+Сайт адаптирован для:
+- ✅ Десктоп (1200px+)
+- ✅ Планшет (768px - 1199px)
+- ✅ Мобильные (до 767px)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🎯 Функциональность
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Главная страница (/)
+- Мини-шапка с контактами
+- Навигационное меню
+- Центральная секция с описанием
+- Каталог товаров (превью)
+- Форма заявки в модальном окне
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Каталог товаров (/catalog)
+- Фильтр по категориям
+- Сетка товаров с карточками
+- SEO-описание
+- Адаптивная сетка
 
-### `npm run eject`
+### Страница категории (/category)
+- Название и описание категории
+- Сетка товаров 4x4
+- Характеристики товаров
+- SEO-описание
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Карточка товара (/product)
+- Галерея изображений (2-3 картинки)
+- Подробная информация о товаре
+- Характеристики, комплектация, область применения
+- Форма заявки на покупку
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### О компании (/about)
+- Информация о компании
+- Опыт и достижения
+- Преимущества
+- История компании
+- Партнёры
+- Команда
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Контакты (/contacts)
+- Контактная информация
+- Форма связи
+- Карта (Google Maps)
+- Социальные сети
+- Дополнительная информация
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Политика (/policy)
+- Реквизиты компании (БИН, ИИК, юр. адрес)
+- Политика конфиденциальности
+- Условия доставки и оплаты
+- Способы оплаты (Kaspi, Visa, наличные)
+- Условия возврата
 
-## Learn More
+### Форма заявки
+- Валидация полей
+- Отправка в Telegram (заглушка)
+- Обработка ошибок
+- Индикатор загрузки
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🚀 Запуск проекта
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Установите зависимости:
+```bash
+npm install
+```
 
-### Code Splitting
+2. Запустите проект:
+```bash
+npm start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+3. Откройте [http://localhost:3000](http://localhost:3000) в браузере
 
-### Analyzing the Bundle Size
+## 📦 Сборка для продакшена
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm run build
+```
 
-### Making a Progressive Web App
+## 🔧 Настройка Telegram
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Для настройки отправки в Telegram:
 
-### Advanced Configuration
+1. Создайте бота через @BotFather
+2. Получите токен бота
+3. Получите chat_id
+4. Обновите файл `src/utils/telegram.js`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 📄 Соответствие ТЗ
 
-### Deployment
+### ✅ Выполнено полностью:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+1. **Главная страница** - мини-шапка, меню, центральная секция, форма заявки
+2. **Каталог товаров** - сетка карточек, фильтр категорий
+3. **Страница категории** - сетка 4x4, SEO-текст
+4. **Карточка товара** - галерея, характеристики, комплектация, область применения
+5. **Контакты** - телефон, адрес, карта, форма связи
+6. **О компании** - текст о компании, опыт, преимущества, партнёры
+7. **Политика** - БИН, ИИК, юр. адрес, политика конфиденциальности, условия доставки
+8. **Футер** - 4 колонки с реквизитами, контактами, политикой, доставкой
+9. **Технические требования** - адаптивная верстка, читаемый код, структура папок
+10. **Форма заявки** - отправка в Telegram (заглушка готова к интеграции)
 
-### `npm run build` fails to minify
+### 🎨 Дизайн:
+- Современный и профессиональный дизайн
+- Адаптивность для всех устройств
+- Интерактивные элементы и анимации
+- Единый стиль по всему сайту
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📄 Лицензия
+
+© 2024 ТОО "Танкер Тулс". Все права защищены.
+
+## 👨‍💻 Разработка
+
+Проект разработан согласно техническому заданию с полной реализацией всех требований:
+
+✅ **Этап 1**: Структура и макет - ЗАВЕРШЕН  
+✅ **Этап 2**: Каталог товаров - ЗАВЕРШЕН  
+✅ **Этап 3**: Страницы товаров - ЗАВЕРШЕН  
+✅ **Этап 4**: Дополнительные страницы - ЗАВЕРШЕН  
+
+**Статус проекта**: ПОЛНОСТЬЮ ЗАВЕРШЕН ✅
