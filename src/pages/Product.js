@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import '../styles/Product.css';
 
-const Product = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeImage, setActiveImage] = useState(0);
-
-  // Данные товара (в реальном проекте будут из API)
-  const product = {
+const products = [
+  {
     id: 1,
     name: 'Болгарка Makita 125мм',
     subtitle: 'Профессиональный инструмент для точной и безопасной работы',
@@ -45,7 +42,90 @@ const Product = () => {
       'Резка металлических труб',
       'Шлифовка сварных швов'
     ]
-  };
+  },
+  {
+    id: 2,
+    name: 'Шуруповёрт DeWalt 18V',
+    subtitle: 'Беспроводной шуруповёрт с литий-ионным аккумулятором',
+    description: 'Мощный и удобный шуруповёрт для профессионального и бытового использования.',
+    price: '85 000 ₸',
+    images: [
+      '/images/products/shurupovert-dewalt-18v.jpg',
+      'https://via.placeholder.com/600x400?text=Шуруповёрт+DeWalt+2',
+      'https://via.placeholder.com/600x400?text=Шуруповёрт+DeWalt+3'
+    ],
+    specifications: [
+      { name: 'Напряжение', value: '18 В' },
+      { name: 'Тип аккумулятора', value: 'Li-Ion' },
+      { name: 'Макс. крутящий момент', value: '70 Нм' },
+      { name: 'Вес', value: '1.7 кг' }
+    ],
+    equipment: [
+      'Шуруповёрт',
+      'Аккумулятор',
+      'Зарядное устройство',
+      'Кейс',
+      'Инструкция'
+    ],
+    applications: [
+      'Сборка мебели',
+      'Строительство',
+      'Ремонт',
+      'Монтажные работы'
+    ]
+  },
+  {
+    id: 3,
+    name: 'Перфоратор Bosch GBH 2-26',
+    subtitle: 'Мощный перфоратор для строительных работ',
+    description: 'Перфоратор Bosch — надёжный инструмент для сверления и долбления бетона и кирпича.',
+    price: '120 000 ₸',
+    images: [
+      '/images/products/perforator-bosch-gbh.jpg',
+      'https://via.placeholder.com/600x400?text=Перфоратор+Bosch+2',
+      'https://via.placeholder.com/600x400?text=Перфоратор+Bosch+3'
+    ],
+    specifications: [
+      { name: 'Мощность', value: '800 Вт' },
+      { name: 'Энергия удара', value: '2.7 Дж' },
+      { name: 'Вес', value: '2.8 кг' }
+    ],
+    equipment: [
+      'Перфоратор',
+      'Бур',
+      'Кейс',
+      'Инструкция'
+    ],
+    applications: [
+      'Сверление бетона',
+      'Долбление',
+      'Ремонт',
+      'Строительство'
+    ]
+  }
+];
+
+const Product = () => {
+  const { id } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
+
+  const product = products.find(p => p.id === Number(id));
+
+  if (!product) {
+    return (
+      <div className="product">
+        <Header />
+        <main className="product-main">
+          <div className="container">
+            <h1>Товар не найден</h1>
+            <p>Проверьте правильность ссылки или вернитесь в <a href="/catalog">каталог</a>.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -71,7 +151,6 @@ const Product = () => {
           <nav className="breadcrumbs">
             <a href="/">Главная</a> &gt;
             <a href="/catalog">Каталог</a> &gt;
-            <a href="/category">Болгарки</a> &gt;
             <span>{product.name}</span>
           </nav>
 
@@ -109,6 +188,7 @@ const Product = () => {
           </div>
 
           {/* Характеристики */}
+          {product.specifications && (
           <section className="product-specifications">
             <h2>Характеристики</h2>
             <div className="specs-grid">
@@ -120,8 +200,10 @@ const Product = () => {
               ))}
             </div>
           </section>
+          )}
 
           {/* Комплектация */}
+          {product.equipment && (
           <section className="product-equipment">
             <h2>Комплектация</h2>
             <ul className="equipment-list">
@@ -130,8 +212,10 @@ const Product = () => {
               ))}
             </ul>
           </section>
+          )}
 
           {/* Область применения */}
+          {product.applications && (
           <section className="product-applications">
             <h2>Область применения</h2>
             <div className="applications-grid">
@@ -143,6 +227,7 @@ const Product = () => {
               ))}
             </div>
           </section>
+          )}
 
           {/* Дополнительная форма заявки */}
           <section className="product-order">

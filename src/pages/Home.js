@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import '../styles/Home.css';
+import '../styles/Catalog.css';
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +21,37 @@ const Home = () => {
     console.log('Форма отправлена:', formData);
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
+
+  const miniProducts = [
+    {
+      id: 1,
+      name: 'Болгарка Makita 125мм',
+      image: '/images/products/bolgarka-makita-125.jpg',
+      price: '45 000 ₸',
+      description: 'Профессиональная угловая шлифмашина'
+    },
+    {
+      id: 2,
+      name: 'Шуруповёрт DeWalt 18V',
+      image: '/images/products/shurupovert-dewalt-18v.jpg',
+      price: '85 000 ₸',
+      description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором'
+    },
+    {
+      id: 3,
+      name: 'Перфоратор Bosch GBH 2-26',
+      image: '/images/products/perforator-bosch-gbh.jpg',
+      price: '120 000 ₸',
+      description: 'Мощный перфоратор для строительных работ'
+    },
+    {
+      id: 4,
+      name: 'Дрель Интерскол ДУ-13/780',
+      image: 'https://via.placeholder.com/300x200?text=Дрель+Интерскол',
+      price: '25 000 ₸',
+      description: 'Универсальная дрель для сверления'
+    }
+  ];
 
   return (
     <div className="home">
@@ -46,65 +77,57 @@ const Home = () => {
             Вся продукция сертифицирована и имеет гарантию от производителя. 
             Работаем как с розничными, так и с оптовыми клиентами.
           </p>
+          
+          {/* Преимущества (4 штуки) */}
+          <div className="advantages-list">
+            <div className="advantage-item">
+              <span className="advantage-icon">🏭</span>
+              <span>Прямые поставки от производителя</span>
+            </div>
+            <div className="advantage-item">
+              <span className="advantage-icon">✅</span>
+              <span>Гарантия качества 12 месяцев</span>
+            </div>
+            <div className="advantage-item">
+              <span className="advantage-icon">🚚</span>
+              <span>Быстрая доставка по Алматы</span>
+            </div>
+            <div className="advantage-item">
+              <span className="advantage-icon">🔧</span>
+              <span>Техническая поддержка</span>
+            </div>
+          </div>
+          
           <button className="btn-primary" onClick={handleOpenModal}>
             Оставить заявку
           </button>
         </div>
       </section>
 
-      {/* Каталог товаров (превью) */}
-      <section className="catalog-preview">
-        <div className="container">
+      {/* Мини-каталог товаров */}
+      <section className="mini-catalog-section">
+        <div className="mini-catalog-header">
           <h2>Популярные товары</h2>
-          <div className="products-preview">
-            <div className="product-preview">
-              <img src="/images/products/bolgarka-makita-125.jpg" alt="Болгарка Makita" />
-              <h3>Болгарка Makita 125мм</h3>
-              <p>45 000 ₸</p>
-            </div>
-            <div className="product-preview">
-              <img src="/images/products/shurupovert-dewalt-18v.jpg" alt="Шуруповёрт DeWalt" />
-              <h3>Шуруповёрт DeWalt 18V</h3>
-              <p>85 000 ₸</p>
-            </div>
-            <div className="product-preview">
-              <img src="/images/products/perforator-bosch-gbh.jpg" alt="Перфоратор Bosch" />
-              <h3>Перфоратор Bosch GBH 2-26</h3>
-              <p>120 000 ₸</p>
-            </div>
-          </div>
-          <div className="catalog-link">
-            <Link to="/catalog" className="btn-secondary">Смотреть весь каталог</Link>
-          </div>
+          <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
-      </section>
-
-      {/* Преимущества */}
-      <section className="advantages">
-        <div className="container">
-          <h2>Почему выбирают нас</h2>
-          <div className="advantages-grid">
-            <div className="advantage-item">
-              <div className="advantage-icon">🏭</div>
-              <h3>Прямые поставки</h3>
-              <p>Работаем напрямую с производителями</p>
+        <div className="mini-catalog-grid">
+          {miniProducts.map(product => (
+            <div
+              key={product.id}
+              className="product-card mini-product-card"
+              onClick={() => window.location.href = `/product/${product.id}`}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="product-image">
+                <img src={product.image} alt={product.name} />
+              </div>
+              <div className="product-info">
+                <h3 className="product-name">{product.name}</h3>
+                <p className="product-description">{product.description}</p>
+                <div className="product-price">{product.price}</div>
+              </div>
             </div>
-            <div className="advantage-item">
-              <div className="advantage-icon">✅</div>
-              <h3>Гарантия качества</h3>
-              <p>Вся продукция сертифицирована</p>
-            </div>
-            <div className="advantage-item">
-              <div className="advantage-icon">🚚</div>
-              <h3>Быстрая доставка</h3>
-              <p>По Алматы в день заказа</p>
-            </div>
-            <div className="advantage-item">
-              <div className="advantage-icon">🔧</div>
-              <h3>Техподдержка</h3>
-              <p>Консультации по выбору инструмента</p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 

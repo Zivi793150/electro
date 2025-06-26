@@ -99,14 +99,13 @@ const Catalog = () => {
           <h1 className="catalog-title">Каталог товаров</h1>
           
           {/* Фильтр категорий */}
-          <div className="category-filter">
+          <div className="category-filter category-filter-grid">
             {categories.map(category => (
               <button
                 key={category.id}
                 className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
                 onClick={() => setSelectedCategory(category.id)}
               >
-                <span className="category-icon">{category.icon}</span>
                 <span className="category-name">{category.name}</span>
               </button>
             ))}
@@ -115,7 +114,12 @@ const Catalog = () => {
           {/* Сетка товаров */}
           <div className="products-grid">
             {filteredProducts.map(product => (
-              <div key={product.id} className="product-card">
+              <div
+                key={product.id}
+                className="product-card"
+                onClick={() => window.location.href = `/product/${product.id}`}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="product-image">
                   <img src={product.image} alt={product.name} />
                 </div>
@@ -123,7 +127,6 @@ const Catalog = () => {
                   <h3 className="product-name">{product.name}</h3>
                   <p className="product-description">{product.description}</p>
                   <div className="product-price">{product.price}</div>
-                  <button className="btn-details">Подробнее</button>
                 </div>
               </div>
             ))}
