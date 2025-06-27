@@ -1,76 +1,192 @@
+/* Удалён блок @font-face и глобальный font-family, чтобы не было ошибки сборки */
+
 /* Мини-шапка */
 .top-bar {
-  background: #333;
-  color: white;
-  font-size: 14px;
-  padding: 8px 20px;
+  background: #f8f9fb;
+  color: #222;
+  font-size: 15px;
+  border-bottom: 1px solid #ececec;
+  padding: 0;
+  min-height: 48px;
+}
+.top-bar-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 48px;
 }
-
-.top-bar-left span,
-.top-bar-right span {
-  margin-right: 20px;
+.top-bar-left, .top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
-
-.top-bar-right span:last-child {
-  margin-right: 0;
+.top-bar-icon {
+  font-size: 18px;
+  margin-right: 4px;
+}
+.top-bar-text {
+  color: #555;
+  font-weight: 400;
+  font-size: 15px;
+}
+.top-bar-divider {
+  width: 1px;
+  height: 22px;
+  background: #e0e0e0;
+  margin: 0 12px;
+  display: inline-block;
+}
+.top-bar-link {
+  color: #888;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+.top-bar-link:hover {
+  color: #1e88e5;
+}
+.social-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+  margin-right: 2px;
+  transition: border-color 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+.social-circle:hover {
+  border-color: #1e88e5;
+  box-shadow: 0 1px 6px 0 #1e88e533, 0 0 3px 1px #90caf955;
+  filter: drop-shadow(0 0 2px #42a5f5);
 }
 
 /* Основная шапка */
 .header {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(30,40,90,0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: 80px;
+}
+.header-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background-color: #f1f1f1;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  justify-content: space-between;
+  min-height: 80px;
 }
-
 .logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
+.logo-icon {
+  font-size: 34px;
+}
+.logo-text {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: 1px;
+}
 .nav {
   display: flex;
-  gap: 30px;
+  gap: 38px;
+  justify-content: center;
+  flex: 1;
 }
-
 .nav a {
+  color: #222;
   text-decoration: none;
-  color: #333;
+  font-size: 18px;
   font-weight: 500;
-  transition: color 0.3s ease;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
 }
-
 .nav a:hover {
-  color: #ffc107;
+  color: #1e88e5;
+  border-bottom: 2px solid #1e88e5;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cart-btn {
+  background: #f4f6fa;
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
+.cart-btn:hover {
+  background: #e3eaf6;
+}
+.cart-icon {
+  width: 22px;
+  height: 22px;
+  fill: #1e88e5;
 }
 
-/* Адаптивность для мобильных устройств */
-@media (max-width: 768px) {
-  .top-bar {
-    flex-direction: column;
-    gap: 5px;
-    text-align: center;
-  }
-  
-  .top-bar-left span,
-  .top-bar-right span {
-    margin-right: 10px;
-  }
-  
-  .header {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
+/* Контейнер */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Адаптивность */
+@media (max-width: 900px) {
   .nav {
-    gap: 15px;
+    gap: 18px;
+  }
+  .header-container {
+    padding: 0 10px;
+  }
+}
+@media (max-width: 700px) {
+  .top-bar-container, .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .nav {
     flex-wrap: wrap;
+    gap: 10px;
     justify-content: center;
+  }
+  .logo-text {
+    font-size: 20px;
+  }
+  .header, .header-container {
+    min-height: 56px;
+  }
+  .top-bar, .top-bar-container {
+    min-height: 36px;
+  }
+}
+@media (max-width: 500px) {
+  .container {
+    padding: 0 6px;
+  }
+  .logo-text {
+    font-size: 15px;
+  }
+  .header-container {
+    min-height: 40px;
+  }
+  .top-bar-container {
+    min-height: 24px;
   }
 } 

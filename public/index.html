@@ -24,6 +24,48 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+    <link rel="preload" href="/fonts/Advaken Sans.otf" as="font" type="font/otf" crossorigin>
+    <link rel="preload" href="/fonts/Farabee Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <!-- Шрифт Hemico © Dan P. Lyons, лицензия CC BY-SA 3.0 https://fontstruct.com/fontstructions/show/1164777 -->
+    <link rel="preload" href="/fonts/hemico.ttf" as="font" type="font/ttf" crossorigin>
+    <!-- Шрифт Bounded © Dan P. Lyons, лицензия CC BY-SA 3.0 https://fontstruct.com/fontstructions/show/1164777 -->
+    <link rel="preload" href="/fonts/Bounded-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <style>
+      @font-face {
+        font-family: 'Advaken Sans';
+        src: url('/fonts/Advaken Sans.otf') format('opentype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Farabee';
+        src: url('/fonts/Farabee Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Hemico';
+        src: url('/fonts/hemico.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'Bounded';
+        src: url('/fonts/Bounded-Regular.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
+      body, html, * {
+        font-family: 'Advaken Sans', 'Farabee', 'Hemico', Arial, sans-serif !important;
+      }
+      .home, .home * {
+        font-family: 'Bounded', Arial, sans-serif !important;
+      }
+    </style>
     <title>React App</title>
   </head>
   <body>

@@ -2,136 +2,243 @@
 .hero {
   display: flex;
   flex-wrap: wrap;
-  padding: 60px 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 500px;
+  padding: 72px 32px 64px 32px;
+  background: linear-gradient(120deg, #f7fafc 0%, #e3eaf6 100%);
+  min-height: 540px;
   align-items: center;
+  border-radius: 0 0 32px 32px;
+  box-shadow: 0 8px 32px 0 rgba(30,40,90,0.06);
 }
 
 .hero-left {
   flex: 1;
-  min-width: 300px;
+  min-width: 320px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .hero-image {
-  max-width: 100%;
+  max-width: 95%;
   height: auto;
-  border-radius: 12px;
-  transition: transform 0.3s ease;
+  border-radius: 18px;
+  transition: transform 0.3s cubic-bezier(.4,2,.6,1);
 }
-
 .hero-image:hover {
-  transform: scale(1.02);
+  transform: scale(1.025);
 }
 
 .hero-right {
   flex: 1;
-  padding: 20px;
-  min-width: 300px;
+  padding: 32px 32px 32px 0;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .hero-right h1 {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-  color: #333;
-  line-height: 1.2;
+  font-size: 4.2rem;
+  margin-bottom: 18px;
+  color: #1a2236;
+  line-height: 1.08;
+  font-family: 'Bounded', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 12px #fff, 0 4px 20px #e3eaf6, 0 8px 32px #e3eaf6;
+  position: relative;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+  text-fill-color: initial;
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+.hero-right h1::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, #1e88e5 0%, #43cea2 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(30,136,229,0.3);
+}
+.hero-right h1 .accent {
+  color: #1e88e5;
+  background: none;
+  text-shadow: 0 0 12px #90caf9, 0 2px 12px #1e88e5cc, 0 4px 20px #90caf9aa;
+  -webkit-text-fill-color: #1e88e5;
+  text-fill-color: #1e88e5;
+  animation: accentPulse 2s ease-in-out infinite;
+  position: relative;
+}
+.hero-right h1 .accent::after {
+  display: none !important;
+}
+
+@keyframes titleGlow {
+  0% {
+    text-shadow: 
+      0 2px 12px rgba(30,40,90,0.10), 
+      0 1px 0 #fff,
+      0 4px 20px rgba(30,40,90,0.08),
+      0 8px 32px rgba(30,40,90,0.06);
+  }
+  100% {
+    text-shadow: 
+      0 2px 12px rgba(30,40,90,0.15), 
+      0 1px 0 #fff,
+      0 4px 20px rgba(30,40,90,0.12),
+      0 8px 32px rgba(30,40,90,0.10);
+  }
+}
+
+@keyframes accentPulse {
+  0%, 100% {
+    text-shadow: 
+      0 0 12px #90caf9, 
+      0 2px 12px #1e88e5cc,
+      0 4px 20px #90caf9aa;
+  }
+  50% {
+    text-shadow: 
+      0 0 16px #90caf9, 
+      0 2px 16px #1e88e5cc,
+      0 6px 24px #90caf9aa;
+  }
 }
 
 .hero-right h3 {
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-  color: #666;
-  font-weight: 400;
+  font-size: 1.85rem;
+  margin-bottom: 28px;
+  color: #1976d2;
+  font-weight: 700;
+  font-family: 'Bounded', Arial, sans-serif;
+  text-shadow: 0 2px 12px #90caf9cc, 0 1px 0 #fff;
 }
 
 .hero-right p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #555;
-  margin-bottom: 15px;
+  font-size: 1.13rem;
+  line-height: 1.7;
+  color: #4a5568;
+  margin-bottom: 18px;
+  font-family: 'Bounded', Arial, sans-serif;
+}
+
+.hero-text-container {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(30,40,90,0.10);
+  padding: 32px 32px 24px 32px;
+  margin-bottom: 24px;
 }
 
 /* Преимущества (4 штуки) */
 .advantages-list {
-  margin: 25px 0;
+  margin: 32px 0 32px 0;
+  display: block;
 }
-
 .advantages-list .advantage-item {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
-  padding: 10px 0;
-  background: none;
-  border-radius: 0;
-  box-shadow: none;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 2px 8px rgba(30,40,90,0.06);
+  padding: 10px 22px 10px 10px;
+  min-width: 220px;
+  gap: 12px;
+  font-family: 'Bounded', Arial, sans-serif;
+  margin-bottom: 16px;
 }
-
+.advantages-list .advantage-item:last-child {
+  margin-bottom: 0;
+}
 .advantages-list .advantage-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #e3eaf6 0%, #c3e6cb 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.5rem;
-  margin-right: 15px;
-  min-width: 30px;
+  color: #1e88e5;
+  box-shadow: 0 2px 8px rgba(30,40,90,0.08);
+  margin-right: 10px;
 }
-
 .advantages-list .advantage-item span:last-child {
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 500;
+  font-size: 1.13rem;
+  color: #1a2236;
+  font-weight: 600;
 }
 
 .btn-primary {
   background: #ffc107;
-  color: #333;
-  padding: 15px 30px;
+  color: #222;
+  padding: 18px 38px;
   border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 1.18rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+  transition: all 0.25s cubic-bezier(.4,2,.6,1);
+  box-shadow: 0 4px 18px rgba(255,193,7,0.13);
+  letter-spacing: 0.5px;
+  font-family: 'Bounded', Arial, sans-serif;
 }
-
 .btn-primary:hover {
   background: #e6ac00;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+  color: #fff;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(255,193,7,0.18);
 }
 
 /* Адаптивность для мобильных устройств */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .hero {
-    padding: 40px 20px;
+    padding: 40px 10px 32px 10px;
     flex-direction: column;
+    border-radius: 0 0 18px 18px;
   }
-  
-  .hero-left,
-  .hero-right {
+  .hero-left, .hero-right {
     flex: none;
     width: 100%;
+    padding: 0;
   }
-  
+  .hero-right {
+    padding: 24px 0 0 0;
+  }
   .hero-right h1 {
-    font-size: 2rem;
+    font-size: 2.1rem;
   }
-  
   .hero-right h3 {
-    font-size: 1.1rem;
+    font-size: 1.08rem;
   }
-  
+  .advantages-list {
+    gap: 10px 0;
+    margin: 18px 0 18px 0;
+  }
   .advantages-list .advantage-item {
-    margin-bottom: 12px;
+    min-width: 160px;
+    padding: 8px 12px 8px 8px;
   }
-  
   .advantages-list .advantage-icon {
-    font-size: 1.3rem;
-    margin-right: 12px;
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    margin-right: 7px;
   }
-  
   .advantages-list .advantage-item span:last-child {
+    font-size: 0.98rem;
+  }
+  .btn-primary {
+    padding: 14px 22px;
     font-size: 1rem;
+  }
+  .hero-text-container {
+    padding: 18px 8px 14px 8px;
   }
 }
 
