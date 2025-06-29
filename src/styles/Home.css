@@ -432,13 +432,15 @@
   font-weight: 700;
   color: #222;
   text-align: center;
-  line-height: 1.15;
-  word-break: break-word;
+  line-height: 1.18;
+  word-break: keep-all;
+  hyphens: auto;
   max-width: 100%;
   margin: 0;
   padding: 0 4px;
   white-space: normal;
   display: block;
+  min-height: 2.4em;
 }
 @media (max-width: 700px) {
   .category-conveyor-section {
