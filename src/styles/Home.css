@@ -94,17 +94,19 @@
 }
 .advantages-list .advantage-item,
 .advantages-list .advantage-icon {
-  transition: none !important;
-  box-shadow: 0 2px 8px rgba(30,40,90,0.06);
+  cursor: default !important;
 }
 .advantages-list .advantage-item:hover,
 .advantages-list .advantage-icon:hover {
-  background: unset !important;
-  color: unset !important;
-  box-shadow: unset !important;
-  filter: unset !important;
+  background: #fff !important;
+  color: #1a2236 !important;
+  box-shadow: 0 2px 8px rgba(30,40,90,0.06) !important;
+  filter: none !important;
   outline: none !important;
+  transform: none !important;
+  transition: none !important;
 }
+
 .advantages-list .advantage-item {
   display: flex;
   align-items: center;
@@ -405,10 +407,6 @@
   transition: box-shadow .2s, border .2s;
   cursor: pointer;
   gap: 8px;
-}
-.category-conveyor-card:hover {
-  box-shadow: 0 6px 24px rgba(255,193,7,0.13);
-  transform: translateY(-2px) scale(1.04);
 }
 .category-conveyor-img-wrap {
   width: 64px;

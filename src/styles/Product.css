@@ -145,15 +145,15 @@
 /* Характеристики — вертикальный список */
 .product-specifications {
   background: #f7fafc;
-  padding: 32px 32px 18px 32px;
-  border-radius: 18px;
+  padding: 18px 16px 10px 16px;
+  border-radius: 14px;
   box-shadow: 0 2px 12px rgba(30,40,90,0.07);
-  margin-bottom: 32px;
+  margin-bottom: 18px;
   border: none;
 }
 .product-specifications h2 {
-  font-size: 2rem;
-  margin-bottom: 28px;
+  font-size: 1.4rem;
+  margin-bottom: 14px;
   color: #1a2236;
   font-family: 'Bounded', Arial, sans-serif;
   font-weight: 800;
@@ -169,10 +169,12 @@
   justify-content: space-between;
   background: #fff;
   border-radius: 0;
-  padding: 18px 0;
+  padding: 8px 0;
   box-shadow: none;
   border: none;
   border-bottom: 1px solid #e3eaf6;
+  font-size: 1rem;
+  line-height: 1.2;
 }
 .spec-item:last-child {
   border-bottom: none;
@@ -180,14 +182,14 @@
 .spec-name {
   font-weight: 600;
   color: #222;
-  font-size: 1.08rem;
+  font-size: 0.98rem;
   flex: 1;
 }
 .spec-value {
   color: #1e88e5;
   font-weight: 800;
-  font-size: 1.13rem;
-  margin-left: 18px;
+  font-size: 1.05rem;
+  margin-left: 12px;
   white-space: nowrap;
 }
 @media (max-width: 700px) {
@@ -209,15 +211,15 @@
 /* Комплектация — вертикальный список */
 .product-equipment {
   background: #f7fafc;
-  padding: 32px 32px 18px 32px;
-  border-radius: 18px;
+  padding: 18px 16px 10px 16px;
+  border-radius: 14px;
   box-shadow: 0 2px 12px rgba(30,40,90,0.07);
-  margin-bottom: 32px;
+  margin-bottom: 18px;
   border: none;
 }
 .product-equipment h2 {
-  font-size: 2rem;
-  margin-bottom: 28px;
+  font-size: 1.4rem;
+  margin-bottom: 14px;
   color: #1a2236;
   font-family: 'Bounded', Arial, sans-serif;
   font-weight: 800;
@@ -233,11 +235,12 @@
   gap: 14px;
   background: #fff;
   border-radius: 0;
-  padding: 16px 0;
+  padding: 6px 0 6px 0;
   box-shadow: none;
   border: none;
   border-bottom: 1px solid #e3eaf6;
-  font-size: 1.08rem;
+  font-size: 1rem;
+  line-height: 1.2;
   font-weight: 600;
   color: #222;
 }
@@ -254,15 +257,15 @@
 /* Область применения — вертикальный список */
 .product-applications {
   background: #f7fafc;
-  padding: 32px 32px 18px 32px;
-  border-radius: 18px;
+  padding: 18px 16px 10px 16px;
+  border-radius: 14px;
   box-shadow: 0 2px 12px rgba(30,40,90,0.07);
-  margin-bottom: 32px;
+  margin-bottom: 18px;
   border: none;
 }
 .product-applications h2 {
-  font-size: 2rem;
-  margin-bottom: 28px;
+  font-size: 1.4rem;
+  margin-bottom: 14px;
   color: #1a2236;
   font-family: 'Bounded', Arial, sans-serif;
   font-weight: 800;
@@ -275,24 +278,26 @@
 .application-item {
   display: flex;
   align-items: center;
-  gap: 14px;
   background: #fff;
   border-radius: 0;
-  padding: 16px 0;
+  padding: 8px 0;
   box-shadow: none;
   border: none;
   border-bottom: 1px solid #e3eaf6;
-  font-size: 1.08rem;
-  font-weight: 600;
-  color: #222;
+  font-size: 1rem;
+  line-height: 1.2;
 }
 .application-item:last-child {
   border-bottom: none;
 }
 .application-icon {
-  color: #1e88e5;
-  font-size: 1.2rem;
-  margin-right: 8px;
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+.application-text {
+  font-weight: 600;
+  color: #222;
+  font-size: 0.98rem;
 }
 @media (max-width: 700px) {
   .product-equipment, .product-applications {
@@ -398,4 +403,40 @@
     padding: 15px 30px;
     font-size: 1.1rem;
   }
+}
+
+.back-btn {
+  margin-bottom: 18px;
+}
+.back-btn button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3em;
+  width: 110px;
+  background: #fff;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  transition: all 0.2s linear;
+  cursor: pointer;
+  border: none;
+  font-family: 'Hemico', Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #222;
+  box-shadow: none;
+}
+.back-btn button > svg {
+  margin-right: 7px;
+  font-size: 20px;
+  transition: all 0.4s ease-in;
+  fill: #222;
+}
+.back-btn button:hover > svg {
+  font-size: 1.2em;
+  transform: translateX(-5px);
+}
+.back-btn button:hover {
+  box-shadow: 9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;
+  transform: translateY(-2px);
 } 
