@@ -37,53 +37,46 @@ const Contacts = () => {
           
           <div className="contacts-content">
             {/* Контактная информация */}
-            <div className="contact-info">
-              <h2>Свяжитесь с нами</h2>
-              
-              <div className="contact-item">
-                <div className="contact-icon">📞</div>
-                <div className="contact-details">
-                  <h3>Телефон</h3>
-                  <p>+7 (777) 777-77-77</p>
-                  <p>+7 (727) 777-77-77</p>
+            <div className="contacts-grid">
+              <div className="contact-card">
+                <div className="contact-card-header">
+                  <span className="contact-card-icon">📞</span>
+                  <span>Телефоны</span>
+                </div>
+                <div className="contact-card-content">
+                  +7 (777) 777-77-77<br />
+                  +7 (727) 777-77-77
                 </div>
               </div>
-              
-              <div className="contact-item">
-                <div className="contact-icon">✉</div>
-                <div className="contact-details">
-                  <h3>Email</h3>
-                  <p>info@tankertools.kz</p>
-                  <p>sales@tankertools.kz</p>
+              <div className="contact-card">
+                <div className="contact-card-header">
+                  <span className="contact-card-icon">✉</span>
+                  <span>Email</span>
+                </div>
+                <div className="contact-card-content">
+                  info@tankertools.kz<br />
+                  sales@tankertools.kz
                 </div>
               </div>
-              
-              <div className="contact-item">
-                <div className="contact-icon">📍</div>
-                <div className="contact-details">
-                  <h3>Адрес</h3>
-                  <p>г. Алматы, ул. Примерная 1</p>
-                  <p>Бизнес-центр "Танкер", офис 205</p>
+              <div className="contact-card">
+                <div className="contact-card-header">
+                  <span className="contact-card-icon">📍</span>
+                  <span>Адрес</span>
+                </div>
+                <div className="contact-card-content">
+                  г. Алматы, ул. Примерная 1<br />
+                  Бизнес-центр "Танкер", офис 205
                 </div>
               </div>
-              
-              <div className="contact-item">
-                <div className="contact-icon">🕒</div>
-                <div className="contact-details">
-                  <h3>Режим работы</h3>
-                  <p>Понедельник - Пятница: 9:00 - 18:00</p>
-                  <p>Суббота: 10:00 - 16:00</p>
-                  <p>Воскресенье: выходной</p>
+              <div className="contact-card">
+                <div className="contact-card-header">
+                  <span className="contact-card-icon">🕒</span>
+                  <span>Режим работы</span>
                 </div>
-              </div>
-              
-              <div className="contact-item">
-                <div className="contact-icon">🚚</div>
-                <div className="contact-details">
-                  <h3>Доставка</h3>
-                  <p>По Алматы: в день заказа</p>
-                  <p>По области: на следующий день</p>
-                  <p>Самовывоз: ежедневно</p>
+                <div className="contact-card-content">
+                  Пн-Пт: 9:00 - 18:00<br />
+                  Сб: 10:00 - 16:00<br />
+                  Вс: выходной
                 </div>
               </div>
             </div>
