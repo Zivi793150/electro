@@ -44,9 +44,9 @@ const Header = () => {
         <nav className="nav">
           <Link to="/">Главная</Link>
           <Link to="/catalog">Каталог</Link>
+          <Link to="/cooperation">Сотрудничество</Link>
           <Link to="/about">О компании</Link>
           <Link to="/contacts">Контакты</Link>
-          <Link to="/policy">Политика</Link>
         </nav>
         </div>
       </header>

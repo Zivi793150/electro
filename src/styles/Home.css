@@ -52,24 +52,14 @@
   -webkit-text-fill-color: initial;
   background-clip: initial;
   text-fill-color: initial;
-  animation: titleGlow 3s ease-in-out infinite alternate;
 }
-
-@keyframes titleGlow {
-  0% {
-    text-shadow: 
-      0 2px 12px rgba(30,40,90,0.10), 
-      0 1px 0 #fff,
-      0 4px 20px rgba(30,40,90,0.08),
-      0 8px 32px rgba(30,40,90,0.06);
-  }
-  100% {
-    text-shadow: 
-      0 2px 12px rgba(30,40,90,0.15), 
-      0 1px 0 #fff,
-      0 4px 20px rgba(30,40,90,0.12),
-      0 8px 32px rgba(30,40,90,0.10);
-  }
+.hero-right h1 .accent {
+  color: #1e88e5;
+  background: none;
+  text-shadow: 0 0 12px #90caf9, 0 2px 12px #1e88e5cc, 0 4px 20px #90caf9aa;
+  -webkit-text-fill-color: #1e88e5;
+  text-fill-color: #1e88e5;
+  position: relative;
 }
 
 .hero-right h3 {
@@ -102,12 +92,24 @@
   margin: 32px 0 32px 0;
   display: block;
 }
+.advantages-list .advantage-item,
+.advantages-list .advantage-icon {
+  transition: none !important;
+  box-shadow: 0 2px 8px rgba(30,40,90,0.06);
+}
+.advantages-list .advantage-item:hover,
+.advantages-list .advantage-icon:hover {
+  background: unset !important;
+  color: unset !important;
+  box-shadow: unset !important;
+  filter: unset !important;
+  outline: none !important;
+}
 .advantages-list .advantage-item {
   display: flex;
   align-items: center;
   background: #fff;
   border-radius: 32px;
-  box-shadow: 0 2px 8px rgba(30,40,90,0.06);
   padding: 10px 22px 10px 10px;
   min-width: 220px;
   gap: 12px;
@@ -127,7 +129,6 @@
   justify-content: center;
   font-size: 1.5rem;
   color: #1e88e5;
-  box-shadow: 0 2px 8px rgba(30,40,90,0.08);
   margin-right: 10px;
 }
 .advantages-list .advantage-item span:last-child {

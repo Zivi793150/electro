@@ -7,6 +7,7 @@ import Product from './pages/Product';
 import About from './pages/About';
 import Contacts from './pages/Contacts';
 import Policy from './pages/Policy';
+import Cooperation from './pages/Cooperation';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/policy" element={<Policy />} />
+          <Route path="/cooperation" element={<Cooperation />} />
         </Routes>
       </div>
     </Router>

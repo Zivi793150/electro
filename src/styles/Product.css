@@ -142,127 +142,167 @@
   box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
 }
 
-/* Характеристики */
+/* Характеристики — вертикальный список */
 .product-specifications {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+  background: #f7fafc;
+  padding: 32px 32px 18px 32px;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(30,40,90,0.07);
+  margin-bottom: 32px;
+  border: none;
 }
-
 .product-specifications h2 {
-  font-size: 1.8rem;
-  margin-bottom: 25px;
-  color: #333;
+  font-size: 2rem;
+  margin-bottom: 28px;
+  color: #1a2236;
+  font-family: 'Bounded', Arial, sans-serif;
+  font-weight: 800;
 }
-
 .specs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
-
 .spec-item {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 12px 15px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border-left: 4px solid #ffc107;
+  background: #fff;
+  border-radius: 0;
+  padding: 18px 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #e3eaf6;
 }
-
+.spec-item:last-child {
+  border-bottom: none;
+}
 .spec-name {
-  font-weight: 500;
-  color: #333;
-}
-
-.spec-value {
-  color: #666;
   font-weight: 600;
+  color: #222;
+  font-size: 1.08rem;
+  flex: 1;
+}
+.spec-value {
+  color: #1e88e5;
+  font-weight: 800;
+  font-size: 1.13rem;
+  margin-left: 18px;
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .product-specifications {
+    padding: 18px 6px 10px 6px;
+    border-radius: 10px;
+  }
+  .spec-item {
+    padding: 12px 0;
+  }
+  .spec-name {
+    font-size: 0.98rem;
+  }
+  .spec-value {
+    font-size: 1rem;
+  }
 }
 
-/* Комплектация */
+/* Комплектация — вертикальный список */
 .product-equipment {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+  background: #f7fafc;
+  padding: 32px 32px 18px 32px;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(30,40,90,0.07);
+  margin-bottom: 32px;
+  border: none;
 }
-
 .product-equipment h2 {
-  font-size: 1.8rem;
-  margin-bottom: 25px;
-  color: #333;
+  font-size: 2rem;
+  margin-bottom: 28px;
+  color: #1a2236;
+  font-family: 'Bounded', Arial, sans-serif;
+  font-weight: 800;
 }
-
 .equipment-list {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
-
 .equipment-list li {
-  padding: 12px 15px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  border-left: 4px solid #28a745;
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border-radius: 0;
+  padding: 16px 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #e3eaf6;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #222;
 }
-
+.equipment-list li:last-child {
+  border-bottom: none;
+}
 .equipment-list li::before {
-  content: '✓';
-  position: absolute;
-  left: 15px;
-  color: #28a745;
-  font-weight: bold;
+  content: '✔';
+  color: #43cea2;
+  font-size: 1.2rem;
+  margin-right: 8px;
 }
 
-.equipment-list li {
-  padding-left: 40px;
-}
-
-/* Область применения */
+/* Область применения — вертикальный список */
 .product-applications {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  margin-bottom: 30px;
+  background: #f7fafc;
+  padding: 32px 32px 18px 32px;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(30,40,90,0.07);
+  margin-bottom: 32px;
+  border: none;
 }
-
 .product-applications h2 {
-  font-size: 1.8rem;
-  margin-bottom: 25px;
-  color: #333;
+  font-size: 2rem;
+  margin-bottom: 28px;
+  color: #1a2236;
+  font-family: 'Bounded', Arial, sans-serif;
+  font-weight: 800;
 }
-
 .applications-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
-
 .application-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
+  gap: 14px;
+  background: #fff;
+  border-radius: 0;
+  padding: 16px 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #e3eaf6;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: #222;
 }
-
+.application-item:last-child {
+  border-bottom: none;
+}
 .application-icon {
+  color: #1e88e5;
   font-size: 1.2rem;
+  margin-right: 8px;
 }
-
-.application-text {
-  color: #333;
-  font-weight: 500;
+@media (max-width: 700px) {
+  .product-equipment, .product-applications {
+    padding: 18px 6px 10px 6px;
+    border-radius: 10px;
+  }
+  .equipment-list li, .application-item {
+    padding: 10px 0;
+    font-size: 0.98rem;
+  }
 }
 
 /* Дополнительная форма заявки */
