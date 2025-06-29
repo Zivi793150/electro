@@ -122,26 +122,28 @@ const Home = () => {
 
       {/* Лента категорий */}
       <section className="category-conveyor-section">
-        <h2 className="category-conveyor-title">Категории товаров</h2>
-        <div className="category-conveyor">
-          <div className="category-conveyor-inner">
-            {categories.map(cat => (
-              <div className="category-conveyor-card" key={cat.id}>
-                <div className="category-conveyor-img-wrap">
-                  <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
+        <div className="category-conveyor-container" style={{maxWidth:1200, margin:'0 auto', padding:'0 16px'}}>
+          <h2 className="category-conveyor-title">Категории товаров</h2>
+          <div className="category-conveyor">
+            <div className="category-conveyor-inner">
+              {categories.map(cat => (
+                <div className="category-conveyor-card" key={cat.id}>
+                  <div className="category-conveyor-img-wrap">
+                    <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
+                  </div>
+                  <div className="category-conveyor-name">{cat.name}</div>
                 </div>
-                <div className="category-conveyor-name">{cat.name}</div>
-              </div>
-            ))}
-            {/* Дублируем для бесшовного автоскролла */}
-            {categories.map(cat => (
-              <div className="category-conveyor-card" key={cat.id + '-dup'}>
-                <div className="category-conveyor-img-wrap">
-                  <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
+              ))}
+              {/* Дублируем для бесшовного автоскролла */}
+              {categories.map(cat => (
+                <div className="category-conveyor-card" key={cat.id + '-dup'}>
+                  <div className="category-conveyor-img-wrap">
+                    <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
+                  </div>
+                  <div className="category-conveyor-name">{cat.name}</div>
                 </div>
-                <div className="category-conveyor-name">{cat.name}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
