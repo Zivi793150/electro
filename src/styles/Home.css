@@ -343,4 +343,113 @@
 
 .footer {
   margin-top: 32px;
+}
+
+/* Лента категорий (горизонтальный конвейер) */
+.category-conveyor-section {
+  margin: 36px 0 36px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.category-conveyor-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1a2236;
+  margin-bottom: 18px;
+  font-family: 'Bounded', Arial, sans-serif;
+  letter-spacing: 0.5px;
+  text-align: center;
+  padding-left: 0;
+}
+.category-conveyor {
+  display: flex;
+  overflow-x: hidden;
+  gap: 24px;
+  padding: 8px 0 18px 0;
+  width: 100%;
+  max-width: 1200px;
+  position: relative;
+}
+.category-conveyor-inner {
+  display: flex;
+  gap: 24px;
+  animation: conveyor-scroll-inner 40s linear infinite;
+  animation-play-state: running;
+}
+.category-conveyor:hover .category-conveyor-inner {
+  animation-play-state: paused;
+}
+@keyframes conveyor-scroll-inner {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.category-conveyor::-webkit-scrollbar {
+  height: 8px;
+}
+.category-conveyor::-webkit-scrollbar-thumb {
+  background: #ffc107;
+  border-radius: 4px;
+}
+.category-conveyor-card {
+  min-width: 140px;
+  max-width: 160px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(30,40,90,0.07);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 18px 12px 14px 12px;
+  transition: box-shadow 0.18s, transform 0.18s;
+  cursor: pointer;
+}
+.category-conveyor-card:hover {
+  box-shadow: 0 6px 24px rgba(255,193,7,0.13);
+  transform: translateY(-2px) scale(1.04);
+}
+.category-conveyor-img-wrap {
+  width: 64px;
+  height: 64px;
+  background: #f7fafc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(30,40,90,0.06);
+}
+.category-conveyor-img-wrap img {
+  max-width: 60%;
+  max-height: 60%;
+  object-fit: contain;
+}
+.category-conveyor-name {
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+  font-family: 'Bounded', Arial, sans-serif;
+}
+@media (max-width: 700px) {
+  .category-conveyor-section {
+    margin: 18px 0 18px 0;
+  }
+  .category-conveyor-title {
+    font-size: 1.2rem;
+    padding-left: 8px;
+  }
+  .category-conveyor-card {
+    min-width: 110px;
+    max-width: 120px;
+    padding: 10px 4px 8px 4px;
+  }
+  .category-conveyor-img-wrap {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 7px;
+  }
+  .category-conveyor-name {
+    font-size: 0.93rem;
+  }
 } 

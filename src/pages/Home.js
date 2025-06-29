@@ -53,6 +53,18 @@ const Home = () => {
     }
   ];
 
+  // Пример категорий с эмодзи
+  const categories = [
+    { id: 1, name: 'Дрели', icon: '🛠️' },
+    { id: 2, name: 'Шуруповёрты', icon: '🔩' },
+    { id: 3, name: 'Болгарки', icon: '⚙️' },
+    { id: 4, name: 'Перфораторы', icon: '🧱' },
+    { id: 5, name: 'Пилы', icon: '🪚' },
+    { id: 6, name: 'Измерительные', icon: '📏' },
+    { id: 7, name: 'Генераторы', icon: '⚡' },
+    { id: 8, name: 'Аксессуары', icon: '🎒' },
+  ];
+
   return (
     <div className="home">
       <Header />
@@ -108,6 +120,32 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Лента категорий */}
+      <section className="category-conveyor-section">
+        <h2 className="category-conveyor-title">Категории товаров</h2>
+        <div className="category-conveyor">
+          <div className="category-conveyor-inner">
+            {categories.map(cat => (
+              <div className="category-conveyor-card" key={cat.id}>
+                <div className="category-conveyor-img-wrap">
+                  <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
+                </div>
+                <div className="category-conveyor-name">{cat.name}</div>
+              </div>
+            ))}
+            {/* Дублируем для бесшовного автоскролла */}
+            {categories.map(cat => (
+              <div className="category-conveyor-card" key={cat.id + '-dup'}>
+                <div className="category-conveyor-img-wrap">
+                  <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
+                </div>
+                <div className="category-conveyor-name">{cat.name}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      
       {/* Мини-каталог товаров */}
       <section className="mini-catalog-section">
         <div className="mini-catalog-header">
