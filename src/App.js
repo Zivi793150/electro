@@ -8,6 +8,7 @@ import About from './pages/About';
 import Contacts from './pages/Contacts';
 import Policy from './pages/Policy';
 import Cooperation from './pages/Cooperation';
+import NotFound from './pages/NotFound';
 import './App.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/policy" element={<Policy />} />
           <Route path="/cooperation" element={<Cooperation />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>
