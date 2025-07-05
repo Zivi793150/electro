@@ -144,6 +144,15 @@ const Product = () => {
     <div className="product">
       <Header />
       <main className="product-main">
+        <nav className="product-breadcrumbs">
+          <a href="/">Главная</a>
+          <span className="breadcrumbs-sep">&gt;</span>
+          <a href="/catalog">Каталог</a>
+          <span className="breadcrumbs-sep">&gt;</span>
+          <a href="/catalog?category=shurupovert">Шуруповёрты</a>
+          <span className="breadcrumbs-sep">&gt;</span>
+          <span>Профессиональный шуруповёрт DeWalt 18V</span>
+        </nav>
         <div className="container product-maket-container">
           <div className="product-maket-content">
             <div className="product-maket-left">

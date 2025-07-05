@@ -708,4 +708,29 @@
   margin-left: auto;
   margin-right: auto;
   text-align: left;
+}
+
+.product-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #888;
+  margin: 0 auto 18px auto;
+  max-width: 1200px;
+  padding: 0 8px;
+}
+.product-breadcrumbs a {
+  color: #1e88e5;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.product-breadcrumbs a:hover {
+  color: #FF6B00;
+  text-decoration: underline;
+}
+.breadcrumbs-sep {
+  color: #bbb;
+  margin: 0 2px;
+  font-size: 1.1em;
 } 
