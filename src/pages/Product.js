@@ -118,8 +118,22 @@ const Product = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
 
-  // Найти товар по id из URL
   const product = products.find(p => p.id === Number(id));
+
+  if (!product) {
+    return (
+      <div className="product">
+        <Header />
+        <main className="product-main">
+          <div className="container" style={{padding: '48px 0', textAlign: 'center'}}>
+            <h1>Товар не найден</h1>
+            <p>Проверьте правильность ссылки или вернитесь в <a href="/catalog">каталог</a>.</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
