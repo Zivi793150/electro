@@ -57,35 +57,41 @@
   display: block;
 }
 
-.thumbnail-images {
+.product-thumbnails {
+  position: absolute;
+  left: 0;
+  bottom: 18px;
+  width: 100%;
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
+  z-index: 2;
 }
 
-.thumbnail {
-  width: 80px;
-  height: 60px;
-  border-radius: 6px;
+.product-thumbnail {
+  width: 54px;
+  height: 54px;
+  border: 2px solid #e3e6ea;
+  border-radius: 8px;
   overflow: hidden;
+  background: #fff;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
+  transition: border 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-.thumbnail:hover {
-  border-color: #ffc107;
-  transform: scale(1.05);
-}
-
-.thumbnail.active {
-  border-color: #ffc107;
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
-}
-
-.thumbnail img {
+.product-thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  display: block;
+}
+
+.product-thumbnail.active {
+  border: 2px solid #FF6B00;
 }
 
 /* Информация о товаре */
@@ -377,9 +383,8 @@
     font-size: 1.6rem;
   }
   
-  .thumbnail {
-    width: 60px;
-    height: 45px;
+  .product-thumbnails {
+    bottom: 10px;
   }
   
   .product-specifications,
@@ -439,4 +444,268 @@
 .back-btn button:hover {
   box-shadow: 9px 9px 33px #d1d1d1, -9px -9px 33px #ffffff;
   transform: translateY(-2px);
+}
+
+/* --- МАКЕТ СТРАНИЦЫ ПРОДУКТА --- */
+.product-maket-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e3e6ea;
+  box-shadow: none;
+  padding: 56px 48px 56px 0;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+.product-maket-content {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  max-width: 1200px;
+}
+.product-maket-left {
+  flex: 1 1 50%;
+  position: relative;
+  min-height: 400px;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+}
+.product-maket-image {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: 0;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  align-self: stretch;
+}
+.product-maket-right {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 32px;
+  padding-left: 56px;
+}
+.maket-title {
+  font-size: 2.7rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: #222;
+  margin: 8px 0 10px 0;
+}
+.maket-subtitle {
+  font-size: 1.25rem;
+  color: #1e88e5;
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.maket-text {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 14px;
+}
+.maket-advantages {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 22px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.maket-adv-item {
+  display: flex;
+  align-items: center;
+  font-size: 1.08rem;
+  color: #222;
+  font-weight: 500;
+  background: none;
+  border: none;
+  padding: 0;
+  gap: 12px;
+}
+.maket-arrow {
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
+}
+.maket-btn {
+  background: #FF6B00;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  padding: 18px 36px;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255,107,0,0.10);
+  transition: background 0.2s;
+}
+.maket-btn:hover {
+  background: #e65c00;
+}
+@media (max-width: 900px) {
+  .product-maket-content {
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+  }
+  .product-maket-left, .product-maket-right {
+    width: 100%;
+    max-width: 100%;
+  }
+  .product-maket-left {
+    min-height: 260px;
+    height: 260px;
+  }
+  .product-maket-container {
+    padding: 18px 4px 18px 0;
+  }
+}
+@media (max-width: 600px) {
+  .product-maket-container {
+    padding: 8px 0 8px 0;
+  }
+  .maket-title {
+    font-size: 1.5rem;
+  }
+  .maket-btn {
+    font-size: 1rem;
+    padding: 14px 18px;
+  }
+  .product-maket-left {
+    min-height: 180px;
+    height: 180px;
+  }
+}
+/* --- КОНЕЦ МАКЕТА --- */
+
+/* --- ХАРАКТЕРИСТИКИ --- */
+.product-specifications-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e3e6ea;
+  box-shadow: none;
+  padding: 40px 48px;
+  margin-top: 24px;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+.product-specifications-content {
+  width: 100%;
+  max-width: 1200px;
+}
+.specifications-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #222;
+  margin: 0 0 24px 0;
+  font-family: 'Bounded', Arial, sans-serif;
+}
+.specifications-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.specification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 0;
+  padding: 12px 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #e3e6ea;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+.specification-item:last-child {
+  border-bottom: none;
+}
+.specification-name {
+  font-weight: 600;
+  color: #222;
+  font-size: 1rem;
+  flex: 1;
+}
+.specification-value {
+  color: #1e88e5;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-left: 12px;
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .product-specifications-container {
+    padding: 24px 16px;
+    margin-top: 16px;
+  }
+  .specifications-title {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+  .specification-item {
+    padding: 10px 0;
+  }
+}
+@media (max-width: 600px) {
+  .product-specifications-container {
+    padding: 16px 8px;
+  }
+  .specifications-title {
+    font-size: 1.3rem;
+  }
+  .specification-name, .specification-value {
+    font-size: 0.9rem;
+  }
+}
+/* --- КОНЕЦ ХАРАКТЕРИСТИК --- */
+
+.maket-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 18px;
+  font-size: 1.35rem;
+}
+.maket-rating .star {
+  color: #FF6B00;
+  font-size: 1.35em;
+  margin-right: 2px;
+}
+.maket-rating .rating-value {
+  color: #222;
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-left: 8px;
+}
+.maket-text-bottom {
+  color: #333;
+  font-size: 1.18rem;
+  font-weight: 500;
+  margin-top: 32px;
+  margin-bottom: 32px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
 } 

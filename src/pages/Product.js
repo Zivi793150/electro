@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
+import ImageModal from '../components/ImageModal';
 import '../styles/Product.css';
 
 const products = [
@@ -105,154 +106,125 @@ const products = [
   }
 ];
 
+const advantages = [
+  'Высокий крутящий момент и мощность',
+  'Долговечный литий-ионный аккумулятор',
+  'Компактный и лёгкий корпус для работы одной рукой'
+];
+
 const Product = () => {
   const { id } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
 
-  const product = products.find(p => p.id === Number(id));
+  // Для примера берём шуруповёрт (id: 2)
+  const product = products.find(p => p.id === 2);
 
-  if (!product) {
-    return (
-      <div className="product">
-        <Header />
-        <main className="product-main">
-          <div className="container">
-            <h1>Товар не найден</h1>
-            <p>Проверьте правильность ссылки или вернитесь в <a href="/catalog">каталог</a>.</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = (formData) => {
-    // Здесь будет логика отправки в Telegram
     console.log('Заявка на товар:', { ...formData, product: product.name });
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
+  };
+
+  // Модалка фото
+  const handleImageClick = () => setShowImageModal(true);
+  const handleCloseImageModal = () => setShowImageModal(false);
+  const handlePrevImage = (e) => {
+    e.stopPropagation();
+    setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
+  const handleNextImage = (e) => {
+    e.stopPropagation();
+    setActiveImage((prev) => (prev + 1) % product.images.length);
   };
 
   return (
     <div className="product">
       <Header />
-      
       <main className="product-main">
-        <div className="container">
-          {/* Хлебные крошки */}
-          <nav className="breadcrumbs">
-            <a href="/">Главная</a> &gt;
-            <a href="/catalog">Каталог</a> &gt;
-            <span>{product.name}</span>
-          </nav>
-          <div className="back-btn">
-            <button onClick={() => window.history.back()}>
-              <svg height={16} width={16} xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1024 1024"><path d="M874.690416 495.52477c0 11.2973-9.168824 20.466124-20.466124 20.466124l-604.773963 0 188.083679 188.083679c7.992021 7.992021 7.992021 20.947078 0 28.939099-4.001127 3.990894-9.240455 5.996574-14.46955 5.996574-5.239328 0-10.478655-1.995447-14.479783-5.996574l-223.00912-223.00912c-3.837398-3.837398-5.996574-9.046027-5.996574-14.46955 0-5.433756 2.159176-10.632151 5.996574-14.46955l223.019353-223.029586c7.992021-7.992021 20.957311-7.992021 28.949332 0 7.992021 8.002254 7.992021 20.957311 0 28.949332l-188.073446 188.073446 604.753497 0C865.521592 475.058646 874.690416 484.217237 874.690416 495.52477z" /></svg>
-              <span>Назад</span>
-            </button>
-          </div>
-
-          <div className="product-content">
-            {/* Галерея изображений */}
-            <div className="product-gallery">
-              <div className="main-image">
-                <img src={product.images[activeImage]} alt={product.name} />
-              </div>
-              <div className="thumbnail-images">
-                {product.images.map((image, index) => (
+        <div className="container product-maket-container">
+          <div className="product-maket-content">
+            <div className="product-maket-left">
+              <img
+                className="product-maket-image"
+                src={product.images[activeImage]}
+                alt={product.name}
+                onClick={handleImageClick}
+                style={{ cursor: 'zoom-in' }}
+              />
+              <div className="product-thumbnails">
+                {product.images.map((img, idx) => (
                   <div
-                    key={index}
-                    className={`thumbnail ${activeImage === index ? 'active' : ''}`}
-                    onClick={() => setActiveImage(index)}
+                    key={idx}
+                    className={`product-thumbnail${activeImage === idx ? ' active' : ''}`}
+                    onClick={() => setActiveImage(idx)}
                   >
-                    <img src={image} alt={`${product.name} ${index + 1}`} />
+                    <img src={img} alt={product.name + ' миниатюра ' + (idx+1)} />
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Информация о товаре */}
-            <div className="product-info">
-              <h1 className="product-title">{product.name}</h1>
-              <h3 className="product-subtitle">{product.subtitle}</h3>
-              <p className="product-description">{product.description}</p>
-              
-              <div className="product-price">{product.price}</div>
-              
-              <button className="btn-order" onClick={handleOpenModal}>
-                Оставить заявку
-              </button>
+            <div className="product-maket-right">
+              <h1 className="maket-title">Профессиональный<br/>шуруповёрт DeWalt 18V</h1>
+              <div className="maket-rating">
+                <span className="star">★</span>
+                <span className="star">★</span>
+                <span className="star">★</span>
+                <span className="star">★</span>
+                <span className="star">★</span>
+                <span className="rating-value">5.0</span>
+              </div>
+              <div className="maket-subtitle">Мощный и удобный шуруповёрт для профессионального и бытового использования. Идеален для сборки мебели, ремонта и строительных работ.</div>
+              <ul className="maket-advantages">
+                {advantages.map((adv, idx) => (
+                  <li key={idx} className="maket-adv-item">
+                    <span className="maket-arrow">
+                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9H15" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/><path d="M11 5L15 9L11 13" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/></svg>
+                    </span>
+                    <span>{adv}</span>
+                  </li>
+                ))}
+              </ul>
+              <button className="maket-btn" onClick={handleOpenModal}>Оставить заявку</button>
             </div>
           </div>
-
-          {/* Характеристики */}
-          {product.specifications && (
-          <section className="product-specifications">
-            <h2>Характеристики</h2>
-            <div className="specs-grid">
-              {product.specifications.map((spec, index) => (
-                <div key={index} className="spec-item">
-                  <span className="spec-name">{spec.name}:</span>
-                  <span className="spec-value">{spec.value}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-          )}
-
-          {/* Комплектация */}
-          {product.equipment && (
-          <section className="product-equipment">
-            <h2>Комплектация</h2>
-            <ul className="equipment-list">
-              {product.equipment.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </section>
-          )}
-
-          {/* Область применения */}
-          {product.applications && (
-          <section className="product-applications">
-            <h2>Область применения</h2>
-            <div className="applications-grid">
-              {product.applications.map((app, index) => (
-                <div key={index} className="application-item">
-                  <span className="application-icon">🔧</span>
-                  <span className="application-text">{app}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-          )}
-
-          {/* Дополнительная форма заявки */}
-          <section className="product-order">
-            <h2>Заказать {product.name}</h2>
-            <p>Оставьте заявку, и наш менеджер свяжется с вами для уточнения деталей заказа.</p>
-            <button className="btn-order-large" onClick={handleOpenModal}>
-              Оставить заявку на покупку
-            </button>
-          </section>
         </div>
-      </main>
 
+        {/* Серый текст-описание после блока с фото, но перед характеристиками */}
+        <div className="maket-text maket-text-bottom">
+          Шуруповёрт DeWalt 18V оснащён современным литий-ионным аккумулятором, обеспечивающим длительную автономную работу. Высокий крутящий момент позволяет легко справляться с любыми задачами по закручиванию и сверлению. Эргономичный дизайн и малый вес делают инструмент удобным для работы одной рукой даже в труднодоступных местах.
+        </div>
+
+        {/* Характеристики */}
+        {product.specifications && (
+          <div className="product-specifications-container">
+            <div className="product-specifications-content">
+              <h2 className="specifications-title">Характеристики</h2>
+              <div className="specifications-grid">
+                {product.specifications.map((spec, index) => (
+                  <div key={index} className="specification-item">
+                    <span className="specification-name">{spec.name}</span>
+                    <span className="specification-value">{spec.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
       <Footer />
-      
-      <Modal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmitForm}
-      />
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
+      {showImageModal && (
+        <ImageModal
+          images={product.images}
+          activeIndex={activeImage}
+          onClose={handleCloseImageModal}
+          onPrev={handlePrevImage}
+          onNext={handleNextImage}
+        />
+      )}
     </div>
   );
 };
