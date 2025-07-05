@@ -118,8 +118,8 @@ const Product = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
 
-  // Для примера берём шуруповёрт (id: 2)
-  const product = products.find(p => p.id === 2);
+  // Найти товар по id из URL
+  const product = products.find(p => p.id === Number(id));
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
