@@ -27,21 +27,24 @@ const Home = () => {
       name: 'Болгарка Makita 125мм',
       image: '/images/products/bolgarka-makita-125.jpg',
       price: '45 000 ₸',
-      description: 'Профессиональная угловая шлифмашина'
+      description: 'Профессиональная угловая шлифмашина',
+      discount: 10
     },
     {
       id: 2,
       name: 'Шуруповёрт DeWalt 18V',
       image: '/images/products/shurupovert-dewalt-18v.jpg',
       price: '85 000 ₸',
-      description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором'
+      description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором',
+      discount: 17
     },
     {
       id: 3,
       name: 'Перфоратор Bosch GBH 2-26',
       image: '/images/products/perforator-bosch-gbh.jpg',
       price: '120 000 ₸',
-      description: 'Мощный перфоратор для строительных работ'
+      description: 'Мощный перфоратор для строительных работ',
+      discount: 8
     },
     {
       id: 4,
@@ -55,7 +58,8 @@ const Home = () => {
       name: 'Лобзик Makita 4329',
       image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita',
       price: '35 000 ₸',
-      description: 'Электролобзик для точной резки'
+      description: 'Электролобзик для точной резки',
+      discount: 5
     },
     {
       id: 6,
@@ -69,7 +73,8 @@ const Home = () => {
       name: 'Генератор Huter DY3000L',
       image: 'https://via.placeholder.com/300x200?text=Генератор+Huter',
       price: '180 000 ₸',
-      description: 'Бензиновый генератор 3 кВт'
+      description: 'Бензиновый генератор 3 кВт',
+      discount: 15
     },
     {
       id: 8,
@@ -137,16 +142,27 @@ const Home = () => {
                 <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}} />
               </div>
               <div className="product-info" style={{padding: '12px 16px 0 16px'}}>
-                {/* Рейтинг и отзывы */}
-                <div className="kaspi-rating">
-                  <span className="kaspi-stars">★★★★★</span>
-                  <span className="kaspi-reviews">({1500 + idx * 300} отзывов)</span>
-                </div>
                 <h3 className="product-name" style={{minHeight: '40px', fontWeight: 500, margin: '0 0 8px 0'}}>{product.name}</h3>
-                <div className="product-price-row">
-                  <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem'}}>{product.price}</span>
-                  {/* <span className="kaspi-installment">{Math.floor(parseInt(product.price.replace(/\D/g, ''))/12).toLocaleString()} ₸ x12</span> */}
+                <div className="product-price-row" style={{alignItems: 'flex-end', gap: 8}}>
+                  {product.discount ? (
+                    <>
+                      <span style={{color:'#888',fontSize:'1.05rem',textDecoration:'line-through',marginRight:6}}>
+                        {parseInt(product.price.replace(/\D/g, ''))
+                          .toLocaleString('ru-RU') + ' ₸'}
+                      </span>
+                      <span className="product-price" style={{color:'#d32f2f',fontWeight:'bold',fontSize:'1.25rem'}}>
+                        {Math.round(parseInt(product.price.replace(/\D/g, '')) * (1 - product.discount/100)).toLocaleString('ru-RU') + ' ₸'}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem'}}>{product.price}</span>
+                  )}
                 </div>
+                {product.discount && (
+                  <div style={{position:'absolute',top:8,right:8,background:'#ffc107',color:'#222',fontWeight:700,fontSize:'0.98rem',borderRadius:4,padding:'2px 10px',zIndex:2}}>
+                    -{product.discount}%
+                  </div>
+                )}
               </div>
             </div>
           ))}
