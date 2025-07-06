@@ -86,6 +86,9 @@ const Catalog = () => {
     }
   ];
 
+  // Популярные товары — первые 4 из массива products
+  const miniProducts = products.slice(0, 4);
+
   const filteredProducts = selectedCategory === 'all' 
     ? products 
     : products.filter(product => product.category === selectedCategory);
@@ -96,6 +99,33 @@ const Catalog = () => {
       
       <main className="catalog-main">
         <div className="container">
+          {/* Популярные товары */}
+          <section className="mini-catalog-section">
+            <div className="mini-catalog-header">
+              <h2>Популярные товары</h2>
+              <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
+            </div>
+            <div className="mini-catalog-grid">
+              {miniProducts.map(product => (
+                <div
+                  key={product.id}
+                  className="product-card mini-product-card"
+                  onClick={() => window.location.href = `/product/${product.id}`}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="product-image">
+                    <img src={product.image} alt={product.name} />
+                  </div>
+                  <div className="product-info">
+                    <h3 className="product-name">{product.name}</h3>
+                    <p className="product-description">{product.description}</p>
+                    <div className="product-price">{product.price}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+          
           <h1 className="catalog-title">Каталог товаров</h1>
           
           {/* Фильтр категорий */}

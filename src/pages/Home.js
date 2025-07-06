@@ -90,28 +90,10 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/* Лента-каталог (бесшовная) */}
-      <section className="category-conveyor-section">
-        <div className="category-conveyor-container" style={{maxWidth:1200, margin:'0 auto', padding:'0 16px'}}>
-          <h2 className="category-conveyor-title">Категории товаров</h2>
-          <div className="category-conveyor">
-            <div className="category-conveyor-inner">
-              {categories.concat(categories).map((cat, idx) => (
-                <div className="category-conveyor-card" key={cat.id + '-' + idx}>
-                  <div className="category-conveyor-img-wrap">
-                    <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
-                  </div>
-                  <div className="category-conveyor-name">{cat.name}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Популярные товары */}
+      {/* Мини-каталог товаров (теперь вместо ленты-каталога) */}
       <section className="mini-catalog-section">
         <div className="mini-catalog-header">
-          <h2>Популярные товары</h2>
+          <h2>Каталог товаров</h2>
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div className="mini-catalog-grid">
