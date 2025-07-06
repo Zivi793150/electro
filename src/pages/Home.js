@@ -49,6 +49,34 @@ const Home = () => {
       image: 'https://via.placeholder.com/300x200?text=Дрель+Интерскол',
       price: '25 000 ₸',
       description: 'Универсальная дрель для сверления'
+    },
+    {
+      id: 5,
+      name: 'Лобзик Makita 4329',
+      image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita',
+      price: '35 000 ₸',
+      description: 'Электролобзик для точной резки'
+    },
+    {
+      id: 6,
+      name: 'Лазерный уровень BOSCH GLL 2-10',
+      image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень',
+      price: '55 000 ₸',
+      description: 'Точный лазерный уровень для разметки'
+    },
+    {
+      id: 7,
+      name: 'Генератор Huter DY3000L',
+      image: 'https://via.placeholder.com/300x200?text=Генератор+Huter',
+      price: '180 000 ₸',
+      description: 'Бензиновый генератор 3 кВт'
+    },
+    {
+      id: 8,
+      name: 'Мультиметр Fluke 117',
+      image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke',
+      price: '95 000 ₸',
+      description: 'Профессиональный измерительный прибор'
     }
   ];
 
@@ -97,7 +125,7 @@ const Home = () => {
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div className="mini-catalog-grid">
-          {miniProducts.map(product => (
+          {miniProducts.slice(0, 8).map(product => (
             <div
               key={product.id}
               className="product-card mini-product-card"
