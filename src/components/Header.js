@@ -53,8 +53,8 @@ const Header = () => {
             <div className="top-bar-phone">+7 (777) 777-77-77</div>
           </div>
         </div>
-      </div>
-    </header>
+        </div>
+      </header>
   );
 };
 

@@ -49,7 +49,7 @@ const Home = () => {
     {
       id: 4,
       name: 'Дрель Интерскол ДУ-13/780',
-      image: 'https://via.placeholder.com/300x200?text=Дрель+Интерскол',
+      image: '/images/products/drel.jpg',
       price: '25 000 ₸',
       description: 'Универсальная дрель для сверления'
     },
@@ -130,42 +130,45 @@ const Home = () => {
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div className="mini-catalog-grid">
-          {miniProducts.slice(0, 8).map((product, idx) => (
-            <div
-              key={product.id}
-              className="product-card kaspi-style mini-product-card"
-              onClick={() => window.location.href = `/product/${product.id}`}
-              style={{ cursor: 'pointer', minHeight: 0 }}
-            >
-              {/* Бейдж рассрочки и бонуса убран */}
-              <div className="product-image" style={{height: '180px', paddingTop: 0, marginBottom: 0}}>
-                <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}} />
-              </div>
-              <div className="product-info" style={{padding: '12px 16px 0 16px'}}>
-                <h3 className="product-name" style={{minHeight: '40px', fontWeight: 500, margin: '0 0 8px 0'}}>{product.name}</h3>
-                <div className="product-price-row" style={{alignItems: 'flex-end', gap: 8}}>
-                  {product.discount ? (
-                    <>
-                      <span style={{color:'#888',fontSize:'1.05rem',textDecoration:'line-through',marginRight:6}}>
-                        {parseInt(product.price.replace(/\D/g, ''))
-                          .toLocaleString('ru-RU') + ' ₸'}
-                      </span>
-                      <span className="product-price" style={{color:'#d32f2f',fontWeight:'bold',fontSize:'1.25rem'}}>
-                        {Math.round(parseInt(product.price.replace(/\D/g, '')) * (1 - product.discount/100)).toLocaleString('ru-RU') + ' ₸'}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem'}}>{product.price}</span>
-                  )}
+          {miniProducts.slice(0, 8).map((product, idx) => {
+            const priceNum = parseInt(product.price.replace(/\D/g, ''));
+            const hasDiscount = !!product.discount;
+            const newPrice = hasDiscount ? Math.round(priceNum * (1 - product.discount/100)) : priceNum;
+            const installment = Math.round(newPrice / 12).toLocaleString('ru-RU') + ' ₸';
+            const bonus = Math.round(newPrice * 0.05).toLocaleString('ru-RU') + ' Б';
+            const rating = (4 + Math.random() * 1).toFixed(1);
+            const reviews = 500 + idx * 300;
+            return (
+              <div
+                key={product.id}
+                className="product-card kaspi-style mini-product-card"
+                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+              >
+                {/* Картинка */}
+                <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
                 </div>
-                {product.discount && (
-                  <div style={{position:'absolute',top:8,right:8,background:'#ffc107',color:'#222',fontWeight:700,fontSize:'0.98rem',borderRadius:4,padding:'2px 10px',zIndex:2}}>
-                    -{product.discount}%
+                <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
+                  {/* Название */}
+                  <a href="#" style={{fontSize: '1.05rem', fontWeight: 500, color: '#1976d2', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</a>
+                  {/* Горизонтальный разделитель только под текстом */}
+                  <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #e0e0e0',margin:'0 0 10px 0', alignSelf:'center'}}></div>
+                  {/* Цена и разделитель */}
+                  <div style={{display: 'flex', alignItems: 'center', gap: 10, marginTop: 0, marginBottom:2, justifyContent:'center', width:'100%'}}>
+                    {hasDiscount && (
+                      <>
+                        <span style={{color:'#888',fontSize:'1.05rem',textDecoration:'line-through',marginRight:0, fontWeight: 400}}>
+                          {priceNum.toLocaleString('ru-RU') + ' ₸'}
+                        </span>
+                        <span style={{height:'2.0em',width:'1px',background:'#e0e0e0',display:'inline-block',margin:'0 7px',verticalAlign:'middle'}}></span>
+                      </>
+                    )}
+                    <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{newPrice.toLocaleString('ru-RU')} ₸</span>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
       <Footer />

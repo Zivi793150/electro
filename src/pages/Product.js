@@ -11,98 +11,125 @@ const products = [
     id: 1,
     name: 'Болгарка Makita 125мм',
     subtitle: 'Профессиональный инструмент для точной и безопасной работы',
-    description: 'Болгарка Makita предназначена для резки и шлифовки металла, плитки, кирпича. Лёгкий корпус, мощный мотор, защита от перегрева — всё для удобства и безопасности.',
+    description: 'Профессиональная угловая шлифмашина',
     price: '45 000 ₸',
     images: [
-      '/images/products/bolgarka-makita-125.jpg',
-      'https://via.placeholder.com/600x400?text=Болгарка+Makita+2',
-      'https://via.placeholder.com/600x400?text=Болгарка+Makita+3'
+      '/images/products/bolgarka-makita-125.jpg'
     ],
     specifications: [
       { name: 'Мощность', value: '1200 Вт' },
-      { name: 'Диаметр диска', value: '125 мм' },
-      { name: 'Обороты', value: 'до 11 000 об/мин' },
-      { name: 'Вес', value: '2.3 кг' },
-      { name: 'Длина кабеля', value: '2.5 м' },
-      { name: 'Потребляемая мощность', value: '1200 Вт' },
-      { name: 'Частота вращения', value: '11000 об/мин' },
-      { name: 'Диаметр посадочного отверстия', value: '22.23 мм' }
+      { name: 'Диаметр диска', value: '125 мм' }
     ],
-    equipment: [
-      'Болгарка',
-      'Защитный кожух',
-      'Ключ',
-      'Руководство пользователя',
-      'Гарантийный талон'
-    ],
-    applications: [
-      'Металлообработка',
-      'Строительство',
-      'Ремонтные работы',
-      'Промышленное использование',
-      'Резка металлических труб',
-      'Шлифовка сварных швов'
-    ]
+    equipment: ['Болгарка', 'Защитный кожух', 'Ключ'],
+    applications: ['Металлообработка', 'Строительство']
   },
   {
     id: 2,
     name: 'Шуруповёрт DeWalt 18V',
     subtitle: 'Беспроводной шуруповёрт с литий-ионным аккумулятором',
-    description: 'Мощный и удобный шуруповёрт для профессионального и бытового использования.',
+    description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором',
     price: '85 000 ₸',
     images: [
-      '/images/products/shurupovert-dewalt-18v.jpg',
-      'https://via.placeholder.com/600x400?text=Шуруповёрт+DeWalt+2',
-      'https://via.placeholder.com/600x400?text=Шуруповёрт+DeWalt+3'
+      '/images/products/shurupovert-dewalt-18v.jpg'
     ],
     specifications: [
       { name: 'Напряжение', value: '18 В' },
-      { name: 'Тип аккумулятора', value: 'Li-Ion' },
-      { name: 'Макс. крутящий момент', value: '70 Нм' },
-      { name: 'Вес', value: '1.7 кг' }
+      { name: 'Тип аккумулятора', value: 'Li-Ion' }
     ],
-    equipment: [
-      'Шуруповёрт',
-      'Аккумулятор',
-      'Зарядное устройство',
-      'Кейс',
-      'Инструкция'
-    ],
-    applications: [
-      'Сборка мебели',
-      'Строительство',
-      'Ремонт',
-      'Монтажные работы'
-    ]
+    equipment: ['Шуруповёрт', 'Аккумулятор', 'Зарядное устройство'],
+    applications: ['Сборка мебели', 'Строительство']
   },
   {
     id: 3,
     name: 'Перфоратор Bosch GBH 2-26',
     subtitle: 'Мощный перфоратор для строительных работ',
-    description: 'Перфоратор Bosch — надёжный инструмент для сверления и долбления бетона и кирпича.',
+    description: 'Мощный перфоратор для строительных работ',
     price: '120 000 ₸',
     images: [
-      '/images/products/perforator-bosch-gbh.jpg',
-      'https://via.placeholder.com/600x400?text=Перфоратор+Bosch+2',
-      'https://via.placeholder.com/600x400?text=Перфоратор+Bosch+3'
+      '/images/products/perforator-bosch-gbh.jpg'
     ],
     specifications: [
       { name: 'Мощность', value: '800 Вт' },
-      { name: 'Энергия удара', value: '2.7 Дж' },
-      { name: 'Вес', value: '2.8 кг' }
+      { name: 'Энергия удара', value: '2.7 Дж' }
     ],
-    equipment: [
-      'Перфоратор',
-      'Бур',
-      'Кейс',
-      'Инструкция'
+    equipment: ['Перфоратор', 'Бур', 'Кейс'],
+    applications: ['Сверление бетона', 'Долбление']
+  },
+  {
+    id: 4,
+    name: 'Дрель Интерскол ДУ-13/780',
+    subtitle: 'Универсальная дрель для сверления',
+    description: 'Универсальная дрель для сверления',
+    price: '25 000 ₸',
+    images: [
+      '/images/products/drel.jpg'
     ],
-    applications: [
-      'Сверление бетона',
-      'Долбление',
-      'Ремонт',
-      'Строительство'
-    ]
+    specifications: [
+      { name: 'Мощность', value: '780 Вт' },
+      { name: 'Патрон', value: '13 мм' }
+    ],
+    equipment: ['Дрель', 'Ключ', 'Инструкция'],
+    applications: ['Сверление', 'Ремонт']
+  },
+  {
+    id: 5,
+    name: 'Лобзик Makita 4329',
+    subtitle: 'Электролобзик для точной резки',
+    description: 'Электролобзик для точной резки',
+    price: '35 000 ₸',
+    images: [
+      'https://via.placeholder.com/300x200?text=Лобзик+Makita'
+    ],
+    specifications: [
+      { name: 'Мощность', value: '450 Вт' }
+    ],
+    equipment: ['Лобзик', 'Пилка'],
+    applications: ['Резка', 'Столярные работы']
+  },
+  {
+    id: 6,
+    name: 'Лазерный уровень BOSCH GLL 2-10',
+    subtitle: 'Точный лазерный уровень для разметки',
+    description: 'Точный лазерный уровень для разметки',
+    price: '55 000 ₸',
+    images: [
+      'https://via.placeholder.com/300x200?text=Лазерный+уровень'
+    ],
+    specifications: [
+      { name: 'Дальность', value: '10 м' }
+    ],
+    equipment: ['Уровень', 'Чехол'],
+    applications: ['Разметка', 'Строительство']
+  },
+  {
+    id: 7,
+    name: 'Генератор Huter DY3000L',
+    subtitle: 'Бензиновый генератор 3 кВт',
+    description: 'Бензиновый генератор 3 кВт',
+    price: '180 000 ₸',
+    images: [
+      'https://via.placeholder.com/300x200?text=Генератор+Huter'
+    ],
+    specifications: [
+      { name: 'Мощность', value: '3 кВт' }
+    ],
+    equipment: ['Генератор'],
+    applications: ['Электроснабжение']
+  },
+  {
+    id: 8,
+    name: 'Мультиметр Fluke 117',
+    subtitle: 'Профессиональный измерительный прибор',
+    description: 'Профессиональный измерительный прибор',
+    price: '95 000 ₸',
+    images: [
+      'https://via.placeholder.com/300x200?text=Мультиметр+Fluke'
+    ],
+    specifications: [
+      { name: 'Тип', value: 'Цифровой' }
+    ],
+    equipment: ['Мультиметр', 'Щупы'],
+    applications: ['Измерения', 'Ремонт']
   }
 ];
 
@@ -181,8 +208,8 @@ const Product = () => {
           <a href="/catalog">Каталог</a>
           {categoryName && <><span className="breadcrumbs-sep">&gt;</span><a href={`/catalog?category=${product.category}`}>{categoryName}</a></>}
           <span className="breadcrumbs-sep">&gt;</span>
-          <span>{product.name}</span>
-        </nav>
+            <span>{product.name}</span>
+          </nav>
         <div className="container product-maket-container">
           <div className="product-maket-content">
             <div className="product-maket-left">
@@ -229,27 +256,27 @@ const Product = () => {
               </ul>
               <button className="maket-btn" onClick={handleOpenModal}>Оставить заявку</button>
             </div>
+            </div>
           </div>
-        </div>
 
-        {/* Характеристики */}
-        {product.specifications && (
+          {/* Характеристики */}
+          {product.specifications && (
         <div className="product-specifications-container">
           <div className="product-specifications-content">
             <h2 className="specifications-title">Характеристики</h2>
             <div className="specifications-grid">
-            {product.specifications.map((spec, index) => (
+              {product.specifications.map((spec, index) => (
                 <div key={index} className="specification-item">
                   <span className="specification-name">{spec.name}</span>
                   <span className="specification-value">{spec.value}</span>
-              </div>
-            ))}
-          </div>
-          </div>
-      </div>
-      )}
-    </main>
-    <Footer />
+                </div>
+              ))}
+            </div>
+                </div>
+            </div>
+          )}
+      </main>
+      <Footer />
     <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
     {showImageModal && (
       <ImageModal
@@ -258,10 +285,10 @@ const Product = () => {
         onClose={handleCloseImageModal}
         onPrev={handlePrevImage}
         onNext={handleNextImage}
-    />
+      />
     )}
-  </div>
-);
+    </div>
+  );
 };
 
 export default Product; 
