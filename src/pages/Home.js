@@ -8,19 +8,18 @@ import '../styles/Catalog.css';
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = (formData) => {
-    // Здесь будет логика отправки в Telegram
     console.log('Форма отправлена:', formData);
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
+
+  const advantages = [
+    'Только оригинальный инструмент от ведущих брендов',
+    'Гарантия и сервисное обслуживание',
+    'Быстрая доставка по всему Казахстану'
+  ];
 
   const miniProducts = [
     {
@@ -68,75 +67,37 @@ const Home = () => {
   return (
     <div className="home">
       <Header />
-      
-      {/* Главная секция */}
-      <section className="hero">
-        <div className="hero-left">
-          <img 
-            src="/images/hero/hero-main.jpg" 
-            alt="Электроинструменты Танкер" 
-            className="hero-image"
-          />
-        </div>
-        <div className="hero-right">
-          <h1>
-            Профессиональные <span className="accent">электроинструменты</span>
-          </h1>
-          <div className="hero-text-container">
-          <h3>Качество и надёжность для ваших проектов</h3>
-          <p>
-            Мы предлагаем широкий ассортимент электроинструментов от ведущих мировых производителей. 
-            Дрели, шуруповёрты, болгарки, перфораторы и многое другое для профессионалов и любителей.
-          </p>
-          <p>
-            Вся продукция сертифицирована и имеет гарантию от производителя. 
-            Работаем как с розничными, так и с оптовыми клиентами.
-          </p>
+      <section className="main-maket-section">
+        <div className="main-maket-container">
+          <div className="main-maket-left">
+            <img src="/images/hero/hero-main.jpg" alt="Электроинструменты для профессионалов" className="main-maket-image" />
           </div>
-          
-          {/* Преимущества (4 штуки) */}
-          <div className="advantages-list">
-            <div className="advantage-item">
-              <span className="advantage-icon">🏭</span>
-              <span>Прямые поставки от производителя</span>
-            </div>
-            <div className="advantage-item">
-              <span className="advantage-icon">✅</span>
-              <span>Гарантия качества 12 месяцев</span>
-            </div>
-            <div className="advantage-item">
-              <span className="advantage-icon">🚚</span>
-              <span>Быстрая доставка по Алматы</span>
-            </div>
-            <div className="advantage-item">
-              <span className="advantage-icon">🔧</span>
-              <span>Техническая поддержка</span>
-            </div>
+          <div className="main-maket-right">
+            <h1 className="main-maket-title">Электроинструменты<br/>для профессионалов и дома</h1>
+            <div className="main-maket-subtitle">Продажа и доставка оригинального электроинструмента по лучшим ценам. Официальная гарантия, большой выбор, консультации и поддержка.</div>
+            <div className="main-maket-text">В нашем магазине вы найдёте дрели, шуруповёрты, перфораторы, болгарки, пилы, измерительные приборы и аксессуары от топовых производителей: DeWalt, Makita, Bosch, Интерскол и других. Работаем с частными и корпоративными клиентами. Поможем подобрать инструмент под ваши задачи!</div>
+            <ul className="main-maket-advantages">
+              {advantages.map((adv, idx) => (
+                <li key={idx} className="main-maket-adv-item">
+                  <span className="main-maket-arrow">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9H15" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/><path d="M11 5L15 9L11 13" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/></svg>
+                  </span>
+                  <span>{adv}</span>
+                </li>
+              ))}
+            </ul>
+            <button className="main-maket-btn" onClick={handleOpenModal}>Оставить заявку</button>
           </div>
-          
-          <button className="btn-primary" onClick={handleOpenModal}>
-            Оставить заявку
-          </button>
         </div>
       </section>
-
-      {/* Лента категорий */}
+      {/* Лента-каталог (бесшовная) */}
       <section className="category-conveyor-section">
         <div className="category-conveyor-container" style={{maxWidth:1200, margin:'0 auto', padding:'0 16px'}}>
           <h2 className="category-conveyor-title">Категории товаров</h2>
           <div className="category-conveyor">
             <div className="category-conveyor-inner">
-              {categories.map(cat => (
-                <div className="category-conveyor-card" key={cat.id}>
-                  <div className="category-conveyor-img-wrap">
-                    <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
-                  </div>
-                  <div className="category-conveyor-name">{cat.name}</div>
-                </div>
-              ))}
-              {/* Дублируем для бесшовного автоскролла */}
-              {categories.map(cat => (
-                <div className="category-conveyor-card" key={cat.id + '-dup'}>
+              {categories.concat(categories).map((cat, idx) => (
+                <div className="category-conveyor-card" key={cat.id + '-' + idx}>
                   <div className="category-conveyor-img-wrap">
                     <span style={{fontSize:'2.2rem'}}>{cat.icon}</span>
                   </div>
@@ -147,8 +108,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
-      {/* Мини-каталог товаров */}
+      {/* Популярные товары */}
       <section className="mini-catalog-section">
         <div className="mini-catalog-header">
           <h2>Популярные товары</h2>
@@ -174,9 +134,7 @@ const Home = () => {
           ))}
         </div>
       </section>
-
       <Footer />
-      
       <Modal 
         isOpen={isModalOpen}
         onClose={handleCloseModal}

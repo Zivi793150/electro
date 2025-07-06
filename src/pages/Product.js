@@ -106,10 +106,16 @@ const products = [
   }
 ];
 
-const advantages = [
-  'Высокий крутящий момент и мощность',
-  'Долговечный литий-ионный аккумулятор',
-  'Компактный и лёгкий корпус для работы одной рукой'
+// Категории для хлебных крошек
+const categories = [
+  { id: 'grinders', name: 'Болгарки' },
+  { id: 'screwdrivers', name: 'Шуруповёрты' },
+  { id: 'hammers', name: 'Перфораторы' },
+  { id: 'drills', name: 'Дрели' },
+  { id: 'jigsaws', name: 'Лобзики' },
+  { id: 'levels', name: 'Лазерные уровни' },
+  { id: 'generators', name: 'Генераторы' },
+  { id: 'measuring', name: 'Измерители' }
 ];
 
 const Product = () => {
@@ -134,6 +140,17 @@ const Product = () => {
       </div>
     );
   }
+
+  // Найти категорию для хлебных крошек
+  const categoryObj = categories.find(cat => cat.id === product.category);
+  const categoryName = categoryObj ? categoryObj.name : '';
+
+  // Преимущества — если есть в product, иначе дефолтные
+  const productAdvantages = product.advantages || [
+    'Высокий крутящий момент и мощность',
+    'Долговечный литий-ионный аккумулятор',
+    'Компактный и лёгкий корпус для работы одной рукой'
+  ];
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -162,11 +179,10 @@ const Product = () => {
           <a href="/">Главная</a>
           <span className="breadcrumbs-sep">&gt;</span>
           <a href="/catalog">Каталог</a>
+          {categoryName && <><span className="breadcrumbs-sep">&gt;</span><a href={`/catalog?category=${product.category}`}>{categoryName}</a></>}
           <span className="breadcrumbs-sep">&gt;</span>
-          <a href="/catalog?category=shurupovert">Шуруповёрты</a>
-          <span className="breadcrumbs-sep">&gt;</span>
-          <span>Профессиональный шуруповёрт DeWalt 18V</span>
-          </nav>
+          <span>{product.name}</span>
+        </nav>
         <div className="container product-maket-container">
           <div className="product-maket-content">
             <div className="product-maket-left">
@@ -190,7 +206,7 @@ const Product = () => {
               </div>
             </div>
             <div className="product-maket-right">
-              <h1 className="maket-title">Профессиональный<br/>шуруповёрт DeWalt 18V</h1>
+              <h1 className="maket-title">{product.name}</h1>
               <div className="maket-rating">
                 <span className="star">★</span>
                 <span className="star">★</span>
@@ -199,10 +215,10 @@ const Product = () => {
                 <span className="star">★</span>
                 <span className="rating-value">5.0</span>
               </div>
-              <div className="maket-subtitle">Мощный и удобный шуруповёрт для профессионального и бытового использования. Идеален для сборки мебели, ремонта и строительных работ.</div>
-              <div className="maket-text">Шуруповёрт DeWalt 18V оснащён современным литий-ионным аккумулятором, обеспечивающим длительную автономную работу. Высокий крутящий момент позволяет легко справляться с любыми задачами по закручиванию и сверлению. Эргономичный дизайн и малый вес делают инструмент удобным для работы одной рукой даже в труднодоступных местах.</div>
+              <div className="maket-subtitle">{product.subtitle}</div>
+              <div className="maket-text">{product.description}</div>
               <ul className="maket-advantages">
-                {advantages.map((adv, idx) => (
+                {productAdvantages.map((adv, idx) => (
                   <li key={idx} className="maket-adv-item">
                     <span className="maket-arrow">
                       <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9H15" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/><path d="M11 5L15 9L11 13" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/></svg>
