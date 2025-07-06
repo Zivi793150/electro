@@ -125,20 +125,28 @@ const Home = () => {
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div className="mini-catalog-grid">
-          {miniProducts.slice(0, 8).map(product => (
+          {miniProducts.slice(0, 8).map((product, idx) => (
             <div
               key={product.id}
-              className="product-card mini-product-card"
+              className="product-card kaspi-style mini-product-card"
               onClick={() => window.location.href = `/product/${product.id}`}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', minHeight: 0 }}
             >
-              <div className="product-image">
-                <img src={product.image} alt={product.name} />
+              {/* Бейдж рассрочки и бонуса убран */}
+              <div className="product-image" style={{height: '180px', paddingTop: 0, marginBottom: 0}}>
+                <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'cover', display: 'block'}} />
               </div>
-              <div className="product-info">
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-description">{product.description}</p>
-                <div className="product-price">{product.price}</div>
+              <div className="product-info" style={{padding: '12px 16px 0 16px'}}>
+                {/* Рейтинг и отзывы */}
+                <div className="kaspi-rating">
+                  <span className="kaspi-stars">★★★★★</span>
+                  <span className="kaspi-reviews">({1500 + idx * 300} отзывов)</span>
+                </div>
+                <h3 className="product-name" style={{minHeight: '40px', fontWeight: 500, margin: '0 0 8px 0'}}>{product.name}</h3>
+                <div className="product-price-row">
+                  <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem'}}>{product.price}</span>
+                  {/* <span className="kaspi-installment">{Math.floor(parseInt(product.price.replace(/\D/g, ''))/12).toLocaleString()} ₸ x12</span> */}
+                </div>
               </div>
             </div>
           ))}
