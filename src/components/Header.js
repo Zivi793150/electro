@@ -15,8 +15,8 @@ const Header = () => {
       {/* Мини-шапка */}
       <div className="top-bar">
         <div className="top-bar-left">
-          <span className="top-bar-address">Алматы</span>
-          <span className="top-bar-email">info@tankertools.kz</span>
+          <div className="top-bar-address">Алматы</div>
+          <div className="top-bar-email">info@tankertools.kz</div>
         </div>
         <div className="top-bar-right">
           <div className="top-bar-socials">
@@ -39,23 +39,23 @@ const Header = () => {
       {/* Основная шапка */}
       <header className="header">
         <div className="container header-container">
-          <div className="logo">
-            <Link to="/">
+        <div className="logo">
+          <Link to="/">
               <span className="logo-icon" style={{fontSize:'2.7rem', marginRight:8}}>🛠️</span>
               <span className="logo-text">TANKER</span>
-            </Link>
-          </div>
+          </Link>
+        </div>
           <nav className="main-nav">
-            <Link to="/">Главная</Link>
+          <Link to="/">Главная</Link>
             <span className="nav-sep" />
-            <Link to="/catalog">Каталог</Link>
+          <Link to="/catalog">Каталог</Link>
             <span className="nav-sep" />
-            <Link to="/cooperation">Сотрудничество</Link>
+          <Link to="/cooperation">Сотрудничество</Link>
             <span className="nav-sep" />
-            <Link to="/about">О компании</Link>
+          <Link to="/about">О компании</Link>
             <span className="nav-sep" />
-            <Link to="/contacts">Контакты</Link>
-          </nav>
+          <Link to="/contacts">Контакты</Link>
+        </nav>
         </div>
       </header>
     </>

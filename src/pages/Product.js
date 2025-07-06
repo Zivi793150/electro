@@ -166,7 +166,7 @@ const Product = () => {
           <a href="/catalog?category=shurupovert">Шуруповёрты</a>
           <span className="breadcrumbs-sep">&gt;</span>
           <span>Профессиональный шуруповёрт DeWalt 18V</span>
-        </nav>
+          </nav>
         <div className="container product-maket-container">
           <div className="product-maket-content">
             <div className="product-maket-left">
@@ -200,6 +200,7 @@ const Product = () => {
                 <span className="rating-value">5.0</span>
               </div>
               <div className="maket-subtitle">Мощный и удобный шуруповёрт для профессионального и бытового использования. Идеален для сборки мебели, ремонта и строительных работ.</div>
+              <div className="maket-text">Шуруповёрт DeWalt 18V оснащён современным литий-ионным аккумулятором, обеспечивающим длительную автономную работу. Высокий крутящий момент позволяет легко справляться с любыми задачами по закручиванию и сверлению. Эргономичный дизайн и малый вес делают инструмент удобным для работы одной рукой даже в труднодоступных местах.</div>
               <ul className="maket-advantages">
                 {advantages.map((adv, idx) => (
                   <li key={idx} className="maket-adv-item">
@@ -215,41 +216,36 @@ const Product = () => {
           </div>
         </div>
 
-        {/* Серый текст-описание после блока с фото, но перед характеристиками */}
-        <div className="maket-text maket-text-bottom">
-          Шуруповёрт DeWalt 18V оснащён современным литий-ионным аккумулятором, обеспечивающим длительную автономную работу. Высокий крутящий момент позволяет легко справляться с любыми задачами по закручиванию и сверлению. Эргономичный дизайн и малый вес делают инструмент удобным для работы одной рукой даже в труднодоступных местах.
-        </div>
-
         {/* Характеристики */}
         {product.specifications && (
-          <div className="product-specifications-container">
-            <div className="product-specifications-content">
-              <h2 className="specifications-title">Характеристики</h2>
-              <div className="specifications-grid">
-                {product.specifications.map((spec, index) => (
-                  <div key={index} className="specification-item">
-                    <span className="specification-name">{spec.name}</span>
-                    <span className="specification-value">{spec.value}</span>
-                  </div>
-                ))}
+        <div className="product-specifications-container">
+          <div className="product-specifications-content">
+            <h2 className="specifications-title">Характеристики</h2>
+            <div className="specifications-grid">
+            {product.specifications.map((spec, index) => (
+                <div key={index} className="specification-item">
+                  <span className="specification-name">{spec.name}</span>
+                  <span className="specification-value">{spec.value}</span>
               </div>
-            </div>
+            ))}
           </div>
-        )}
-      </main>
-      <Footer />
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
-      {showImageModal && (
-        <ImageModal
-          images={product.images}
-          activeIndex={activeImage}
-          onClose={handleCloseImageModal}
-          onPrev={handlePrevImage}
-          onNext={handleNextImage}
-        />
+          </div>
+      </div>
       )}
-    </div>
-  );
+    </main>
+    <Footer />
+    <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
+    {showImageModal && (
+      <ImageModal
+        images={product.images}
+        activeIndex={activeImage}
+        onClose={handleCloseImageModal}
+        onPrev={handlePrevImage}
+        onNext={handleNextImage}
+    />
+    )}
+  </div>
+);
 };
 
 export default Product; 
