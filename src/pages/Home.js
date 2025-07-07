@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import '../styles/Home.css';
 import '../styles/Catalog.css';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -139,34 +140,39 @@ const Home = () => {
             const rating = (4 + Math.random() * 1).toFixed(1);
             const reviews = 500 + idx * 300;
             return (
-              <div
+              <Link
+                to={`/product/${product.id}`}
                 key={product.id}
-                className="product-card kaspi-style mini-product-card"
-                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                {/* Картинка */}
-                <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
-                </div>
-                <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
-                  {/* Название */}
-                  <a href="#" style={{fontSize: '1.05rem', fontWeight: 500, color: '#1976d2', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</a>
-                  {/* Горизонтальный разделитель только под текстом */}
-                  <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #e0e0e0',margin:'0 0 10px 0', alignSelf:'center'}}></div>
-                  {/* Цена и разделитель */}
-                  <div style={{display: 'flex', alignItems: 'center', gap: 10, marginTop: 0, marginBottom:2, justifyContent:'center', width:'100%'}}>
-                    {hasDiscount && (
-                      <>
-                        <span style={{color:'#888',fontSize:'1.05rem',textDecoration:'line-through',marginRight:0, fontWeight: 400}}>
-                          {priceNum.toLocaleString('ru-RU') + ' ₸'}
-                        </span>
-                        <span style={{height:'2.0em',width:'1px',background:'#e0e0e0',display:'inline-block',margin:'0 7px',verticalAlign:'middle'}}></span>
-                      </>
-                    )}
-                    <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{newPrice.toLocaleString('ru-RU')} ₸</span>
+                <div
+                  className="product-card kaspi-style mini-product-card"
+                  style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+                >
+                  {/* Картинка */}
+                  <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
+                  </div>
+                  <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
+                    {/* Название */}
+                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1976d2', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                    {/* Горизонтальный разделитель только под текстом */}
+                    <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #e0e0e0',margin:'0 0 10px 0', alignSelf:'center'}}></div>
+                    {/* Цена и разделитель */}
+                    <div style={{display: 'flex', alignItems: 'center', gap: 10, marginTop: 0, marginBottom:2, justifyContent:'center', width:'100%'}}>
+                      {hasDiscount && (
+                        <>
+                          <span style={{color:'#888',fontSize:'1.05rem',textDecoration:'line-through',marginRight:0, fontWeight: 400}}>
+                            {priceNum.toLocaleString('ru-RU') + ' ₸'}
+                          </span>
+                          <span style={{height:'2.0em',width:'1px',background:'#e0e0e0',display:'inline-block',margin:'0 7px',verticalAlign:'middle'}}></span>
+                        </>
+                      )}
+                      <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{newPrice.toLocaleString('ru-RU')} ₸</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
