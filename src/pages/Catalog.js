@@ -2,9 +2,21 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/Catalog.css';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Catalog = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const location = useLocation();
+  const getCategoryFromQuery = () => {
+    const params = new URLSearchParams(location.search);
+    return params.get('category') || 'all';
+  };
+  const [selectedCategory, setSelectedCategory] = useState(getCategoryFromQuery());
+
+  React.useEffect(() => {
+    const cat = getCategoryFromQuery();
+    setSelectedCategory(cat);
+  }, [location.search]);
 
   // Данные категорий и товаров (в реальном проекте будут из API)
   const categories = [
@@ -142,23 +154,38 @@ const Catalog = () => {
           </div>
 
           {/* Сетка товаров */}
-          <div className="products-grid">
+          <div className="products-grid" style={{gap: 0}}>
             {filteredProducts.map(product => (
-              <div
+              <Link
+                to={`/product/${product.id}`}
                 key={product.id}
-                className="product-card"
-                onClick={() => window.location.href = `/product/${product.id}`}
-                style={{ cursor: 'pointer' }}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <div className="product-image">
-                  <img src={product.image} alt={product.name} />
+                <div
+                  className="product-card kaspi-style mini-product-card"
+                  style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+                >
+                  {/* Картинка */}
+                  <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
+                  </div>
+                  {/* Разделительная полоска между фото и названием */}
+                  <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
+                  <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
+                    {/* Название */}
+                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                    {/* Надпись "Цена" */}
+                    <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
+                      <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
+                    </div>
+                    {/* Цена и разделитель */}
+                    <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
+                      <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{parseInt(product.price.replace(/\D/g, '')).toLocaleString('ru-RU')} ₸</span>
+                      <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
+                    </div>
+                  </div>
                 </div>
-                <div className="product-info">
-                  <h3 className="product-name">{product.name}</h3>
-                  <p className="product-description">{product.description}</p>
-                  <div className="product-price">{product.price}</div>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
 

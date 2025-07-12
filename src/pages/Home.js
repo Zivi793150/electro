@@ -27,6 +27,7 @@ const Home = () => {
       id: 1,
       name: 'Болгарка Makita 125мм',
       image: '/images/products/bolgarka-makita-125.jpg',
+      category: 'grinders',
       price: '45 000 ₸',
       description: 'Профессиональная угловая шлифмашина',
       discount: 10
@@ -35,6 +36,7 @@ const Home = () => {
       id: 2,
       name: 'Шуруповёрт DeWalt 18V',
       image: '/images/products/shurupovert-dewalt-18v.jpg',
+      category: 'screwdrivers',
       price: '85 000 ₸',
       description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором',
       discount: 17
@@ -43,6 +45,7 @@ const Home = () => {
       id: 3,
       name: 'Перфоратор Bosch GBH 2-26',
       image: '/images/products/perforator-bosch-gbh.jpg',
+      category: 'hammers',
       price: '120 000 ₸',
       description: 'Мощный перфоратор для строительных работ',
       discount: 8
@@ -51,6 +54,7 @@ const Home = () => {
       id: 4,
       name: 'Дрель Интерскол ДУ-13/780',
       image: '/images/products/drel.jpg',
+      category: 'drills',
       price: '25 000 ₸',
       description: 'Универсальная дрель для сверления'
     },
@@ -58,6 +62,7 @@ const Home = () => {
       id: 5,
       name: 'Лобзик Makita 4329',
       image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita',
+      category: 'jigsaws',
       price: '35 000 ₸',
       description: 'Электролобзик для точной резки',
       discount: 5
@@ -66,6 +71,7 @@ const Home = () => {
       id: 6,
       name: 'Лазерный уровень BOSCH GLL 2-10',
       image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень',
+      category: 'levels',
       price: '55 000 ₸',
       description: 'Точный лазерный уровень для разметки'
     },
@@ -73,6 +79,7 @@ const Home = () => {
       id: 7,
       name: 'Генератор Huter DY3000L',
       image: 'https://via.placeholder.com/300x200?text=Генератор+Huter',
+      category: 'generators',
       price: '180 000 ₸',
       description: 'Бензиновый генератор 3 кВт',
       discount: 15
@@ -81,6 +88,7 @@ const Home = () => {
       id: 8,
       name: 'Мультиметр Fluke 117',
       image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke',
+      category: 'measuring',
       price: '95 000 ₸',
       description: 'Профессиональный измерительный прибор'
     }
@@ -141,7 +149,7 @@ const Home = () => {
             const reviews = 500 + idx * 300;
             return (
               <Link
-                to={`/product/${product.id}`}
+                to={`/catalog?category=${product.category}`}
                 key={product.id}
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >
@@ -154,19 +162,10 @@ const Home = () => {
                   <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
                 </div>
                 {/* Разделительная полоска между фото и названием */}
-                <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 10px auto', alignSelf:'center'}}></div>
+                <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto -30px auto', alignSelf:'center'}}></div>
                 <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
                   {/* Название */}
                   <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1976d2', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  {/* Надпись "Цена" */}
-                  <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
-                    <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
-                  </div>
-                  {/* Только цена */}
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
-                    <span className="product-price" style={{color:'#222',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{priceNum.toLocaleString('ru-RU')} ₸</span>
-                    <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
-                  </div>
                 </div>
               </div>
               </Link>

@@ -201,94 +201,96 @@ const Product = () => {
   return (
     <div className="product">
       <Header />
-      <main className="product-main">
-        <nav className="product-breadcrumbs">
-          <a href="/">Главная</a>
-          <span className="breadcrumbs-sep">&gt;</span>
-          <a href="/catalog">Каталог</a>
-          {categoryName && <><span className="breadcrumbs-sep">&gt;</span><a href={`/catalog?category=${product.category}`}>{categoryName}</a></>}
-          <span className="breadcrumbs-sep">&gt;</span>
-            <span>{product.name}</span>
-          </nav>
-        <div className="container product-maket-container">
-          <div className="product-maket-content">
-            <div className="product-maket-left">
-              <img
-                className="product-maket-image"
-                src={product.images[activeImage]}
-                alt={product.name}
-                onClick={handleImageClick}
-                style={{ cursor: 'zoom-in' }}
-              />
-              <div className="product-thumbnails">
-                {product.images.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className={`product-thumbnail${activeImage === idx ? ' active' : ''}`}
-                    onClick={() => setActiveImage(idx)}
-                  >
-                    <img src={img} alt={product.name + ' миниатюра ' + (idx+1)} />
+      <main className="product-main" style={{background:'#fff',padding:'48px 0'}}>
+        <div className="container" style={{maxWidth:1440, margin:'0 auto', display:'flex', flexDirection:'column', alignItems:'center'}}>
+          <div style={{display:'flex',gap:64,alignItems:'flex-start',justifyContent:'center',width:'100%',flexWrap:'wrap'}}>
+            {/* Фото и миниатюры */}
+            <div style={{flex:'0 0 600px',maxWidth:600}}>
+              <div style={{border:'1px solid #eee',borderRadius:18,padding:32,background:'#fafbfc',textAlign:'center'}}>
+                <img src={product.images[activeImage]} alt={product.name} style={{maxWidth:'100%',maxHeight:600,objectFit:'contain',margin:'0 auto',display:'block',borderRadius:12}} />
+              </div>
+              {product.images.length > 1 && (
+                <div style={{display:'flex',gap:16,marginTop:18,justifyContent:'center'}}>
+                  {product.images.map((img,idx)=>(
+                    <img key={idx} src={img} alt={product.name+idx} style={{width:90,height:90,objectFit:'contain',borderRadius:10,border:activeImage===idx?'3px solid #1e88e5':'2px solid #eee',cursor:'pointer',background:'#fff'}} onClick={()=>setActiveImage(idx)} />
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Инфо и цена справа */}
+            <div style={{flex:'1 1 420px',minWidth:340,maxWidth:520,display:'flex',flexDirection:'column',gap:32,justifyContent:'flex-start'}}>
+              <h1 style={{fontSize:'2.8rem',fontWeight:800,margin:'0 0 18px 0',color:'#1a2236',lineHeight:1.13}}>{product.name}</h1>
+              <div style={{fontSize:'1.45rem',color:'#444',marginBottom:12}}>{product.subtitle}</div>
+              {/* Горизонтальная полоска */}
+              <div style={{width:'100%',borderTop:'2px solid #bdbdbd',margin:'12px 0 28px 0'}}></div>
+              <div style={{display:'flex',alignItems:'center',gap:40,margin:'24px 0'}}>
+                <div style={{display:'flex',alignItems:'center',gap:18}}>
+                  <div>
+                    <div style={{color:'#888',fontSize:'1.25rem',marginBottom:4}}>Цена</div>
+                    <div style={{fontSize:'2.7rem',fontWeight:900,color:'#FFB300',letterSpacing:1,whiteSpace:'nowrap'}}>
+                      {parseInt(product.price.replace(/\D/g,'')).toLocaleString('ru-RU')}
+                      <span style={{whiteSpace:'nowrap',marginLeft:6}}>₸</span>
+                    </div>
                   </div>
-                ))}
+                  {/* Вертикальная полоска */}
+                  <span style={{height:'4.2em',width:'2px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 18px',verticalAlign:'middle'}}></span>
+                </div>
+                <button onClick={handleOpenModal} style={{background:'#FF6B00',color:'#fff',fontWeight:800,fontSize:'1.45rem',border:'none',borderRadius:12,padding:'22px 54px',cursor:'pointer',boxShadow:'0 6px 24px rgba(255,107,0,0.13)',transition:'background 0.2s'}}>Оформить заказ</button>
               </div>
-            </div>
-            <div className="product-maket-right">
-              <h1 className="maket-title">{product.name}</h1>
-              <div className="maket-rating">
-                <span className="star">★</span>
-                <span className="star">★</span>
-                <span className="star">★</span>
-                <span className="star">★</span>
-                <span className="star">★</span>
-                <span className="rating-value">5.0</span>
-              </div>
-              <div className="maket-subtitle">{product.subtitle}</div>
-              <div className="maket-text">{product.description}</div>
-              <ul className="maket-advantages">
-                {productAdvantages.map((adv, idx) => (
-                  <li key={idx} className="maket-adv-item">
-                    <span className="maket-arrow">
-                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9H15" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/><path d="M11 5L15 9L11 13" stroke="#FF6B00" strokeWidth="2" strokeLinecap="round"/></svg>
-                    </span>
-                    <span>{adv}</span>
-                  </li>
-                ))}
-              </ul>
-              <button className="maket-btn" onClick={handleOpenModal}>Оставить заявку</button>
-            </div>
             </div>
           </div>
-
-          {/* Характеристики */}
-          {product.specifications && (
-        <div className="product-specifications-container">
-          <div className="product-specifications-content">
-            <h2 className="specifications-title">Характеристики</h2>
-            <div className="specifications-grid">
-              {product.specifications.map((spec, index) => (
-                <div key={index} className="specification-item">
-                  <span className="specification-name">{spec.name}</span>
-                  <span className="specification-value">{spec.value}</span>
-                </div>
-              ))}
+          {/* Вкладки снизу, на всю ширину */}
+          <div style={{marginTop:64, width:'100%', display:'flex', justifyContent:'flex-start', marginLeft:0}}>
+            <div style={{marginLeft:'calc((100% - 1440px)/2 + 0px)', minWidth:480}}>
+              <Tabs product={product} />
             </div>
-                </div>
-            </div>
-          )}
+          </div>
+        </div>
       </main>
       <Footer />
-    <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
-    {showImageModal && (
-      <ImageModal
-        images={product.images}
-        activeIndex={activeImage}
-        onClose={handleCloseImageModal}
-        onPrev={handlePrevImage}
-        onNext={handleNextImage}
-      />
-    )}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
     </div>
   );
 };
+
+function Tabs({product}) {
+  const [tab,setTab]=React.useState('desc');
+  return (
+    <div style={{background:'#fff',borderRadius:12,boxShadow:'0 2px 12px rgba(30,40,90,0.06)',padding:'24px 18px',maxWidth:900}}>
+      <div style={{display:'flex',gap:16,marginBottom:18}}>
+        <button onClick={()=>setTab('desc')} style={{background:'none',border:'none',fontWeight:tab==='desc'?700:400,fontSize:'1.08rem',color:tab==='desc'?'#1e88e5':'#222',borderBottom:tab==='desc'?'2px solid #1e88e5':'2px solid transparent',padding:'6px 12px',cursor:'pointer'}}>Описание</button>
+        <button onClick={()=>setTab('specs')} style={{background:'none',border:'none',fontWeight:tab==='specs'?700:400,fontSize:'1.08rem',color:tab==='specs'?'#1e88e5':'#222',borderBottom:tab==='specs'?'2px solid #1e88e5':'2px solid transparent',padding:'6px 12px',cursor:'pointer'}}>Характеристики</button>
+        <button onClick={()=>setTab('equip')} style={{background:'none',border:'none',fontWeight:tab==='equip'?700:400,fontSize:'1.08rem',color:tab==='equip'?'#1e88e5':'#222',borderBottom:tab==='equip'?'2px solid #1e88e5':'2px solid transparent',padding:'6px 12px',cursor:'pointer'}}>Комплектация</button>
+      </div>
+      <div style={{minHeight:60}}>
+        {tab==='desc' && (
+          <div style={{fontSize:'1.05rem',color:'#222'}}>{product.description}</div>
+        )}
+        {tab==='specs' && (
+          <div style={{fontSize:'1.05rem',color:'#222'}}>
+            {product.specifications && product.specifications.length>0 ? (
+              <ul style={{paddingLeft:18,margin:0}}>
+                {product.specifications.map((spec,idx)=>(
+                  <li key={idx}><b>{spec.name}:</b> {spec.value}</li>
+                ))}
+              </ul>
+            ) : 'Нет данных'}
+          </div>
+        )}
+        {tab==='equip' && (
+          <div style={{fontSize:'1.05rem',color:'#222'}}>
+            {product.equipment && product.equipment.length>0 ? (
+              <ul style={{paddingLeft:18,margin:0}}>
+                {product.equipment.map((item,idx)=>(
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            ) : 'Нет данных'}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default Product; 
