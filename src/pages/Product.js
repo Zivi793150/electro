@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
-import ImageModal from '../components/ImageModal';
 import '../styles/Product.css';
 
 const products = [
@@ -199,51 +198,45 @@ const Product = () => {
   };
 
   return (
-    <div className="product">
+    <div className="product-page">
       <Header />
-      <main className="product-main" style={{background:'#fff',padding:'48px 0'}}>
-        <div className="container" style={{maxWidth:1440, margin:'0 auto', display:'flex', flexDirection:'column', alignItems:'center'}}>
-          <div style={{display:'flex',gap:64,alignItems:'flex-start',justifyContent:'center',width:'100%',flexWrap:'wrap'}}>
+      <main className="product-main">
+        <div className="product-container">
+          <div className="product-flex">
             {/* Фото и миниатюры */}
-            <div style={{flex:'0 0 600px',maxWidth:600}}>
-              <div style={{border:'1px solid #eee',borderRadius:18,padding:32,background:'#fafbfc',textAlign:'center'}}>
-                <img src={product.images[activeImage]} alt={product.name} style={{maxWidth:'100%',maxHeight:600,objectFit:'contain',margin:'0 auto',display:'block',borderRadius:12}} />
+            <div className="product-gallery">
+              <div className="product-image-main">
+                <img src={product.images[activeImage]} alt={product.name} loading="lazy" />
               </div>
               {product.images.length > 1 && (
-                <div style={{display:'flex',gap:16,marginTop:18,justifyContent:'center'}}>
+                <div className="product-thumbs">
                   {product.images.map((img,idx)=>(
-                    <img key={idx} src={img} alt={product.name+idx} style={{width:90,height:90,objectFit:'contain',borderRadius:10,border:activeImage===idx?'3px solid #1e88e5':'2px solid #eee',cursor:'pointer',background:'#fff'}} onClick={()=>setActiveImage(idx)} />
+                    <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
                   ))}
                 </div>
               )}
             </div>
             {/* Инфо и цена справа */}
-            <div style={{flex:'1 1 420px',minWidth:340,maxWidth:520,display:'flex',flexDirection:'column',gap:32,justifyContent:'flex-start'}}>
-              <h1 style={{fontSize:'2.8rem',fontWeight:800,margin:'0 0 18px 0',color:'#1a2236',lineHeight:1.13}}>{product.name}</h1>
-              <div style={{fontSize:'1.45rem',color:'#444',marginBottom:12}}>{product.subtitle}</div>
-              {/* Горизонтальная полоска */}
-              <div style={{width:'100%',borderTop:'2px solid #bdbdbd',margin:'12px 0 28px 0'}}></div>
-              <div style={{display:'flex',alignItems:'center',gap:40,margin:'24px 0'}}>
-                <div style={{display:'flex',alignItems:'center',gap:18}}>
-                  <div>
-                    <div style={{color:'#888',fontSize:'1.25rem',marginBottom:4}}>Цена</div>
-                    <div style={{fontSize:'2.7rem',fontWeight:900,color:'#FFB300',letterSpacing:1,whiteSpace:'nowrap'}}>
-                      {parseInt(product.price.replace(/\D/g,'')).toLocaleString('ru-RU')}
-                      <span style={{whiteSpace:'nowrap',marginLeft:6}}>₸</span>
-                    </div>
+            <div className="product-info-block">
+              <h1 className="product-title">{product.name}</h1>
+              <div className="product-subtitle">{product.subtitle}</div>
+              <div className="product-divider"></div>
+              <div className="product-buy-row">
+                <div className="product-price-block">
+                  <div className="product-price-label">Цена</div>
+                  <div className="product-price-value">
+                    {parseInt(product.price.replace(/\D/g,'')).toLocaleString('ru-RU')}
+                    <span className="product-currency">₸</span>
                   </div>
-                  {/* Вертикальная полоска */}
-                  <span style={{height:'4.2em',width:'2px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 18px',verticalAlign:'middle'}}></span>
+                  <span className="product-price-divider"></span>
                 </div>
-                <button onClick={handleOpenModal} style={{background:'#FF6B00',color:'#fff',fontWeight:800,fontSize:'1.45rem',border:'none',borderRadius:12,padding:'22px 54px',cursor:'pointer',boxShadow:'0 6px 24px rgba(255,107,0,0.13)',transition:'background 0.2s'}}>Оформить заказ</button>
+                <button className="product-buy-btn" onClick={handleOpenModal}>Оформить заказ</button>
               </div>
             </div>
           </div>
-          {/* Вкладки снизу, на всю ширину */}
-          <div style={{marginTop:64, width:'100%', display:'flex', justifyContent:'flex-start', marginLeft:0}}>
-            <div style={{marginLeft:'calc((100% - 1440px)/2 + 0px)', minWidth:480}}>
-              <Tabs product={product} />
-            </div>
+          {/* Вкладки снизу */}
+          <div className="product-tabs-wrap">
+            <Tabs product={product} />
           </div>
         </div>
       </main>
@@ -256,20 +249,18 @@ const Product = () => {
 function Tabs({product}) {
   const [tab,setTab]=React.useState('desc');
   return (
-    <div style={{background:'#fff',borderRadius:12,boxShadow:'0 2px 12px rgba(30,40,90,0.06)',padding:'24px 18px',maxWidth:900}}>
-      <div style={{display:'flex',gap:16,marginBottom:18}}>
-        <button onClick={()=>setTab('desc')} style={{background:'none',border:'none',fontWeight:tab==='desc'?700:400,fontSize:'1.08rem',color:tab==='desc'?'#1e88e5':'#222',borderBottom:tab==='desc'?'2px solid #1e88e5':'2px solid transparent',padding:'6px 12px',cursor:'pointer'}}>Описание</button>
-        <button onClick={()=>setTab('specs')} style={{background:'none',border:'none',fontWeight:tab==='specs'?700:400,fontSize:'1.08rem',color:tab==='specs'?'#1e88e5':'#222',borderBottom:tab==='specs'?'2px solid #1e88e5':'2px solid transparent',padding:'6px 12px',cursor:'pointer'}}>Характеристики</button>
-        <button onClick={()=>setTab('equip')} style={{background:'none',border:'none',fontWeight:tab==='equip'?700:400,fontSize:'1.08rem',color:tab==='equip'?'#1e88e5':'#222',borderBottom:tab==='equip'?'2px solid #1e88e5':'2px solid transparent',padding:'6px 12px',cursor:'pointer'}}>Комплектация</button>
+    <div className="product-tabs">
+      <div className="product-tabs-header">
+        <button className={tab==='desc'?'active':''} onClick={()=>setTab('desc')}>Описание</button>
+        <button className={tab==='specs'?'active':''} onClick={()=>setTab('specs')}>Характеристики</button>
+        <button className={tab==='equip'?'active':''} onClick={()=>setTab('equip')}>Комплектация</button>
       </div>
-      <div style={{minHeight:60}}>
-        {tab==='desc' && (
-          <div style={{fontSize:'1.05rem',color:'#222'}}>{product.description}</div>
-        )}
+      <div className="product-tabs-content">
+        {tab==='desc' && <div>{product.description}</div>}
         {tab==='specs' && (
-          <div style={{fontSize:'1.05rem',color:'#222'}}>
+          <div>
             {product.specifications && product.specifications.length>0 ? (
-              <ul style={{paddingLeft:18,margin:0}}>
+              <ul>
                 {product.specifications.map((spec,idx)=>(
                   <li key={idx}><b>{spec.name}:</b> {spec.value}</li>
                 ))}
@@ -278,9 +269,9 @@ function Tabs({product}) {
           </div>
         )}
         {tab==='equip' && (
-          <div style={{fontSize:'1.05rem',color:'#222'}}>
+          <div>
             {product.equipment && product.equipment.length>0 ? (
-              <ul style={{paddingLeft:18,margin:0}}>
+              <ul>
                 {product.equipment.map((item,idx)=>(
                   <li key={idx}>{item}</li>
                 ))}

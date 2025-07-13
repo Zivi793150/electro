@@ -1,13 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/Header.css';
-import { FiInstagram } from 'react-icons/fi';
-import { FaTelegramPlane, FaWhatsapp } from 'react-icons/fa';
-import { SiTiktok } from 'react-icons/si';
-
-const SocialIcon = ({children, href, label}) => (
-  <a href={href} className="top-bar-link social-circle" aria-label={label} target="_blank" rel="noopener noreferrer">{children}</a>
-);
 
 const Header = () => {
   return (
@@ -38,16 +31,16 @@ const Header = () => {
           <div className="header-right-col">
             <div className="top-bar-socials">
               <a href="#" className="top-bar-social" title="Instagram" target="_blank" rel="noopener noreferrer">
-                <FiInstagram size={18} />
+                <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} style={{display:'block'}} />
               </a>
               <a href="#" className="top-bar-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
-                <FaWhatsapp size={18} />
+                <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} style={{display:'block'}} />
               </a>
               <a href="#" className="top-bar-social" title="Telegram" target="_blank" rel="noopener noreferrer">
-                <FaTelegramPlane size={18} />
+                <img src="/icons/telegram.svg" alt="Telegram" width={24} height={24} style={{display:'block'}} />
               </a>
               <a href="#" className="top-bar-social" title="TikTok" target="_blank" rel="noopener noreferrer">
-                <SiTiktok size={18} />
+                <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
             <div className="top-bar-phone">+7 (777) 777-77-77</div>

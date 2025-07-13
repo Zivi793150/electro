@@ -7,126 +7,55 @@ import '../styles/Contacts.css';
 const Contacts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSubmitForm = (formData) => {
-    // Здесь будет логика отправки в Telegram
-    console.log('Контактная форма:', formData);
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+  const handleSubmitForm = () => {
     alert('Спасибо! Ваше сообщение отправлено. Мы свяжемся с вами в ближайшее время.');
   };
-
   const handleSocialClick = (platform) => {
-    // Здесь будет логика перехода в соцсети
-    console.log(`Переход в ${platform}`);
-    alert(`Переход в ${platform} (в реальном проекте будет ссылка)`);
+    alert(`Переход в ${platform}`);
   };
 
   return (
     <div className="contacts">
       <Header />
-      
       <main className="contacts-main">
         <div className="container">
           <h1 className="contacts-title">Контакты</h1>
-          
           <div className="contacts-content">
-            {/* Контактная информация */}
             <div className="contacts-grid">
               <div className="contact-card">
-                <div className="contact-card-header">
-                  <span className="contact-card-icon">📞</span>
-                  <span>Телефоны</span>
-                </div>
-                <div className="contact-card-content">
-                  +7 (777) 777-77-77<br />
-                  +7 (727) 777-77-77
-                </div>
+                <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/telephone.svg" alt="Телефон" width={24} height={24} /></span><span>Телефоны</span></div>
+                <div className="contact-card-content">+7 (777) 777-77-77<br />+7 (727) 777-77-77</div>
               </div>
               <div className="contact-card">
-                <div className="contact-card-header">
-                  <span className="contact-card-icon">✉</span>
-                  <span>Email</span>
-                </div>
-                <div className="contact-card-content">
-                  info@tankertools.kz<br />
-                  sales@tankertools.kz
-                </div>
+                <div className="contact-card-header"><span className="contact-card-icon">✉</span><span>Email</span></div>
+                <div className="contact-card-content">info@tankertools.kz<br />sales@tankertools.kz</div>
               </div>
               <div className="contact-card">
-                <div className="contact-card-header">
-                  <span className="contact-card-icon">📍</span>
-                  <span>Адрес</span>
-                </div>
-                <div className="contact-card-content">
-                  г. Алматы, ул. Примерная 1<br />
-                  Бизнес-центр "Танкер", офис 205
-                </div>
+                <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/map.svg" alt="Адрес" width={24} height={24} /></span><span>Адрес</span></div>
+                <div className="contact-card-content">г. Алматы, ул. Примерная 1<br />Бизнес-центр "Танкер", офис 205</div>
               </div>
               <div className="contact-card">
-                <div className="contact-card-header">
-                  <span className="contact-card-icon">🕒</span>
-                  <span>Режим работы</span>
-                </div>
-                <div className="contact-card-content">
-                  Пн-Пт: 9:00 - 18:00<br />
-                  Сб: 10:00 - 16:00<br />
-                  Вс: выходной
-                </div>
+                <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/clock.svg" alt="Часы" width={24} height={24} /></span><span>Режим работы</span></div>
+                <div className="contact-card-content">Пн-Пт: 9:00 - 18:00<br />Сб: 10:00 - 16:00<br />Вс: выходной</div>
               </div>
             </div>
-
-            {/* Форма связи */}
             <div className="contact-form">
               <h2>Напишите нам</h2>
               <p>Оставьте сообщение, и мы свяжемся с вами в ближайшее время</p>
-              
-              <button className="btn-contact-form" onClick={handleOpenModal}>
-                Отправить сообщение
-              </button>
-              
+              <button className="btn-contact-form" onClick={handleOpenModal}>Отправить сообщение</button>
               <div className="social-links">
                 <h3>Мы в социальных сетях</h3>
                 <div className="social-grid">
-                  <button 
-                    className="social-link" 
-                    onClick={() => handleSocialClick('WhatsApp')}
-                  >
-                    <span className="social-icon">📱</span>
-                    <span>WhatsApp</span>
-                  </button>
-                  <button 
-                    className="social-link" 
-                    onClick={() => handleSocialClick('Telegram')}
-                  >
-                    <span className="social-icon">📧</span>
-                    <span>Telegram</span>
-                  </button>
-                  <button 
-                    className="social-link" 
-                    onClick={() => handleSocialClick('Instagram')}
-                  >
-                    <span className="social-icon">📷</span>
-                    <span>Instagram</span>
-                  </button>
-                  <button 
-                    className="social-link" 
-                    onClick={() => handleSocialClick('Facebook')}
-                  >
-                    <span className="social-icon">📘</span>
-                    <span>Facebook</span>
-                  </button>
+                  <button className="social-link" onClick={() => handleSocialClick('WhatsApp')}><span className="social-icon"><img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} /></span><span>WhatsApp</span></button>
+                  <button className="social-link" onClick={() => handleSocialClick('Telegram')}><span className="social-icon"><img src="/icons/telegram.svg" alt="Telegram" width={24} height={24} /></span><span>Telegram</span></button>
+                  <button className="social-link" onClick={() => handleSocialClick('Instagram')}><span className="social-icon"><img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} /></span><span>Instagram</span></button>
+                  <button className="social-link" onClick={() => handleSocialClick('Facebook')}><span className="social-icon">📘</span><span>Facebook</span></button>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Карта */}
           <section className="map-section">
             <h2>Как нас найти</h2>
             <div className="map-container">
@@ -142,38 +71,18 @@ const Contacts = () => {
               ></iframe>
             </div>
           </section>
-
-          {/* Дополнительная информация */}
           <section className="additional-info">
             <div className="info-grid">
-              <div className="info-item">
-                <h3>🚚 Доставка</h3>
-                <p>Бесплатная доставка по Алматы при заказе от 50 000 ₸</p>
-              </div>
-              <div className="info-item">
-                <h3>🔧 Сервис</h3>
-                <p>Техническое обслуживание и ремонт электроинструментов</p>
-              </div>
-              <div className="info-item">
-                <h3>📋 Тендеры</h3>
-                <p>Участие в государственных и коммерческих тендерах</p>
-              </div>
-              <div className="info-item">
-                <h3>💰 Оплата</h3>
-                <p>Наличные, банковские карты, безналичный расчёт</p>
-              </div>
+              <div className="info-item"><h3><img src="/icons/truck.svg" alt="Доставка" width={24} height={24} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Доставка</h3><p>Бесплатная доставка по Алматы при заказе от 50 000 ₸</p></div>
+              <div className="info-item"><h3><img src="/icons/wrench.svg" alt="Сервис" width={24} height={24} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Сервис</h3><p>Техническое обслуживание и ремонт электроинструментов</p></div>
+              <div className="info-item"><h3><img src="/icons/checklist.svg" alt="Тендеры" width={24} height={24} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Тендеры</h3><p>Участие в государственных и коммерческих тендерах</p></div>
+              <div className="info-item"><h3><img src="/icons/card.svg" alt="Оплата" width={24} height={24} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Оплата</h3><p>Наличные, банковские карты, безналичный расчёт</p></div>
             </div>
           </section>
         </div>
       </main>
-
       <Footer />
-      
-      <Modal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={handleSubmitForm}
-      />
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
     </div>
   );
 };

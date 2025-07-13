@@ -19,10 +19,10 @@ const Footer = () => {
         <div className="footer-column">
           <h4>Контакты</h4>
           <ul>
-            <li>📞 +7 (777) 777-77-77</li>
+            <li><img src="/icons/telephone.svg" alt="Телефон" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> +7 (777) 777-77-77</li>
             <li>✉ info@tankertools.kz</li>
-            <li>📍 г. Алматы, Казахстан</li>
-            <li>🕒 Пн-Пт: 9:00-18:00</li>
+            <li><img src="/icons/map.svg" alt="Адрес" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> г. Алматы, Казахстан</li>
+            <li><img src="/icons/clock.svg" alt="Часы" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Пн-Пт: 9:00-18:00</li>
           </ul>
         </div>
         
@@ -39,10 +39,10 @@ const Footer = () => {
         <div className="footer-column">
           <h4>Доставка и оплата</h4>
           <ul>
-            <li>🚚 Доставка по Алматы</li>
-            <li>📦 Самовывоз</li>
-            <li>💳 Kaspi, Visa, наличные</li>
-            <li>⚡ Быстрая обработка заказов</li>
+            <li><img src="/icons/truck.svg" alt="Доставка" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Доставка по Алматы</li>
+            <li><img src="/icons/box.svg" alt="Самовывоз" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Самовывоз</li>
+            <li><img src="/icons/card.svg" alt="Оплата" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Kaspi, Visa, наличные</li>
+            <li><img src="/icons/lightning.svg" alt="Быстро" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Быстрая обработка заказов</li>
           </ul>
         </div>
       </div>

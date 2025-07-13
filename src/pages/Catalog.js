@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/Catalog.css';
-import { Link } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Catalog = () => {
   const location = useLocation();
@@ -13,12 +12,10 @@ const Catalog = () => {
   };
   const [selectedCategory, setSelectedCategory] = useState(getCategoryFromQuery());
 
-  React.useEffect(() => {
-    const cat = getCategoryFromQuery();
-    setSelectedCategory(cat);
+  useEffect(() => {
+    setSelectedCategory(getCategoryFromQuery());
   }, [location.search]);
 
-  // Данные категорий и товаров (в реальном проекте будут из API)
   const categories = [
     { id: 'all', name: 'Все товары', icon: '🔧' },
     { id: 'drills', name: 'Дрели', icon: '🛠' },
@@ -32,86 +29,24 @@ const Catalog = () => {
   ];
 
   const products = [
-    {
-      id: 1,
-      name: 'Болгарка Makita 125мм',
-      category: 'grinders',
-      image: '/images/products/bolgarka-makita-125.jpg',
-      price: '45 000 ₸',
-      description: 'Профессиональная угловая шлифмашина'
-    },
-    {
-      id: 2,
-      name: 'Шуруповёрт DeWalt 18V',
-      category: 'screwdrivers',
-      image: '/images/products/shurupovert-dewalt-18v.jpg',
-      price: '85 000 ₸',
-      description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором'
-    },
-    {
-      id: 3,
-      name: 'Перфоратор Bosch GBH 2-26',
-      category: 'hammers',
-      image: '/images/products/perforator-bosch-gbh.jpg',
-      price: '120 000 ₸',
-      description: 'Мощный перфоратор для строительных работ'
-    },
-    {
-      id: 4,
-      name: 'Дрель Интерскол ДУ-13/780',
-      category: 'drills',
-      image: 'https://via.placeholder.com/300x200?text=Дрель+Интерскол',
-      price: '25 000 ₸',
-      description: 'Универсальная дрель для сверления'
-    },
-    {
-      id: 5,
-      name: 'Лобзик Makita 4329',
-      category: 'jigsaws',
-      image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita',
-      price: '35 000 ₸',
-      description: 'Электролобзик для точной резки'
-    },
-    {
-      id: 6,
-      name: 'Лазерный уровень BOSCH GLL 2-10',
-      category: 'levels',
-      image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень',
-      price: '55 000 ₸',
-      description: 'Точный лазерный уровень для разметки'
-    },
-    {
-      id: 7,
-      name: 'Генератор Huter DY3000L',
-      category: 'generators',
-      image: 'https://via.placeholder.com/300x200?text=Генератор+Huter',
-      price: '180 000 ₸',
-      description: 'Бензиновый генератор 3 кВт'
-    },
-    {
-      id: 8,
-      name: 'Мультиметр Fluke 117',
-      category: 'measuring',
-      image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke',
-      price: '95 000 ₸',
-      description: 'Профессиональный измерительный прибор'
-    }
+    { id: 1, name: 'Болгарка Makita 125мм', category: 'grinders', image: '/images/products/bolgarka-makita-125.jpg', price: '45 000 ₸', description: 'Профессиональная угловая шлифмашина' },
+    { id: 2, name: 'Шуруповёрт DeWalt 18V', category: 'screwdrivers', image: '/images/products/shurupovert-dewalt-18v.jpg', price: '85 000 ₸', description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором' },
+    { id: 3, name: 'Перфоратор Bosch GBH 2-26', category: 'hammers', image: '/images/products/perforator-bosch-gbh.jpg', price: '120 000 ₸', description: 'Мощный перфоратор для строительных работ' },
+    { id: 4, name: 'Дрель Интерскол ДУ-13/780', category: 'drills', image: 'https://via.placeholder.com/300x200?text=Дрель+Интерскол', price: '25 000 ₸', description: 'Универсальная дрель для сверления' },
+    { id: 5, name: 'Лобзик Makita 4329', category: 'jigsaws', image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita', price: '35 000 ₸', description: 'Электролобзик для точной резки' },
+    { id: 6, name: 'Лазерный уровень BOSCH GLL 2-10', category: 'levels', image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень', price: '55 000 ₸', description: 'Точный лазерный уровень для разметки' },
+    { id: 7, name: 'Генератор Huter DY3000L', category: 'generators', image: 'https://via.placeholder.com/300x200?text=Генератор+Huter', price: '180 000 ₸', description: 'Бензиновый генератор 3 кВт' },
+    { id: 8, name: 'Мультиметр Fluke 117', category: 'measuring', image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke', price: '95 000 ₸', description: 'Профессиональный измерительный прибор' }
   ];
 
-  // Популярные товары — первые 4 из массива products
   const miniProducts = products.slice(0, 4);
-
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+  const filteredProducts = selectedCategory === 'all' ? products : products.filter(product => product.category === selectedCategory);
 
   return (
     <div className="catalog">
       <Header />
-      
       <main className="catalog-main">
         <div className="container">
-          {/* Популярные товары */}
           <section className="mini-catalog-section">
             <div className="mini-catalog-header">
               <h2>Популярные товары</h2>
@@ -126,7 +61,7 @@ const Catalog = () => {
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="product-image">
-                    <img src={product.image} alt={product.name} />
+                    <img src={product.image} alt={product.name} loading="lazy" />
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>
@@ -137,10 +72,7 @@ const Catalog = () => {
               ))}
             </div>
           </section>
-          
           <h1 className="catalog-title">Каталог товаров</h1>
-          
-          {/* Фильтр категорий */}
           <div className="category-filter category-filter-grid">
             {categories.map(category => (
               <button
@@ -152,8 +84,6 @@ const Catalog = () => {
               </button>
             ))}
           </div>
-
-          {/* Сетка товаров */}
           <div className="products-grid" style={{gap: 0}}>
             {filteredProducts.map(product => (
               <Link
@@ -165,48 +95,31 @@ const Catalog = () => {
                   className="product-card kaspi-style mini-product-card"
                   style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
                 >
-                  {/* Картинка */}
                   <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
+                    <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
                   </div>
-                  {/* Разделительная полоска между фото и названием */}
                   <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
                   <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
-                    {/* Название */}
                     <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                    {/* Надпись "Цена" */}
                     <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
                       <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                     </div>
-                    {/* Цена и разделитель */}
                     <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
                       <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{parseInt(product.price.replace(/\D/g, '')).toLocaleString('ru-RU')} ₸</span>
                       <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
                     </div>
-                  </div>
+                </div>
                 </div>
               </Link>
             ))}
           </div>
-
-          {/* SEO-описание */}
           <section className="seo-description">
             <h2>Электроинструменты: качество и надёжность</h2>
-            <p>
-              Мы предлагаем широкий ассортимент профессиональных электроинструментов 
-              от ведущих мировых производителей. В нашем каталоге вы найдёте дрели, 
-              шуруповёрты, болгарки, перфораторы и многое другое. Вся продукция 
-              сертифицирована и имеет гарантию от производителя.
-            </p>
-            <p>
-              Работаем как с розничными, так и с оптовыми клиентами. Предоставляем 
-              техническую поддержку и консультации по выбору инструмента. 
-              Доставка по Алматы и области.
-            </p>
+            <p>Мы предлагаем широкий ассортимент профессиональных электроинструментов от ведущих мировых производителей. В нашем каталоге вы найдёте дрели, шуруповёрты, болгарки, перфораторы и многое другое. Вся продукция сертифицирована и имеет гарантию от производителя.</p>
+            <p>Работаем как с розничными, так и с оптовыми клиентами. Предоставляем техническую поддержку и консультации по выбору инструмента. Доставка по Алматы и области.</p>
           </section>
         </div>
       </main>
-
       <Footer />
     </div>
   );

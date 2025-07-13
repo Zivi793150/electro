@@ -1,31 +1,49 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Catalog from './pages/Catalog';
-import Category from './pages/Category';
-import Product from './pages/Product';
-import About from './pages/About';
-import Contacts from './pages/Contacts';
-import Policy from './pages/Policy';
-import Cooperation from './pages/Cooperation';
-import NotFound from './pages/NotFound';
 import './App.css';
+
+// Lazy loading для всех страниц
+const Home = lazy(() => import('./pages/Home'));
+const Catalog = lazy(() => import('./pages/Catalog'));
+const Category = lazy(() => import('./pages/Category'));
+const Product = lazy(() => import('./pages/Product'));
+const About = lazy(() => import('./pages/About'));
+const Contacts = lazy(() => import('./pages/Contacts'));
+const Policy = lazy(() => import('./pages/Policy'));
+const Cooperation = lazy(() => import('./pages/Cooperation'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+// Fallback компонент для загрузки
+const LoadingFallback = () => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    height: '100vh',
+    fontSize: '18px',
+    color: '#666'
+  }}>
+    Загрузка...
+  </div>
+);
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/catalog" element={<Catalog />} />
-          <Route path="/category" element={<Category />} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contacts" element={<Contacts />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/cooperation" element={<Cooperation />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/category" element={<Category />} />
+            <Route path="/product/:id" element={<Product />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contacts" element={<Contacts />} />
+            <Route path="/policy" element={<Policy />} />
+            <Route path="/cooperation" element={<Cooperation />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </div>
     </Router>
   );

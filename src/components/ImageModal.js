@@ -10,7 +10,7 @@ const ImageModal = ({ images, activeIndex, onClose, onPrev, onNext }) => {
         {images.length > 1 && (
           <button className="image-modal-arrow left" onClick={onPrev}>&#8592;</button>
         )}
-        <img className="image-modal-img" src={images[activeIndex]} alt="Фото товара" />
+        <img className="image-modal-img" src={images[activeIndex]} alt="Фото товара" loading="lazy" />
         {images.length > 1 && (
           <button className="image-modal-arrow right" onClick={onNext}>&#8594;</button>
         )}

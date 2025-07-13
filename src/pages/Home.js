@@ -3,16 +3,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import '../styles/Home.css';
-import '../styles/Catalog.css';
-import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-  const handleSubmitForm = (formData) => {
-    console.log('Форма отправлена:', formData);
+  const handleSubmitForm = () => {
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
 
@@ -23,87 +20,14 @@ const Home = () => {
   ];
 
   const miniProducts = [
-    {
-      id: 1,
-      name: 'Болгарка Makita 125мм',
-      image: '/images/products/bolgarka-makita-125.jpg',
-      category: 'grinders',
-      price: '45 000 ₸',
-      description: 'Профессиональная угловая шлифмашина',
-      discount: 10
-    },
-    {
-      id: 2,
-      name: 'Шуруповёрт DeWalt 18V',
-      image: '/images/products/shurupovert-dewalt-18v.jpg',
-      category: 'screwdrivers',
-      price: '85 000 ₸',
-      description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором',
-      discount: 17
-    },
-    {
-      id: 3,
-      name: 'Перфоратор Bosch GBH 2-26',
-      image: '/images/products/perforator-bosch-gbh.jpg',
-      category: 'hammers',
-      price: '120 000 ₸',
-      description: 'Мощный перфоратор для строительных работ',
-      discount: 8
-    },
-    {
-      id: 4,
-      name: 'Дрель Интерскол ДУ-13/780',
-      image: '/images/products/drel.jpg',
-      category: 'drills',
-      price: '25 000 ₸',
-      description: 'Универсальная дрель для сверления'
-    },
-    {
-      id: 5,
-      name: 'Лобзик Makita 4329',
-      image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita',
-      category: 'jigsaws',
-      price: '35 000 ₸',
-      description: 'Электролобзик для точной резки',
-      discount: 5
-    },
-    {
-      id: 6,
-      name: 'Лазерный уровень BOSCH GLL 2-10',
-      image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень',
-      category: 'levels',
-      price: '55 000 ₸',
-      description: 'Точный лазерный уровень для разметки'
-    },
-    {
-      id: 7,
-      name: 'Генератор Huter DY3000L',
-      image: 'https://via.placeholder.com/300x200?text=Генератор+Huter',
-      category: 'generators',
-      price: '180 000 ₸',
-      description: 'Бензиновый генератор 3 кВт',
-      discount: 15
-    },
-    {
-      id: 8,
-      name: 'Мультиметр Fluke 117',
-      image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke',
-      category: 'measuring',
-      price: '95 000 ₸',
-      description: 'Профессиональный измерительный прибор'
-    }
-  ];
-
-  // Пример категорий с эмодзи
-  const categories = [
-    { id: 1, name: 'Дрели', icon: '🛠️' },
-    { id: 2, name: 'Шуруповёрты', icon: '🔩' },
-    { id: 3, name: 'Болгарки', icon: '⚙️' },
-    { id: 4, name: 'Перфораторы', icon: '🧱' },
-    { id: 5, name: 'Пилы', icon: '🪚' },
-    { id: 6, name: 'Измерительные', icon: '📏' },
-    { id: 7, name: 'Генераторы', icon: '⚡' },
-    { id: 8, name: 'Аксессуары', icon: '🎒' },
+    { id: 1, name: 'Болгарка Makita 125мм', image: '/images/products/bolgarka-makita-125.jpg', category: 'grinders' },
+    { id: 2, name: 'Шуруповёрт DeWalt 18V', image: '/images/products/shurupovert-dewalt-18v.jpg', category: 'screwdrivers' },
+    { id: 3, name: 'Перфоратор Bosch GBH 2-26', image: '/images/products/perforator-bosch-gbh.jpg', category: 'hammers' },
+    { id: 4, name: 'Дрель Интерскол ДУ-13/780', image: '/images/products/drel.jpg', category: 'drills' },
+    { id: 5, name: 'Лобзик Makita 4329', image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita', category: 'jigsaws' },
+    { id: 6, name: 'Лазерный уровень BOSCH GLL 2-10', image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень', category: 'levels' },
+    { id: 7, name: 'Генератор Huter DY3000L', image: 'https://via.placeholder.com/300x200?text=Генератор+Huter', category: 'generators' },
+    { id: 8, name: 'Мультиметр Fluke 117', image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke', category: 'measuring' }
   ];
 
   return (
@@ -112,7 +36,7 @@ const Home = () => {
       <section className="main-maket-section">
         <div className="main-maket-container">
           <div className="main-maket-left">
-            <img src="/images/hero/hero-main.jpg" alt="Электроинструменты для профессионалов" className="main-maket-image" />
+            <img src="/images/hero/hero-main.jpg" alt="Электроинструменты для профессионалов" className="main-maket-image" loading="lazy" />
           </div>
           <div className="main-maket-right">
             <h1 className="main-maket-title">Электроинструменты<br/>для профессионалов и дома</h1>
@@ -132,45 +56,29 @@ const Home = () => {
           </div>
         </div>
       </section>
-      {/* Мини-каталог товаров (теперь вместо ленты-каталога) */}
       <section className="mini-catalog-section">
         <div className="mini-catalog-header">
           <h2>Каталог товаров</h2>
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div className="mini-catalog-grid">
-          {miniProducts.slice(0, 8).map((product, idx) => {
-            const priceNum = parseInt(product.price.replace(/\D/g, ''));
-            const hasDiscount = !!product.discount;
-            const newPrice = hasDiscount ? Math.round(priceNum * (1 - product.discount/100)) : priceNum;
-            const installment = Math.round(newPrice / 12).toLocaleString('ru-RU') + ' ₸';
-            const bonus = Math.round(newPrice * 0.05).toLocaleString('ru-RU') + ' Б';
-            const rating = (4 + Math.random() * 1).toFixed(1);
-            const reviews = 500 + idx * 300;
-            return (
-              <Link
-                to={`/catalog?category=${product.category}`}
-                key={product.id}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                <div
-                className="product-card kaspi-style mini-product-card"
-                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
-              >
-                {/* Картинка */}
-                <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} />
+          {miniProducts.map((product) => (
+            <a
+              href={`/catalog?category=${product.category}`}
+              key={product.id}
+              className="mini-product-link"
+            >
+              <div className="product-card mini-product-card">
+                <div className="product-image">
+                  <img src={product.image} alt={product.name} loading="lazy" />
                 </div>
-                {/* Разделительная полоска между фото и названием */}
-                <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto -30px auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
-                  {/* Название */}
-                  <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1976d2', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                <div className="mini-product-divider"></div>
+                <div className="product-info">
+                  <span className="mini-product-name">{product.name}</span>
                 </div>
               </div>
-              </Link>
-            );
-          })}
+            </a>
+          ))}
         </div>
       </section>
       <Footer />
