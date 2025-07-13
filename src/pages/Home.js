@@ -61,20 +61,20 @@ const Home = () => {
           <h2>Каталог товаров</h2>
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
-        <div className="mini-catalog-grid">
+        <div className="home-mini-catalog-grid">
           {miniProducts.map((product) => (
             <a
               href={`/catalog?category=${product.category}`}
               key={product.id}
-              className="mini-product-link"
+              className="home-mini-product-link"
             >
-              <div className="product-card mini-product-card">
+              <div className="product-card home-mini-product-card">
                 <div className="product-image">
                   <img src={product.image} alt={product.name} loading="lazy" />
                 </div>
-                <div className="mini-product-divider"></div>
+                <div className="home-mini-product-divider"></div>
                 <div className="product-info">
-                  <span className="mini-product-name">{product.name}</span>
+                  <span className="home-mini-product-name">{product.name}</span>
                 </div>
               </div>
             </a>

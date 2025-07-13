@@ -39,6 +39,7 @@ const Catalog = () => {
     { id: 8, name: 'Мультиметр Fluke 117', category: 'measuring', image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke', price: '95 000 ₸', description: 'Профессиональный измерительный прибор' }
   ];
 
+  // miniProducts всегда первые 4 товара, не зависит от фильтрации
   const miniProducts = products.slice(0, 4);
   const filteredProducts = selectedCategory === 'all' ? products : products.filter(product => product.category === selectedCategory);
 
@@ -52,21 +53,27 @@ const Catalog = () => {
               <h2>Популярные товары</h2>
               <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
             </div>
-            <div className="mini-catalog-grid">
+            <div className="catalog-mini-catalog-grid">
               {miniProducts.map(product => (
                 <div
                   key={product.id}
-                  className="product-card mini-product-card"
+                  className="product-card catalog-mini-product-card"
                   onClick={() => window.location.href = `/product/${product.id}`}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
                 >
-                  <div className="product-image">
-                    <img src={product.image} alt={product.name} loading="lazy" />
+                  <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
                   </div>
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <p className="product-description">{product.description}</p>
-                    <div className="product-price">{product.price}</div>
+                  <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
+                  <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
+                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                    <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
+                      <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
+                    </div>
+                    <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
+                      <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{parseInt(product.price.replace(/\D/g, '')).toLocaleString('ru-RU')} ₸</span>
+                      <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
+                    </div>
                   </div>
                 </div>
               ))}
