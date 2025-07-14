@@ -79,18 +79,9 @@ const Catalog = () => {
               ))}
             </div>
           </section>
-          <h1 className="catalog-title">Каталог товаров</h1>
-          <div className="category-filter category-filter-grid">
-            {categories.map(category => (
-              <button
-                key={category.id}
-                className={`category-btn ${selectedCategory === category.id ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                <span className="category-name">{category.name}</span>
-              </button>
-            ))}
-          </div>
+          <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
+            Каталог товаров
+          </h1>
           <div className="products-grid" style={{gap: 0}}>
             {filteredProducts.map(product => (
               <Link

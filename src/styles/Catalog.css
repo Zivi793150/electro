@@ -1,6 +1,11 @@
 /* --- Оптимизированные стили для каталога --- */
 .catalog-main { padding: 24px 0; background: #f8f9fa; min-height: 60vh; }
-.catalog-title { text-align: center; font-size: 2rem; margin-bottom: 24px; color: #222; }
+.catalog-title { 
+  text-align: left; 
+  font-size: 2rem; 
+  margin-bottom: 24px; 
+  color: #222; 
+}
 .category-filter { display: flex; flex-wrap: wrap; justify-content: center; margin: 24px 0; gap: 8px; }
 .category-btn { min-width: 100px; height: 40px; padding: 0 12px; background: #fff; border: 1px solid #e3eaf6; font-size: 1rem; color: #222; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .category-btn.active { background: #ffc107; color: #222; border-color: #ffc107; }

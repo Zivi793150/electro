@@ -13,7 +13,10 @@ const products = [
     description: 'Профессиональная угловая шлифмашина',
     price: '45 000 ₸',
     images: [
-      '/images/products/bolgarka-makita-125.jpg'
+      '/images/products/bolgarka-makita-125.jpg',
+      '/images/products/shurupovert-dewalt-18v.jpg',
+      '/images/products/perforator-bosch-gbh.jpg',
+      '/images/products/drel.jpg'
     ],
     specifications: [
       { name: 'Мощность', value: '1200 Вт' },
@@ -205,16 +208,18 @@ const Product = () => {
           <div className="product-flex">
             {/* Фото и миниатюры */}
             <div className="product-gallery">
-              <div className="product-image-main">
-                <img src={product.images[activeImage]} alt={product.name} loading="lazy" />
-              </div>
-              {product.images.length > 1 && (
-                <div className="product-thumbs">
-                  {product.images.map((img,idx)=>(
-                    <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
-                  ))}
+              <div className="product-gallery-inner">
+                <div className="product-image-main">
+                  <img src={product.images[activeImage]} alt={product.name} loading="lazy" />
                 </div>
-              )}
+                {product.images.length > 1 && (
+                  <div className="product-thumbs">
+                    {product.images.map((img,idx)=>(
+                      <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             {/* Инфо и цена справа */}
             <div className="product-info-block">
@@ -223,25 +228,31 @@ const Product = () => {
               <div className="product-divider"></div>
               <div className="product-buy-row">
                 <div className="product-price-block">
-                  <div className="product-price-label">Цена</div>
-                  <div className="product-price-value">
-                    {parseInt(product.price.replace(/\D/g,'')).toLocaleString('ru-RU')}
-                    <span className="product-currency">₸</span>
+                  <div className="product-price-label-value">
+                    <div className="product-price-label">Цена</div>
+                    <div className="product-price-value">
+                      {parseInt(product.price.replace(/\D/g,'')).toLocaleString('ru-RU')}
+                      <span className="product-currency">₸</span>
+                    </div>
                   </div>
                   <span className="product-price-divider"></span>
                 </div>
-                <button className="product-buy-btn" onClick={handleOpenModal}>Оформить заказ</button>
+                <div className="product-buy-btns">
+                  <button className="product-btn-ask" onClick={handleOpenModal}>Задать вопрос</button>
+                  <div className="product-btns-divider"></div>
+                  <button className="product-btn-buy" onClick={handleOpenModal}>Купить</button>
+                </div>
               </div>
             </div>
           </div>
           {/* Вкладки снизу */}
           <div className="product-tabs-wrap">
             <Tabs product={product} />
-          </div>
-        </div>
+                </div>
+            </div>
       </main>
       <Footer />
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
+    <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
     </div>
   );
 };

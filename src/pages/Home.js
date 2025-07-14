@@ -65,7 +65,7 @@ const Home = () => {
           {miniProducts.map((product) => (
             <a
               href={`/catalog?category=${product.category}`}
-              key={product.id}
+                key={product.id}
               className="home-mini-product-link"
             >
               <div className="product-card home-mini-product-card">

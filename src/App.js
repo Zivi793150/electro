@@ -32,17 +32,17 @@ function App() {
     <Router>
       <div className="App">
         <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/category" element={<Category />} />
-            <Route path="/product/:id" element={<Product />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/policy" element={<Policy />} />
-            <Route path="/cooperation" element={<Cooperation />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/product/:id" element={<Product />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/policy" element={<Policy />} />
+          <Route path="/cooperation" element={<Cooperation />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
         </Suspense>
       </div>
     </Router>
