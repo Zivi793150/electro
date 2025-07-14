@@ -242,7 +242,7 @@ const Product = () => {
                   <div className="product-btns-divider"></div>
                   <button className="product-btn-buy" onClick={handleOpenModal}>Купить</button>
                 </div>
-              </div>
+            </div>
             </div>
           </div>
           {/* Вкладки снизу */}
@@ -276,9 +276,9 @@ const Product = () => {
                   <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
                     <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{parseInt(product.price.replace(/\D/g, '')).toLocaleString('ru-RU')} ₸</span>
                     <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
-                  </div>
+            </div>
                 </div>
-              </div>
+            </div>
             ))}
           </div>
         </div>

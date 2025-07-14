@@ -3,6 +3,7 @@
 .catalog-title { 
   text-align: left; 
   font-size: 2rem; 
+  margin-top: 0;
   margin-bottom: 24px; 
   color: #222; 
 }
@@ -11,7 +12,8 @@
 .category-btn.active { background: #ffc107; color: #222; border-color: #ffc107; }
 .category-name { font-size: 1rem; color: inherit; text-align: center; width: 100%; }
 .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; margin-bottom: 24px; }
-.product-card { background: #fff; border: 1px solid #e3e6ea; display: flex; flex-direction: column; height: 100%; }
+.product-card { background: #fff; border: 1px solid #e3e6ea; display: flex; flex-direction: column; height: 100%; box-shadow: none; transition: none; }
+.product-card:hover { box-shadow: none !important; transform: none !important; }
 .product-image { height: 120px; background: #fff; display: flex; align-items: flex-start; justify-content: center; padding: 0; margin: 0; }
 .product-image img { max-width: 100%; max-height: 100px; object-fit: contain; }
 .product-info { padding: 8px; display: flex; flex-direction: column; flex: 1 1 auto; justify-content: flex-end; }
@@ -27,16 +29,16 @@
 /* KASPI STYLE */
 .product-card.kaspi-style {
   position: relative;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid #e0e0e0;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: none;
+  transition: none;
   padding-bottom: 10px;
 }
 .product-card.kaspi-style:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  transform: translateY(-2px);
+  box-shadow: none;
+  transform: none;
 }
 .kaspi-badge {
   position: absolute;
@@ -243,12 +245,12 @@
   width: 220px;
   min-width: 180px;
   background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: none;
+  border-radius: 0;
   padding: 24px 18px 24px 18px;
   box-sizing: border-box;
   margin-right: 0;
-  margin-top: 48px;
+  margin-top: 0;
 }
 .sidebar-title {
   font-size: 1.15rem;
