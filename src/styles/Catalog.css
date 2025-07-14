@@ -1,5 +1,5 @@
 /* --- Оптимизированные стили для каталога --- */
-.catalog-main { padding: 24px 0; background: #f8f9fa; min-height: 60vh; }
+.catalog-main { padding: 24px 0 0 0; background: #f8f9fa; min-height: 60vh; }
 .catalog-title { 
   text-align: left; 
   font-size: 2rem; 
@@ -232,3 +232,57 @@
 }
 @media (max-width: 900px) { .catalog-mini-catalog-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 600px) { .catalog-mini-catalog-grid { grid-template-columns: 1fr; } .product-image { height: 60px; } .product-image img { height: 40px; max-height: 40px; } } 
+
+.catalog-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+}
+.catalog-sidebar {
+  width: 220px;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px 18px 24px 18px;
+  box-sizing: border-box;
+  margin-right: 0;
+  margin-top: 48px;
+}
+.sidebar-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #1a2236;
+}
+.sidebar-categories {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar-category-btn {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1.04rem;
+  color: #222;
+  padding: 8px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.sidebar-category-btn.active,
+.sidebar-category-btn:hover {
+  background: #f5f7fa;
+  color: #FFB300;
+  font-weight: 600;
+}
+.catalog-content {
+  flex: 1 1 0%;
+  min-width: 0;
+} 
