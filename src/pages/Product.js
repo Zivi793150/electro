@@ -205,17 +205,38 @@ const Product = () => {
       <Header />
       <main className="product-main">
         <div className="product-container">
+          <nav className="breadcrumbs" style={{paddingBottom: '18px'}}>
+          <a href="/">Главная</a>
+            <span>&gt;</span>
+          <a href="/catalog">Каталог</a>
+            {categoryName && (
+              <>
+                <span>&gt;</span>
+                <a href={`/catalog?category=${product.category}`}>{categoryName}</a>
+              </>
+            )}
+            <span>&gt;</span>
+            <span style={{color:'#1a2236', fontWeight:500}}>{product.name}</span>
+          </nav>
           <div className="product-flex">
             {/* Фото и миниатюры */}
             <div className="product-gallery">
               <div className="product-gallery-inner">
-                <div className="product-image-main">
-                  <img src={product.images[activeImage]} alt={product.name} loading="lazy" />
+                <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
+                  <img src={(product.images.length > 1 ? product.images[activeImage] : ["/images/products/bolgarka-makita-125.jpg","/images/products/perforator-bosch-gbh.jpg","/images/products/drel.jpg"][activeImage])} alt={product.name} loading="lazy" />
                 </div>
                 {product.images.length > 1 && (
                   <div className="product-thumbs">
                     {product.images.map((img,idx)=>(
                       <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
+                    ))}
+                  </div>
+                )}
+                {/* Если картинок мало, добавим любые из public/images/products/ */}
+                {product.images.length <= 1 && (
+                  <div className="product-thumbs" style={{marginBottom: '18px'}}>
+                    {["/images/products/bolgarka-makita-125.jpg","/images/products/perforator-bosch-gbh.jpg","/images/products/drel.jpg"].map((img,idx)=>(
+                      <img key={idx} src={img} alt={"thumb"+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
                     ))}
                   </div>
                 )}
@@ -231,18 +252,20 @@ const Product = () => {
                   <div className="product-price-label-value">
                     <div className="product-price-label">Цена</div>
                     <div className="product-price-value">
-                      {parseInt(product.price.replace(/\D/g,'')).toLocaleString('ru-RU')}
+                      {parseInt(product.price.replace(/\D/g,''))}
                       <span className="product-currency">₸</span>
                     </div>
                   </div>
-                  <span className="product-price-divider"></span>
                 </div>
+                <span className="product-price-divider"></span>
                 <div className="product-buy-btns">
                   <button className="product-btn-ask" onClick={handleOpenModal}>Задать вопрос</button>
                   <div className="product-btns-divider"></div>
                   <button className="product-btn-buy" onClick={handleOpenModal}>Купить</button>
-                </div>
+                
+              </div>
             </div>
+            <div className="product-divider"></div>
             </div>
           </div>
           {/* Вкладки снизу */}
@@ -285,12 +308,63 @@ const Product = () => {
       </section>
       <Footer />
     <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
+    {/* Модальное окно для увеличенного фото */}
+    {showImageModal && (
+      <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
+          <img src={product.images[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} />
+          {product.images.length > 1 && (
+            <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
+              <button onClick={handlePrevImage} style={{fontSize:28,padding:'4px 16px',background:'none',border:'none',cursor:'pointer',color:'#222'}}>&#8592;</button>
+              <button onClick={handleNextImage} style={{fontSize:28,padding:'4px 16px',background:'none',border:'none',cursor:'pointer',color:'#222'}}>&#8594;</button>
+            </div>
+          )}
+          <button onClick={handleCloseImageModal} style={{position:'absolute',top:8,right:12,fontSize:32,background:'none',border:'none',color:'#222',cursor:'pointer',lineHeight:1}}>&times;</button>
+        </div>
+      </div>
+    )}
     </div>
   );
 };
 
 function Tabs({product}) {
   const [tab,setTab]=React.useState('desc');
+  // Пример группированных характеристик (можно заменить на реальные данные)
+  const groupedSpecs = [
+    {
+      title: 'Дополнительно',
+      specs: [
+        { name: 'Наличие удара', value: 'безударный' },
+        { name: 'Функции', value: 'реверс' },
+        { name: 'Комплектация', value: 'кейс, зарядное устройство, угловая насадка, два аккумулятора, набор бит, набор сверл, набор накидных головок' },
+        { name: 'Особенности', value: 'сменный аккумулятор' },
+        { name: 'Вес', value: '2.0 кг' },
+        { name: 'Дополнительная информация', value: 'гибкая насадка, набор бит, набор сверл, набор накидных головок' },
+      ]
+    },
+    {
+      title: 'Аккумулятор',
+      specs: [
+        { name: 'Напряжение аккумулятора', value: '48.0 В' },
+        { name: 'Тип аккумулятора', value: 'Li-Ion' },
+        { name: 'Ёмкость аккумулятора', value: '2.0 Ач' },
+        { name: 'Питание', value: 'от аккумулятора' },
+        { name: 'Аккумулятор и зарядное устройство в комплекте', value: 'Да' },
+      ]
+    },
+    {
+      title: 'Характеристики',
+      specs: [
+        { name: 'Тип патрона', value: 'быстрозажимной' },
+        { name: 'Тип инструмента', value: 'дрель-шуруповёрт' },
+        { name: 'Количество скоростей работы', value: '2' },
+        { name: 'Диаметр патрона', value: '10' },
+        { name: 'Максимальное число оборотов холостого хода', value: '1400.0 об/мин' },
+        { name: 'Максимальный крутящий момент', value: '48.0 Нм' },
+        { name: 'Потребляемая мощность', value: '350.0 Вт' },
+      ]
+    }
+  ];
   return (
     <div className="product-tabs">
       <div className="product-tabs-header">
@@ -301,14 +375,23 @@ function Tabs({product}) {
       <div className="product-tabs-content">
         {tab==='desc' && <div>{product.description}</div>}
         {tab==='specs' && (
-          <div>
-            {product.specifications && product.specifications.length>0 ? (
-              <ul>
-                {product.specifications.map((spec,idx)=>(
-                  <li key={idx}><b>{spec.name}:</b> {spec.value}</li>
-                ))}
-              </ul>
-            ) : 'Нет данных'}
+          <div className="product-specs-kaspi-block">
+            <h2 className="product-specs-title">Характеристики {product.name}</h2>
+            {groupedSpecs.map((group, idx) => (
+              <div className="product-specs-group" key={group.title}>
+                <div className="product-specs-group-title">{group.title}</div>
+                <div className="product-specs-flex-table">
+                  {group.specs.map((spec, i) => (
+                    <div className={"product-specs-flex-row" + (!spec.value ? " no-value" : "")} key={i}>
+                      <span className="product-specs-flex-name">{spec.name}</span>
+                      <span className="product-specs-flex-dots"></span>
+                      {spec.value && <span className="product-specs-flex-value">{spec.value}</span>}
+                    </div>
+                  ))}
+                </div>
+                {idx !== groupedSpecs.length-1 && <div className="product-specs-divider"></div>}
+              </div>
+            ))}
           </div>
         )}
         {tab==='equip' && (

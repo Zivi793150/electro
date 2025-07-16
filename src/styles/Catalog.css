@@ -1,6 +1,6 @@
 /* --- Оптимизированные стили для каталога --- */
 .catalog-main { padding: 24px 0 0 0; background: #f8f9fa; min-height: 60vh; }
-.catalog-title { 
+.catalog-title {
   text-align: left; 
   font-size: 2rem; 
   margin-top: 0;
