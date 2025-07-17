@@ -20,7 +20,7 @@
 .product-flex {
   display: flex;
   gap: 16px;
-  align-items: flex-start;
+  align-items: center; /* центрируем по вертикали */
   justify-content: flex-start;
   max-width: 1100px;
   width: 100%;
@@ -33,12 +33,11 @@
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
-  align-items: stretch;
 }
 .product-gallery {
-  flex: 0 0 660px;
-  min-width: 520px;
-  max-width: 660px;
+  flex: 0 0 600px;
+  min-width: 400px;
+  max-width: 600px;
   position: relative;
   /* padding-bottom: 80px; */
   padding-left: 8px;
@@ -69,7 +68,13 @@
   text-align: center;
   border: none; border-radius: 0; padding: 0; background: #fff; text-align: center; box-shadow: none;
 }
-.product-image-main img { max-width: 100%; max-height: 420px; object-fit: contain; border-radius: 0; box-shadow: none; }
+.product-image-main img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+}
 .product-thumbs {
   position: static;
   left: auto;
@@ -87,28 +92,15 @@
 .product-thumbs img { width: 64px; height: 64px; object-fit: contain; border-radius: 0; border: none; cursor: pointer; background: #fff; transition: box-shadow 0.2s; box-shadow: 0 0 0 1.5px #e0e0e0; }
 .product-thumbs img.active { box-shadow: 0 0 0 2.5px #1e88e5; }
 .product-info-block {
-  margin-top: -70px;
-  margin-bottom: 0;
   width: 340px;
   max-width: 340px;
   min-height: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  justify-content: flex-start;
-  position: relative;
-  background: #fff;
-  border-left: none;
-  border-right: none;
-
-  padding: 20px 20px 16px 20px;
-  box-sizing: border-box;
-  align-items: flex-start;
-  text-align: left;
-  transform: scale(0.67);
-  transform-origin: center center;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 8px 16px 16px 16px !important;
+  margin-top: -30px;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  transform: none;
 }
 .product-info-block::after { display: none; }
 .product-title {
@@ -127,7 +119,7 @@
   text-align: left;
 }
 .product-divider {
-  width: 340px;
+  width: 340px; /* чтобы линия была по всей ширине блока */
   border-top: 1.5px solid #bdbdbd;
   margin: 10px 0 14px 0;
 
@@ -403,6 +395,20 @@
 .product-specs-divider {
   border-top: 1.5px solid #bdbdbd;
   margin: 18px 0 14px 0;
+}
+.product-desc-kaspi-block {
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 18px 18px 10px 18px;
+  margin: 0 auto 0 auto;
+  max-width: none;
+  min-width: 0;
+  border: 1.5px solid #bdbdbd;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 1.05rem;
+  color: #222;
 }
 @media (max-width: 900px) {
   .product-flex { flex-direction: column; gap: 24px; align-items: center; }

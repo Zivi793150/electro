@@ -373,7 +373,7 @@ function Tabs({product}) {
         <button className={tab==='equip'?'active':''} onClick={()=>setTab('equip')}>Комплектация</button>
       </div>
       <div className="product-tabs-content">
-        {tab==='desc' && <div>{product.description}</div>}
+        {tab==='desc' && <div className="product-desc-kaspi-block">{product.description}</div>}
         {tab==='specs' && (
           <div className="product-specs-kaspi-block">
             <h2 className="product-specs-title">Характеристики {product.name}</h2>
@@ -395,7 +395,7 @@ function Tabs({product}) {
           </div>
         )}
         {tab==='equip' && (
-          <div>
+          <div className="product-desc-kaspi-block">
             {product.equipment && product.equipment.length>0 ? (
               <ul>
                 {product.equipment.map((item,idx)=>(
