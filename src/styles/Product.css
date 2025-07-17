@@ -149,7 +149,7 @@
   min-width: 120px;
   margin-right: 24px;
   position: relative;
-}
+  }
 .product-price-label-value {
   display: flex;
   flex-direction: column;
@@ -236,10 +236,10 @@
   min-width: 0;
   text-align: center;
   display: block;
-}
+  }
 .product-btn-buy:hover {
   background: #e65c00;
-}
+  }
 .product-btns-divider {
   width: 100%;
   height: 2px;
@@ -248,7 +248,7 @@
   border-radius: 1px;
   display: block;
   position: static;
-}
+  }
 .product-tabs-wrap {
   margin-top: 40px;
   width: 100%;
@@ -417,7 +417,7 @@
   .product-specs-kaspi-block {
     padding: 12px 4px 8px 4px;
     max-width: 100%;
-  }
+}
   .product-specs-title { font-size: 1.08rem; }
   .product-specs-group-title { font-size: 1rem; }
   .product-specs-name, .product-specs-value { font-size: 0.98rem; }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
+import AboutCompanySection from '../components/AboutCompanySection';
 import '../styles/Home.css';
 
 const Home = () => {
@@ -81,6 +82,7 @@ const Home = () => {
           ))}
         </div>
       </section>
+      <AboutCompanySection />
       <Footer />
       <Modal 
         isOpen={isModalOpen}
