@@ -175,3 +175,23 @@ npm run build
 ✅ **Этап 4**: Дополнительные страницы - ЗАВЕРШЕН  
 
 **Статус проекта**: ПОЛНОСТЬЮ ЗАВЕРШЕН ✅
+
+## Backend (Node.js + Express + MongoDB)
+
+### Запуск
+1. Установите зависимости:
+   ```
+npm install
+   ```
+2. Создайте файл `.env` в корне проекта и добавьте строку подключения к MongoDB:
+   ```
+MONGODB_URI=mongodb://localhost:27017/electro
+PORT=5000
+   ```
+3. Запустите сервер:
+   ```
+node server.js
+   ```
+
+### Проверка
+Перейдите на [http://localhost:5000/api/ping](http://localhost:5000/api/ping) — должен быть ответ `{ "message": "pong" }`.

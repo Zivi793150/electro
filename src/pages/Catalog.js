@@ -11,10 +11,28 @@ const Catalog = () => {
     return params.get('category') || 'all';
   };
   const [selectedCategory, setSelectedCategory] = useState(getCategoryFromQuery());
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setSelectedCategory(getCategoryFromQuery());
   }, [location.search]);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    fetch('http://localhost:5000/api/products')
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('Ошибка загрузки товаров');
+        setLoading(false);
+      });
+  }, []);
 
   const categories = [
     { id: 'all', name: 'Все товары', icon: '🔧' },
@@ -28,20 +46,9 @@ const Catalog = () => {
     { id: 'measuring', name: 'Измерители', icon: '📏' }
   ];
 
-  const products = [
-    { id: 1, name: 'Болгарка Makita 125мм', category: 'grinders', image: '/images/products/bolgarka-makita-125.jpg', price: '45 000 ₸', description: 'Профессиональная угловая шлифмашина' },
-    { id: 2, name: 'Шуруповёрт DeWalt 18V', category: 'screwdrivers', image: '/images/products/shurupovert-dewalt-18v.jpg', price: '85 000 ₸', description: 'Беспроводной шуруповёрт с литий-ионным аккумулятором' },
-    { id: 3, name: 'Перфоратор Bosch GBH 2-26', category: 'hammers', image: '/images/products/perforator-bosch-gbh.jpg', price: '120 000 ₸', description: 'Мощный перфоратор для строительных работ' },
-    { id: 4, name: 'Дрель Интерскол ДУ-13/780', category: 'drills', image: 'https://via.placeholder.com/300x200?text=Дрель+Интерскол', price: '25 000 ₸', description: 'Универсальная дрель для сверления' },
-    { id: 5, name: 'Лобзик Makita 4329', category: 'jigsaws', image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita', price: '35 000 ₸', description: 'Электролобзик для точной резки' },
-    { id: 6, name: 'Лазерный уровень BOSCH GLL 2-10', category: 'levels', image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень', price: '55 000 ₸', description: 'Точный лазерный уровень для разметки' },
-    { id: 7, name: 'Генератор Huter DY3000L', category: 'generators', image: 'https://via.placeholder.com/300x200?text=Генератор+Huter', price: '180 000 ₸', description: 'Бензиновый генератор 3 кВт' },
-    { id: 8, name: 'Мультиметр Fluke 117', category: 'measuring', image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke', price: '95 000 ₸', description: 'Профессиональный измерительный прибор' }
-  ];
-
-  // miniProducts всегда первые 4 товара, не зависит от фильтрации
-  const miniProducts = products.slice(0, 4);
-  const filteredProducts = selectedCategory === 'all' ? products : products.filter(product => product.category === selectedCategory);
+  const filteredProducts = selectedCategory === 'all'
+    ? products
+    : products.filter(product => product.category === selectedCategory);
 
   return (
     <div className="catalog">
@@ -67,6 +74,11 @@ const Catalog = () => {
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               Каталог товаров
             </h1>
+            {loading ? (
+              <div style={{padding: 32}}>Загрузка...</div>
+            ) : error ? (
+              <div style={{color: 'red', padding: 32}}>{error}</div>
+            ) : (
             <div className="products-grid" style={{gap: 0}}>
               {filteredProducts.map(product => (
                 <Link
@@ -79,7 +91,7 @@ const Catalog = () => {
                     style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
                   >
                     <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                      <img src={product.image} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
+                      <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
                     </div>
                     <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
                     <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
@@ -88,7 +100,7 @@ const Catalog = () => {
                         <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                       </div>
                       <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
-                        <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{parseInt(product.price.replace(/\D/g, '')).toLocaleString('ru-RU')} ₸</span>
+                        <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{product.price ? product.price + ' ₸' : ''}</span>
                         <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
                       </div>
                   </div>
@@ -96,6 +108,7 @@ const Catalog = () => {
                 </Link>
               ))}
             </div>
+            )}
             <section className="seo-description">
               <h2>Электроинструменты: качество и надёжность</h2>
               <p>Мы предлагаем широкий ассортимент профессиональных электроинструментов от ведущих мировых производителей. В нашем каталоге вы найдёте дрели, шуруповёрты, болгарки, перфораторы и многое другое. Вся продукция сертифицирована и имеет гарантию от производителя.</p>
