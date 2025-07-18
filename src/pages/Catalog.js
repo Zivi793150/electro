@@ -82,8 +82,8 @@ const Catalog = () => {
             <div className="products-grid" style={{gap: 0}}>
               {filteredProducts.map(product => (
                 <Link
-                  to={`/product/${product.id}`}
-                  key={product.id}
+                  to={`/product/${product._id}`}
+                  key={product._id}
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
                   <div

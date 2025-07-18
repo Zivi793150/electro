@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
@@ -7,6 +7,15 @@ import '../styles/Home.css';
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [miniProducts, setMiniProducts] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products?limit=8')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setMiniProducts(data);
+      });
+  }, []);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -18,17 +27,6 @@ const Home = () => {
     'Только оригинальный инструмент от ведущих брендов',
     'Гарантия и сервисное обслуживание',
     'Быстрая доставка по всему Казахстану'
-  ];
-
-  const miniProducts = [
-    { id: 1, name: 'Болгарка Makita 125мм', image: '/images/products/bolgarka-makita-125.jpg', category: 'grinders' },
-    { id: 2, name: 'Шуруповёрт DeWalt 18V', image: '/images/products/shurupovert-dewalt-18v.jpg', category: 'screwdrivers' },
-    { id: 3, name: 'Перфоратор Bosch GBH 2-26', image: '/images/products/perforator-bosch-gbh.jpg', category: 'hammers' },
-    { id: 4, name: 'Дрель Интерскол ДУ-13/780', image: '/images/products/drel.jpg', category: 'drills' },
-    { id: 5, name: 'Лобзик Makita 4329', image: 'https://via.placeholder.com/300x200?text=Лобзик+Makita', category: 'jigsaws' },
-    { id: 6, name: 'Лазерный уровень BOSCH GLL 2-10', image: 'https://via.placeholder.com/300x200?text=Лазерный+уровень', category: 'levels' },
-    { id: 7, name: 'Генератор Huter DY3000L', image: 'https://via.placeholder.com/300x200?text=Генератор+Huter', category: 'generators' },
-    { id: 8, name: 'Мультиметр Fluke 117', image: 'https://via.placeholder.com/300x200?text=Мультиметр+Fluke', category: 'measuring' }
   ];
 
   return (
@@ -65,13 +63,13 @@ const Home = () => {
         <div className="home-mini-catalog-grid">
           {miniProducts.map((product) => (
             <a
-              href={`/catalog?category=${product.category}`}
-                key={product.id}
+              href={`/product/${product._id}`}
+              key={product._id}
               className="home-mini-product-link"
             >
               <div className="product-card home-mini-product-card">
                 <div className="product-image">
-                  <img src={product.image} alt={product.name} loading="lazy" />
+                  <img src={product.image || '/images/products/placeholder.png'} alt={product.name} loading="lazy" />
                 </div>
                 <div className="home-mini-product-divider"></div>
                 <div className="product-info">
