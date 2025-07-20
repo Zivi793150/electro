@@ -1,28 +1,14 @@
-import { MongoClient, ObjectId } from 'mongodb';
-
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+import { connectToDatabase } from '../mongodb';
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
+  const { db } = await connectToDatabase();
+  const { id } = req.query;
   try {
-    await client.connect();
-    const db = client.db('Tanker_products');
-    const collection = db.collection('products');
-
-    if (req.method === 'GET') {
-      const { id } = req.query;
-      const product = await collection.findOne({ _id: new ObjectId(id) });
-      if (!product) {
-        res.status(404).json({ error: 'Товар не найден' });
-      } else {
-        res.status(200).json(product);
-      }
-    } else {
-      res.status(405).json({ error: 'Method not allowed' });
-    }
-  } catch (err) {
+    const product = await db.collection('products').findOne({ _id: new ObjectId(id) });
+    if (!product) return res.status(404).json({ error: 'Товар не найден' });
+    res.status(200).json(product);
+  } catch (e) {
     res.status(500).json({ error: 'Ошибка при получении товара' });
-  } finally {
-    await client.close();
   }
 } 

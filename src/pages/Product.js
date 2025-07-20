@@ -29,7 +29,7 @@ const Product = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/products/${id}`)
+    fetch(`http://localhost:5000/api/products/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) {
@@ -47,7 +47,7 @@ const Product = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch('/api/products?limit=4')
+    fetch('http://localhost:5000/api/products?limit=4')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
