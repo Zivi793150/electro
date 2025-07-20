@@ -96,7 +96,7 @@ const Product = () => {
   };
 
   const handleBuy = () => {
-    navigate('/checkout');
+    navigate('/checkout', { state: { product } });
   };
 
   // Модалка фото
