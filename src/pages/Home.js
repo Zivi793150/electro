@@ -10,7 +10,7 @@ const Home = () => {
   const [miniProducts, setMiniProducts] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/products?limit=8')
+    fetch('/api/products?limit=8')
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
