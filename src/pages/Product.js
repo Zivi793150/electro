@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
@@ -25,6 +25,11 @@ const Product = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
+  const navigate = useNavigate();
+
+  const API_URL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000/api/products'
+    : '/api/products';
 
   useEffect(() => {
     setLoading(true);
@@ -90,6 +95,10 @@ const Product = () => {
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
 
+  const handleBuy = () => {
+    navigate('/checkout');
+  };
+
   // Модалка фото
   const handleImageClick = () => setShowImageModal(true);
   const handleCloseImageModal = () => setShowImageModal(false);
@@ -107,17 +116,17 @@ const Product = () => {
       <Header />
       <main className="product-main">
         <div className="product-container">
-          <nav className="breadcrumbs" style={{paddingBottom: '18px'}}>
-          <a href="/">Главная</a>
-            <span>&gt;</span>
-          <a href="/catalog">Каталог</a>
+          <nav className="breadcrumbs" style={{paddingBottom: '18px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
+            <a href="/">Главная</a>
+            <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+            <a href="/catalog">Каталог</a>
             {categoryName && (
               <>
-                <span>&gt;</span>
+                <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
                 <a href={`/catalog?category=${product.category}`}>{categoryName}</a>
               </>
             )}
-            <span>&gt;</span>
+            <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
             <span style={{color:'#1a2236', fontWeight:500}}>{product.name}</span>
           </nav>
           <div className="product-flex">
@@ -127,19 +136,29 @@ const Product = () => {
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img src={Array.isArray(product.images) && product.images.length > 0 ? product.images[activeImage] : '/images/products/placeholder.png'} alt={product.name} loading="lazy" />
                 </div>
-                {Array.isArray(product.images) && product.images.length > 1 && (
-                  <div className="product-thumbs">
-                    {product.images.map((img,idx)=>(
-                      <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
-                    ))}
-                  </div>
-                )}
                 {(Array.isArray(product.images) && product.images.length <= 1) && (
-                  <div className="product-thumbs" style={{marginBottom: '18px'}}>
-                    {["/images/products/bolgarka-makita-125.jpg","/images/products/perforator-bosch-gbh.jpg","/images/products/drel.jpg"].map((img,idx)=>(
-                      <img key={idx} src={img} alt={"thumb"+idx} className={activeImage===idx?"active":""} onClick={()=>setActiveImage(idx)} loading="lazy" />
-                    ))}
-                  </div>
+                  <>
+                    <div className="product-thumbs" style={{marginBottom: '18px'}}>
+                      {["/images/products/bolgarka-makita-125.jpg","/images/products/perforator-bosch-gbh.jpg","/images/products/drel.jpg"].map((img,idx)=>(
+                        <img key={idx} src={img} alt={"thumb"+idx} className={activeImage===idx?"active": ""} onClick={()=>setActiveImage(idx)} loading="lazy" />
+                      ))}
+                    </div>
+                    <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 4, marginBottom: 12, border:'none'}}>
+                      Чтобы увеличить, нажмите на картинку
+                    </div>
+                  </>
+                )}
+                {Array.isArray(product.images) && product.images.length > 1 && (
+                  <>
+                    <div className="product-thumbs">
+                      {product.images.map((img,idx)=>(
+                        <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active": ""} onClick={()=>setActiveImage(idx)} loading="lazy" />
+                      ))}
+                    </div>
+                    <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 4, marginBottom: 12, border:'none'}}>
+                      Чтобы увеличить, нажмите на картинку
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -162,7 +181,7 @@ const Product = () => {
                 <div className="product-buy-btns">
                   <button className="product-btn-ask" onClick={handleOpenModal}>Задать вопрос</button>
                   <div className="product-btns-divider"></div>
-                  <button className="product-btn-buy" onClick={handleOpenModal}>Купить</button>
+                  <button className="product-btn-buy" onClick={handleBuy}>Купить</button>
                 
               </div>
             </div>

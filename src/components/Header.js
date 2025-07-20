@@ -6,13 +6,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-united-bar">
-        <div className="header-logo">
-          <Link to="/">
-            <span className="logo-icon" style={{fontSize:'2.7rem', marginRight:8}}>🛠️</span>
-            <span className="logo-text">TANKER</span>
-          </Link>
-        </div>
-        <nav className="main-nav">
+        <nav className="main-nav" style={{ fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400 }}>
           <Link to="/">Главная</Link>
           <span className="nav-sep" />
           <Link to="/catalog">Каталог</Link>

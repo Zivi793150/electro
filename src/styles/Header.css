@@ -301,6 +301,7 @@
   min-height: 72px;
   background: #fff;
   /* border-bottom: 1px solid #e3e6ea; */
+  position: relative;
 }
 .header-logo {
   flex: 0 0 auto;
@@ -316,13 +317,24 @@
   gap: 0;
   font-size: 1.13rem;
   font-weight: 500;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  z-index: 2;
 }
 .header-right-blocks {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   gap: 32px;
   min-width: 320px;
+  z-index: 3;
 }
 .header-right-col {
   display: flex;
@@ -363,4 +375,16 @@
   .main-nav {
     margin: 8px 0;
   }
+} 
+
+.main-nav, .nav {
+  font-family: Roboto, Arial, sans-serif !important;
+  font-weight: 400 !important;
+  justify-content: center !important;
+  display: flex !important;
+  width: 100%;
+}
+.main-nav a, .nav a {
+  font-family: Roboto, Arial, sans-serif !important;
+  font-weight: 400 !important;
 } 
