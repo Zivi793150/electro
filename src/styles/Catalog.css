@@ -11,7 +11,12 @@
 .category-btn { min-width: 100px; height: 40px; padding: 0 12px; background: #fff; border: 1px solid #e3eaf6; font-size: 1rem; color: #222; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .category-btn.active { background: #ffc107; color: #222; border-color: #ffc107; }
 .category-name { font-size: 1rem; color: inherit; text-align: center; width: 100%; }
-.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; margin-bottom: 24px; }
+.catalog-products-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+  gap: 8px; 
+  margin-bottom: 24px; 
+}
 .product-card { background: #fff; border: 1px solid #e3e6ea; display: flex; flex-direction: column; height: 100%; box-shadow: none; transition: none; }
 .product-card:hover { box-shadow: none !important; transform: none !important; }
 .product-image { height: 120px; background: #fff; display: flex; align-items: flex-start; justify-content: center; padding: 0; margin: 0; }
@@ -24,7 +29,7 @@
 .seo-description h2 { font-size: 1.2rem; margin-bottom: 10px; color: #222; }
 .seo-description p { font-size: 0.95rem; line-height: 1.5; color: #555; margin-bottom: 8px; }
 .seo-description p:last-child { margin-bottom: 0; }
-@media (max-width: 768px) { .catalog-main { padding: 12px 0; } .catalog-title { font-size: 1.2rem; margin-bottom: 16px; } .category-filter { gap: 4px; margin-bottom: 12px; } .category-btn { padding: 6px 8px; min-width: 60px; height: 32px; font-size: 0.9rem; } .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 4px; margin-bottom: 12px; } .product-info { padding: 6px; } .product-name { font-size: 0.95rem; } .seo-description { padding: 8px; margin-top: 8px; } .seo-description h2 { font-size: 1rem; } }
+@media (max-width: 768px) { .catalog-main { padding: 12px 0; } .catalog-title { font-size: 1.2rem; margin-bottom: 16px; } .category-filter { gap: 4px; margin-bottom: 12px; } .category-btn { padding: 6px 8px; min-width: 60px; height: 32px; font-size: 0.9rem; } .catalog-products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 4px; margin-bottom: 12px; } .product-info { padding: 6px; } .product-name { font-size: 0.95rem; } .seo-description { padding: 8px; margin-top: 8px; } .seo-description h2 { font-size: 1rem; } }
 
 /* KASPI STYLE */
 .product-card.kaspi-style {

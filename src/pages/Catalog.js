@@ -83,7 +83,7 @@ const Catalog = () => {
             ) : error ? (
               <div style={{color: 'red', padding: 32}}>{error}</div>
             ) : (
-            <div className="products-grid" style={{gap: 0}}>
+            <div className="catalog-products-grid" style={{gap: 0}}>
               {filteredProducts.map(product => (
                 <Link
                   to={`/product/${product._id}`}

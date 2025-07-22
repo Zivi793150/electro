@@ -164,28 +164,52 @@ const Product = () => {
             </div>
             {/* Инфо и цена справа */}
             <div className="product-info-block">
-              <h1 className="product-title">{product.name}</h1>
-              <div className="product-subtitle">{product.subtitle}</div>
-              <div className="product-divider"></div>
-              <div className="product-buy-row">
-                <div className="product-price-block">
-                  <div className="product-price-label-value">
-                    <div className="product-price-label">Цена</div>
-                    <div className="product-price-value">
-                      {Number(product.price).toLocaleString('ru-RU')}
-                      <span className="product-currency">₸</span>
+              <>
+                <h1 className="product-title" style={{fontWeight: 700}}>{product.name}</h1>
+                <div className="product-subtitle">{product.subtitle}</div>
+                <div className="product-divider"></div>
+                <div className="product-buy-row">
+                  <div className="product-price-block">
+                    <div className="product-price-label-value">
+                      <div className="product-price-label">Цена</div>
+                      <div className="product-price-value">
+                        {Number(product.price).toLocaleString('ru-RU')}
+                        <span className="product-currency">₸</span>
+                      </div>
                     </div>
                   </div>
+                  <span className="product-price-divider"></span>
+                  <div className="product-buy-btns">
+                    <button className="product-btn-ask" onClick={handleOpenModal}>Задать вопрос</button>
+                    <div className="product-btns-divider"></div>
+                    <button className="product-btn-buy" onClick={handleBuy}>Купить</button>
+                  </div>
                 </div>
-                <span className="product-price-divider"></span>
-                <div className="product-buy-btns">
-                  <button className="product-btn-ask" onClick={handleOpenModal}>Задать вопрос</button>
-                  <div className="product-btns-divider"></div>
-                  <button className="product-btn-buy" onClick={handleBuy}>Купить</button>
-                
-              </div>
-            </div>
-            <div className="product-divider"></div>
+                <div className="product-divider"></div>
+                <div style={{marginTop: 14, background: '#f5f7fa', borderRadius: 10, padding: '10px 12px 8px 12px', fontSize: '0.98rem', color: '#222', boxShadow: 'none', maxWidth: 320}}>
+                  <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem'}}>
+                    Ваш город: <a href="#" style={{color:'#1e88e5', textDecoration:'underline', cursor:'pointer'}}>Алматы</a>
+                  </div>
+                  <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
+                    <span style={{fontSize:17, marginTop:2}}>🚚</span>
+                    <div>
+                      <div style={{fontWeight:500, color:'#222'}}>Бесплатная доставка по городу</div>
+                      <div style={{color:'#1e88e5', fontWeight:600, fontSize:13}}>Сегодня — БЕСПЛАТНО</div>
+                    </div>
+                  </div>
+                  <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
+                    <span style={{fontSize:17, marginTop:2}}>🏬</span>
+                    <div>
+                      <div style={{fontWeight:500, color:'#222'}}>Самовывоз из магазина <a href="#" style={{color:'#1e88e5'}}>ул. Толе би 216Б</a></div>
+                      <div style={{color:'#222', fontSize:13}}>Сегодня с 9:00 до 18:00 — больше 5</div>
+                    </div>
+                  </div>
+                  <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
+                    <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
+                    <span>Срок доставки рассчитывается менеджером после оформления заказа</span>
+                  </div>
+                </div>
+              </>
             </div>
           </div>
           {/* Вкладки снизу */}

@@ -64,27 +64,29 @@ const Home = () => {
           <h2>Каталог товаров</h2>
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
-        <div className="products-grid" style={{gap: 0}}>
-          {miniProducts.map((product) => (
-            <a
-              href={`/product/${product._id}`}
-              key={product._id}
-              style={{ textDecoration: 'none', color: 'inherit' }}
-            >
-              <div
-                className="product-card kaspi-style mini-product-card"
-                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+        <div style={{maxWidth: 1200, margin: '0 auto', width: '100%'}}>
+          <div className="home-products-grid" style={{gap: 0}}>
+            {miniProducts.map((product) => (
+              <a
+                href={`/product/${product._id}`}
+                key={product._id}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
+                <div
+                  className="product-card kaspi-style mini-product-card"
+                  style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+                >
+                  <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
+                  </div>
+                  <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
+                  <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
+                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                  </div>
                 </div>
-                <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
-                  <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            ))}
+          </div>
         </div>
       </section>
       <AboutCompanySection />
