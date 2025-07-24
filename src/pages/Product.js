@@ -27,14 +27,12 @@ const Product = () => {
   const [miniProducts, setMiniProducts] = useState([]);
   const navigate = useNavigate();
 
-  const API_URL = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000/api/products'
-    : '/api/products';
+  const API_URL = '/api/products';
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/products/${id}`)
+    fetch(`${API_URL}/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) {
@@ -52,7 +50,7 @@ const Product = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch('/api/products?limit=4')
+    fetch(`${API_URL}?limit=4`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);

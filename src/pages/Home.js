@@ -9,12 +9,10 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
 
-  const API_URL = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000/api/products'
-    : '/api/products';
+  const API_URL = '/api/products';
 
   useEffect(() => {
-    fetch('/api/products?limit=8')
+    fetch(`${API_URL}?limit=8`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);

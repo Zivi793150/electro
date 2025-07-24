@@ -19,14 +19,12 @@ const Catalog = () => {
     setSelectedCategory(getCategoryFromQuery());
   }, [location.search]);
 
-  const API_URL = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:5000/api/products'
-    : '/api/products';
+  const API_URL = '/api/products';
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch('/api/products')
+    fetch(API_URL)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
