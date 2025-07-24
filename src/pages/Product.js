@@ -111,6 +111,8 @@ const Product = () => {
     setActiveImage((prev) => (prev + 1) % product.images.length);
   };
 
+  const shortDesc = (product.shortDesc || 'краткое описание').slice(0, 160);
+
   return (
     <div className="product-page">
       <Header />
@@ -165,8 +167,8 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700}}>{product.name}</h1>
-                <div className="product-short-desc" style={{fontSize: '1.08rem', color: '#888', marginBottom: 10, fontWeight: 400}}>краткое описание</div>
+                <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 18}}>{product.name}</h1>
+                <div className="product-short-desc" style={{fontSize: '1.18rem', color: '#222', marginBottom: 10, fontWeight: 500, marginTop: 0}}>{shortDesc}</div>
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">

@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Checkout from './pages/Checkout';
+import AdminApp from './admin/AdminApp';
 
 // Lazy loading для всех страниц
 const Home = lazy(() => import('./pages/Home'));
@@ -43,6 +44,7 @@ function App() {
           <Route path="/policy" element={<Policy />} />
           <Route path="/cooperation" element={<Cooperation />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/admin/*" element={<AdminApp />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
