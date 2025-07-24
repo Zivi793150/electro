@@ -166,6 +166,7 @@ const Product = () => {
             <div className="product-info-block">
               <>
                 <h1 className="product-title" style={{fontWeight: 700}}>{product.name}</h1>
+                <div className="product-short-desc" style={{fontSize: '1.08rem', color: '#888', marginBottom: 10, fontWeight: 400}}>краткое описание</div>
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">
