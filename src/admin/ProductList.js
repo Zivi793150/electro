@@ -17,11 +17,19 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     e.preventDefault();
     setLoading(true);
     setError('');
+    // Преобразуем цену к числу с плавающей точкой, поддерживаем запятую и точку
+    let parsedPrice = price.replace(',', '.');
+    if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
+      setError('Введите корректную цену (например: 19.65 или 19,65)');
+      setLoading(false);
+      return;
+    }
+    parsedPrice = Number(parsedPrice);
     try {
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, price, category, image, description })
+        body: JSON.stringify({ name, price: parsedPrice, category, image, description })
       });
       if (!res.ok) throw new Error(isEdit ? 'Ошибка при обновлении товара' : 'Ошибка при добавлении товара');
       setLoading(false);
@@ -41,7 +49,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
           <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Название" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
         </div>
         <div style={{marginBottom:12}}>
-          <input required type="number" min="0" value={price} onChange={e=>setPrice(e.target.value)} placeholder="Цена" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
+          <input required type="text" value={price} onChange={e=>setPrice(e.target.value)} placeholder="Цена (например: 19.65)" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
         </div>
         <div style={{marginBottom:12}}>
           <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Категория" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
