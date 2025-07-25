@@ -133,73 +133,8 @@ const Product = () => {
             {/* Фото и миниатюры */}
             <div className="product-gallery">
               <div className="product-gallery-inner">
-                <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in', position: 'relative'}}>
+                <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img src={Array.isArray(product.images) && product.images.length > 0 ? product.images[activeImage] : '/images/products/placeholder.png'} alt={product.name} loading="lazy" />
-                  {/* Стрелки навигации для основной галереи */}
-                  {((Array.isArray(product.images) && product.images.length > 1) || (Array.isArray(product.images) && product.images.length <= 1)) && (
-                    <>
-                      <button 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          if (Array.isArray(product.images) && product.images.length > 1) {
-                            setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length);
-                          } else {
-                            setActiveImage((prev) => (prev - 1 + 3) % 3);
-                          }
-                        }}
-                        style={{
-                          position: 'absolute',
-                          left: 10,
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: 40,
-                          height: 40,
-                          fontSize: 20,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                          zIndex: 10
-                        }}
-                      >
-                        ‹
-                      </button>
-                      <button 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          if (Array.isArray(product.images) && product.images.length > 1) {
-                            setActiveImage((prev) => (prev + 1) % product.images.length);
-                          } else {
-                            setActiveImage((prev) => (prev + 1) % 3);
-                          }
-                        }}
-                        style={{
-                          position: 'absolute',
-                          right: 10,
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'rgba(255, 255, 255, 0.9)',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: 40,
-                          height: 40,
-                          fontSize: 20,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                          zIndex: 10
-                        }}
-                      >
-                        ›
-                      </button>
-                    </>
-                  )}
                 </div>
                 {(Array.isArray(product.images) && product.images.length <= 1) && (
                   <>
