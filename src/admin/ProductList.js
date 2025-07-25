@@ -8,6 +8,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [category, setCategory] = useState(initialData?.category || '');
   const [image, setImage] = useState(initialData?.image || '');
   const [description, setDescription] = useState(initialData?.description || '');
+  const [shortDescription, setShortDescription] = useState(initialData?.shortDescription || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -29,7 +30,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, price: parsedPrice, category, image, description })
+        body: JSON.stringify({ name, price: parsedPrice, category, image, description, shortDescription })
       });
       if (!res.ok) throw new Error(isEdit ? 'Ошибка при обновлении товара' : 'Ошибка при добавлении товара');
       setLoading(false);
@@ -57,8 +58,11 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         <div style={{marginBottom:12}}>
           <input value={image} onChange={e=>setImage(e.target.value)} placeholder="URL изображения" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
         </div>
+        <div style={{marginBottom:12}}>
+          <textarea value={shortDescription} onChange={e=>setShortDescription(e.target.value)} placeholder="Краткое описание (до 160 символов)" maxLength={160} style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:38}} />
+        </div>
         <div style={{marginBottom:16}}>
-          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Краткое описание" maxLength={160} style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Описание" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
         </div>
         {error && <div style={{color:'#e53935',marginBottom:10}}>{error}</div>}
         <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
@@ -136,6 +140,7 @@ const ProductList = ({ onLogout }) => {
               <tr style={{background: '#f5f7fa'}}>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Фото</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Название</th>
+                <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Краткое описание</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Цена</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Категория</th>
                 <th style={{padding: '8px 6px', textAlign: 'center', fontWeight: 600, color: '#222'}}>Действия</th>
@@ -148,6 +153,7 @@ const ProductList = ({ onLogout }) => {
                     <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: 44, height: 44, objectFit: 'contain', borderRadius: 5, background: '#f5f7fa', border: '1px solid #e0e0e0'}} />
                   </td>
                   <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>{product.name}</td>
+                  <td style={{padding: '6px 6px', color: '#444', fontSize: 13}}>{product.shortDescription || '-'}</td>
                   <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? Number(product.price).toLocaleString('ru-RU') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
