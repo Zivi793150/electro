@@ -9,6 +9,8 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [image, setImage] = useState(initialData?.image || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
+  const [characteristics, setCharacteristics] = useState(initialData?.characteristics || '');
+  const [equipment, setEquipment] = useState(initialData?.equipment || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,7 +29,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     }
     parsedPrice = Number(parsedPrice);
     try {
-      let payload = { name, price: parsedPrice, category, image, description, 'Short description': shortDescription };
+      let payload = { name, price: parsedPrice, category, image, description, 'Short description': shortDescription, characteristics, equipment };
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -45,7 +47,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
 
   return (
     <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:340,maxWidth:400,boxShadow:'0 2px 16px rgba(30,40,90,0.10)'}}>
+      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:340,maxWidth:500,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto'}}>
         <h3 style={{marginTop:0,marginBottom:18,fontWeight:700,fontSize:20}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
         <div style={{marginBottom:12}}>
           <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Название" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
@@ -62,8 +64,14 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         <div style={{marginBottom:12}}>
           <textarea value={shortDescription} onChange={e=>setShortDescription(e.target.value)} placeholder="Краткое описание (до 160 символов)" maxLength={160} style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:38}} />
         </div>
+        <div style={{marginBottom:12}}>
+          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Описание" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+        </div>
+        <div style={{marginBottom:12}}>
+          <textarea value={characteristics} onChange={e=>setCharacteristics(e.target.value)} placeholder="Характеристики" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+        </div>
         <div style={{marginBottom:16}}>
-          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Характеристики" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+          <textarea value={equipment} onChange={e=>setEquipment(e.target.value)} placeholder="Комплектация" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
         </div>
         {error && <div style={{color:'#e53935',marginBottom:10}}>{error}</div>}
         <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>

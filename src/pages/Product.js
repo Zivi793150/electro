@@ -133,8 +133,59 @@ const Product = () => {
             {/* Фото и миниатюры */}
             <div className="product-gallery">
               <div className="product-gallery-inner">
-                <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
+                <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in', position: 'relative'}}>
                   <img src={Array.isArray(product.images) && product.images.length > 0 ? product.images[activeImage] : '/images/products/placeholder.png'} alt={product.name} loading="lazy" />
+                  {/* Стрелки навигации для основной галереи */}
+                  {Array.isArray(product.images) && product.images.length > 1 && (
+                    <>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length); }}
+                        style={{
+                          position: 'absolute',
+                          left: 10,
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'rgba(255, 255, 255, 0.9)',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: 40,
+                          height: 40,
+                          fontSize: 20,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                          zIndex: 10
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev + 1) % product.images.length); }}
+                        style={{
+                          position: 'absolute',
+                          right: 10,
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          background: 'rgba(255, 255, 255, 0.9)',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: 40,
+                          height: 40,
+                          fontSize: 20,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                          zIndex: 10
+                        }}
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
                 </div>
                 {(Array.isArray(product.images) && product.images.length <= 1) && (
                   <>
@@ -260,10 +311,59 @@ const Product = () => {
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
           <img src={product.images[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} />
           {product.images.length > 1 && (
-            <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
-              <button onClick={handlePrevImage} style={{fontSize:28,padding:'4px 16px',background:'none',border:'none',cursor:'pointer',color:'#222'}}>&#8592;</button>
-              <button onClick={handleNextImage} style={{fontSize:28,padding:'4px 16px',background:'none',border:'none',cursor:'pointer',color:'#222'}}>&#8594;</button>
-            </div>
+            <>
+              <button 
+                onClick={handlePrevImage} 
+                style={{
+                  position: 'absolute',
+                  left: 20,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 50,
+                  height: 50,
+                  fontSize: 24,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  zIndex: 10,
+                  color: '#222'
+                }}
+              >
+                ‹
+              </button>
+              <button 
+                onClick={handleNextImage} 
+                style={{
+                  position: 'absolute',
+                  right: 20,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 50,
+                  height: 50,
+                  fontSize: 24,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                  zIndex: 10,
+                  color: '#222'
+                }}
+              >
+                ›
+              </button>
+              <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
+                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {product.images.length}</span>
+              </div>
+            </>
           )}
           <button onClick={handleCloseImageModal} style={{position:'absolute',top:8,right:12,fontSize:32,background:'none',border:'none',color:'#222',cursor:'pointer',lineHeight:1}}>&times;</button>
         </div>
