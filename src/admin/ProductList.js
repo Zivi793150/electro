@@ -28,12 +28,6 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     parsedPrice = Number(parsedPrice);
     try {
       let payload = { name, price: parsedPrice, category, image, description, 'Short description': shortDescription };
-      if (isEdit) {
-        // Не отправляем _id в update
-        const { _id, ...rest } = initialData;
-        payload = { ...rest, ...payload };
-        delete payload._id;
-      }
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
