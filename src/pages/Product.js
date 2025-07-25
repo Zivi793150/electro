@@ -136,10 +136,17 @@ const Product = () => {
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in', position: 'relative'}}>
                   <img src={Array.isArray(product.images) && product.images.length > 0 ? product.images[activeImage] : '/images/products/placeholder.png'} alt={product.name} loading="lazy" />
                   {/* Стрелки навигации для основной галереи */}
-                  {Array.isArray(product.images) && product.images.length > 1 && (
+                  {((Array.isArray(product.images) && product.images.length > 1) || (Array.isArray(product.images) && product.images.length <= 1)) && (
                     <>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length); }}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          if (Array.isArray(product.images) && product.images.length > 1) {
+                            setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+                          } else {
+                            setActiveImage((prev) => (prev - 1 + 3) % 3);
+                          }
+                        }}
                         style={{
                           position: 'absolute',
                           left: 10,
@@ -162,7 +169,14 @@ const Product = () => {
                         ‹
                       </button>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); setActiveImage((prev) => (prev + 1) % product.images.length); }}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          if (Array.isArray(product.images) && product.images.length > 1) {
+                            setActiveImage((prev) => (prev + 1) % product.images.length);
+                          } else {
+                            setActiveImage((prev) => (prev + 1) % 3);
+                          }
+                        }}
                         style={{
                           position: 'absolute',
                           right: 10,
