@@ -4,7 +4,7 @@ const API_URL = '/api/products';
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
-  const [price, setPrice] = useState(initialData?.price || '');
+  const [price, setPrice] = useState(initialData?.price !== undefined ? String(initialData.price) : '');
   const [category, setCategory] = useState(initialData?.category || '');
   const [image, setImage] = useState(initialData?.image || '');
   const [description, setDescription] = useState(initialData?.description || '');
@@ -19,7 +19,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     setLoading(true);
     setError('');
     // Преобразуем цену к числу с плавающей точкой, поддерживаем запятую и точку
-    let parsedPrice = price.replace(',', '.');
+    let parsedPrice = String(price).replace(',', '.');
     if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
       setError('Введите корректную цену (например: 19.65 или 19,65)');
       setLoading(false);
