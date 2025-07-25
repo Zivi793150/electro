@@ -109,7 +109,7 @@ const Product = () => {
     setActiveImage((prev) => (prev + 1) % product.images.length);
   };
 
-  const shortDesc = (product.shortDesc || 'краткое описание').slice(0, 160);
+  const shortDesc = product['Short description'] || 'краткое описание';
 
   return (
     <div className="product-page">
