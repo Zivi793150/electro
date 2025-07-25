@@ -8,7 +8,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [category, setCategory] = useState(initialData?.category || '');
   const [image, setImage] = useState(initialData?.image || '');
   const [description, setDescription] = useState(initialData?.description || '');
-  const [shortDescription, setShortDescription] = useState(initialData?.['short description'] || '');
+  const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -30,7 +30,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, price: parsedPrice, category, image, description, 'short description': shortDescription })
+        body: JSON.stringify({ name, price: parsedPrice, category, image, description, 'Short description': shortDescription })
       });
       if (!res.ok) throw new Error(isEdit ? 'Ошибка при обновлении товара' : 'Ошибка при добавлении товара');
       setLoading(false);
@@ -155,7 +155,7 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>{product.name}</td>
                   <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? Number(product.price).toLocaleString('ru-RU') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
-                  <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['short description'] || ''}</td>
+                  <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['Short description'] || ''}</td>
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
                     <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Редактировать</button>
                     <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer'}}>Удалить</button>
