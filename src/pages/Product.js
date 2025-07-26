@@ -25,6 +25,35 @@ const Product = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
+  
+  // Объединяем все изображения из разных полей
+  const getAllImages = () => {
+    const images = [];
+    
+    // Добавляем изображения из поля images
+    if (Array.isArray(product?.images)) {
+      images.push(...product.images);
+    }
+    
+    // Добавляем изображения из поля images2
+    if (Array.isArray(product?.images2)) {
+      images.push(...product.images2);
+    }
+    
+    // Добавляем изображения из поля images3
+    if (Array.isArray(product?.images3)) {
+      images.push(...product.images3);
+    }
+    
+    // Если нет изображений, добавляем placeholder
+    if (images.length === 0) {
+      images.push('/images/products/placeholder.png');
+    }
+    
+    return images;
+  };
+  
+  const allImages = getAllImages();
   const navigate = useNavigate();
 
   const API_URL = '/api/products';
@@ -102,11 +131,11 @@ const Product = () => {
   const handleCloseImageModal = () => setShowImageModal(false);
   const handlePrevImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+    setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
   const handleNextImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev + 1) % product.images.length);
+    setActiveImage((prev) => (prev + 1) % allImages.length);
   };
 
   const shortDesc = product['Short description'] || 'краткое описание';
@@ -134,25 +163,13 @@ const Product = () => {
             <div className="product-gallery">
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
-                  <img src={Array.isArray(product.images) && product.images.length > 0 ? product.images[activeImage] : '/images/products/placeholder.png'} alt={product.name} loading="lazy" />
+                  <img src={allImages[activeImage]} alt={product.name} loading="lazy" />
                 </div>
-                {(Array.isArray(product.images) && product.images.length <= 1) && (
-                  <>
-                    <div className="product-thumbs" style={{marginBottom: '18px'}}>
-                      {["/images/products/bolgarka-makita-125.jpg","/images/products/perforator-bosch-gbh.jpg","/images/products/drel.jpg"].map((img,idx)=>(
-                        <img key={idx} src={img} alt={"thumb"+idx} className={activeImage===idx?"active": ""} onClick={()=>setActiveImage(idx)} loading="lazy" />
-                      ))}
-                    </div>
-                    <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 4, marginBottom: 12, border:'none'}}>
-                      Чтобы увеличить, нажмите на картинку
-                    </div>
-                  </>
-                )}
-                {Array.isArray(product.images) && product.images.length > 1 && (
+                {allImages.length > 1 && (
                   <>
                     <div className="product-thumbs">
-                      {product.images.map((img,idx)=>(
-                        <img key={idx} src={img} alt={product.name+idx} className={activeImage===idx?"active": ""} onClick={()=>setActiveImage(idx)} loading="lazy" />
+                      {allImages.map((img, idx) => (
+                        <img key={idx} src={img} alt={product.name + idx} className={activeImage === idx ? "active" : ""} onClick={() => setActiveImage(idx)} loading="lazy" />
                       ))}
                     </div>
                     <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 4, marginBottom: 12, border:'none'}}>
@@ -167,6 +184,31 @@ const Product = () => {
               <>
                 <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 18}}>{product.name}</h1>
                 <div className="product-short-desc" style={{fontSize: '1.18rem', color: '#222', marginBottom: 10, fontWeight: 500, marginTop: 0}}>{shortDesc}</div>
+                
+                {/* Дополнительная информация о товаре */}
+                {(product.article || product.power || product.package) && (
+                  <div style={{marginBottom: 16, padding: '12px 16px', background: '#f8f9fa', borderRadius: 8, border: '1px solid #e9ecef'}}>
+                    {product.article && (
+                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 6}}>
+                        <span style={{color: '#666', fontSize: '0.9rem'}}>Артикул:</span>
+                        <span style={{fontWeight: 500, color: '#1a2236'}}>{product.article}</span>
+                      </div>
+                    )}
+                    {product.power && (
+                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 6}}>
+                        <span style={{color: '#666', fontSize: '0.9rem'}}>Мощность:</span>
+                        <span style={{fontWeight: 500, color: '#1a2236'}}>{product.power}</span>
+                      </div>
+                    )}
+                    {product.package && (
+                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 6}}>
+                        <span style={{color: '#666', fontSize: '0.9rem'}}>Упаковка:</span>
+                        <span style={{fontWeight: 500, color: '#1a2236'}}>{product.package}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">
@@ -258,8 +300,8 @@ const Product = () => {
     {showImageModal && (
       <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-          <img src={product.images[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} />
-          {product.images.length > 1 && (
+          <img src={allImages[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} />
+          {allImages.length > 1 && (
             <>
               <button 
                 onClick={handlePrevImage} 
@@ -310,7 +352,7 @@ const Product = () => {
                 ›
               </button>
               <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
-                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {product.images.length}</span>
+                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {allImages.length}</span>
               </div>
             </>
           )}
@@ -324,42 +366,38 @@ const Product = () => {
 
 function Tabs({product}) {
   const [tab,setTab]=React.useState('desc');
-  // Пример группированных характеристик (можно заменить на реальные данные)
-  const groupedSpecs = [
-    {
-      title: 'Дополнительно',
-      specs: [
-        { name: 'Наличие удара', value: 'безударный' },
-        { name: 'Функции', value: 'реверс' },
-        { name: 'Комплектация', value: 'кейс, зарядное устройство, угловая насадка, два аккумулятора, набор бит, набор сверл, набор накидных головок' },
-        { name: 'Особенности', value: 'сменный аккумулятор' },
-        { name: 'Вес', value: '2.0 кг' },
-        { name: 'Дополнительная информация', value: 'гибкая насадка, набор бит, набор сверл, набор накидных головок' },
-      ]
-    },
-    {
-      title: 'Аккумулятор',
-      specs: [
-        { name: 'Напряжение аккумулятора', value: '48.0 В' },
-        { name: 'Тип аккумулятора', value: 'Li-Ion' },
-        { name: 'Ёмкость аккумулятора', value: '2.0 Ач' },
-        { name: 'Питание', value: 'от аккумулятора' },
-        { name: 'Аккумулятор и зарядное устройство в комплекте', value: 'Да' },
-      ]
-    },
-    {
-      title: 'Характеристики',
-      specs: [
-        { name: 'Тип патрона', value: 'быстрозажимной' },
-        { name: 'Тип инструмента', value: 'дрель-шуруповёрт' },
-        { name: 'Количество скоростей работы', value: '2' },
-        { name: 'Диаметр патрона', value: '10' },
-        { name: 'Максимальное число оборотов холостого хода', value: '1400.0 об/мин' },
-        { name: 'Максимальный крутящий момент', value: '48.0 Нм' },
-        { name: 'Потребляемая мощность', value: '350.0 Вт' },
-      ]
+  
+  // Функция для парсинга характеристик из строки
+  const parseCharacteristics = (characteristicsStr) => {
+    if (!characteristicsStr) return [];
+    
+    try {
+      // Пытаемся распарсить как JSON
+      return JSON.parse(characteristicsStr);
+    } catch {
+      // Если не JSON, разбиваем по строкам
+      return characteristicsStr.split('\n').filter(line => line.trim()).map(line => {
+        const [name, value] = line.split(':').map(s => s.trim());
+        return { name, value };
+      });
     }
-  ];
+  };
+  
+  // Функция для парсинга комплектации из строки
+  const parseEquipment = (equipmentStr) => {
+    if (!equipmentStr) return [];
+    
+    try {
+      // Пытаемся распарсить как JSON
+      return JSON.parse(equipmentStr);
+    } catch {
+      // Если не JSON, разбиваем по строкам или запятым
+      return equipmentStr.split(/[\n,]/).filter(item => item.trim()).map(item => item.trim());
+    }
+  };
+  
+  const characteristics = parseCharacteristics(product.characteristics);
+  const equipment = parseEquipment(product.equipment);
   return (
     <div className="product-tabs">
       <div className="product-tabs-header">
@@ -368,15 +406,22 @@ function Tabs({product}) {
         <button className={tab==='equip'?'active':''} onClick={()=>setTab('equip')}>Комплектация</button>
       </div>
       <div className="product-tabs-content">
-        {tab==='desc' && <div className="product-desc-kaspi-block">{product.description}</div>}
+        {tab==='desc' && (
+          <div className="product-desc-kaspi-block">
+            {product.description ? (
+              <div dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }} />
+            ) : (
+              <div style={{color: '#888', fontStyle: 'italic'}}>Описание товара отсутствует</div>
+            )}
+          </div>
+        )}
         {tab==='specs' && (
           <div className="product-specs-kaspi-block">
             <h2 className="product-specs-title">Характеристики {product.name}</h2>
-            {groupedSpecs.map((group, idx) => (
-              <div className="product-specs-group" key={group.title}>
-                <div className="product-specs-group-title">{group.title}</div>
+            {characteristics.length > 0 ? (
+              <div className="product-specs-group">
                 <div className="product-specs-flex-table">
-                  {group.specs.map((spec, i) => (
+                  {characteristics.map((spec, i) => (
                     <div className={"product-specs-flex-row" + (!spec.value ? " no-value" : "")} key={i}>
                       <span className="product-specs-flex-name">{spec.name}</span>
                       <span className="product-specs-flex-dots"></span>
@@ -384,20 +429,23 @@ function Tabs({product}) {
                     </div>
                   ))}
                 </div>
-                {idx !== groupedSpecs.length-1 && <div className="product-specs-divider"></div>}
               </div>
-            ))}
+            ) : (
+              <div style={{color: '#888', fontStyle: 'italic', padding: '20px 0'}}>Характеристики товара отсутствуют</div>
+            )}
           </div>
         )}
         {tab==='equip' && (
           <div className="product-desc-kaspi-block">
-            {product.equipment && product.equipment.length>0 ? (
-              <ul>
-                {product.equipment.map((item,idx)=>(
-                  <li key={idx}>{item}</li>
+            {equipment.length > 0 ? (
+              <ul style={{margin: 0, paddingLeft: 20}}>
+                {equipment.map((item, idx) => (
+                  <li key={idx} style={{marginBottom: 8, lineHeight: 1.5}}>{item}</li>
                 ))}
               </ul>
-            ) : 'Нет данных'}
+            ) : (
+              <div style={{color: '#888', fontStyle: 'italic'}}>Информация о комплектации отсутствует</div>
+            )}
           </div>
         )}
       </div>
