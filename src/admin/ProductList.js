@@ -7,12 +7,66 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [price, setPrice] = useState(initialData?.price !== undefined ? String(initialData.price) : '');
   const [category, setCategory] = useState(initialData?.category || '');
   const [image, setImage] = useState(initialData?.image || '');
+  const [images, setImages] = useState(initialData?.images ? JSON.stringify(initialData.images) : '');
+  const [images2, setImages2] = useState(initialData?.images2 ? JSON.stringify(initialData.images2) : '');
+  const [images3, setImages3] = useState(initialData?.images3 ? JSON.stringify(initialData.images3) : '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
   const [characteristics, setCharacteristics] = useState(initialData?.characteristics || '');
   const [equipment, setEquipment] = useState(initialData?.equipment || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Функция для парсинга JSON строки в массив
+  const parseImagesArray = (imagesStr) => {
+    if (!imagesStr) return [];
+    try {
+      return JSON.parse(imagesStr);
+    } catch {
+      // Если не JSON, разбиваем по запятым
+      return imagesStr.split(',').map(url => url.trim()).filter(url => url);
+    }
+  };
+  
+  // Функция для загрузки файлов
+  const handleFileUpload = async (event, setField) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      files.forEach(file => {
+        formData.append('file', file);
+      });
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки файлов');
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Добавляем новые URL к существующим
+        const currentUrls = parseImagesArray(setField === setImages ? images : setField === setImages2 ? images2 : images3);
+        const newUrls = [...currentUrls, ...result.files];
+        setField(JSON.stringify(newUrls));
+      } else {
+        setError('Ошибка загрузки файлов');
+      }
+    } catch (err) {
+      setError('Ошибка загрузки файлов: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const isEdit = Boolean(initialData && initialData._id);
 
@@ -29,7 +83,19 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     }
     parsedPrice = Number(parsedPrice);
     try {
-      let payload = { name, price: parsedPrice, category, image, description, 'Short description': shortDescription, characteristics, equipment };
+      let payload = { 
+        name, 
+        price: parsedPrice, 
+        category, 
+        image, 
+        images: parseImagesArray(images),
+        images2: parseImagesArray(images2),
+        images3: parseImagesArray(images3),
+        description, 
+        'Short description': shortDescription, 
+        characteristics, 
+        equipment 
+      };
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +125,31 @@ function ProductForm({ onClose, onSuccess, initialData }) {
           <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Категория" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
         </div>
         <div style={{marginBottom:12}}>
-          <input value={image} onChange={e=>setImage(e.target.value)} placeholder="URL изображения" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
+          <input value={image} onChange={e=>setImage(e.target.value)} placeholder="URL основного изображения" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
+        </div>
+        <div style={{marginBottom:12}}>
+          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Галерея изображений (images):</label>
+          <textarea value={images} onChange={e=>setImages(e.target.value)} placeholder='["/images/products/photo1.jpg", "/images/products/photo2.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+          <div style={{display:'flex',gap:8,marginTop:4}}>
+            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages)} style={{flex:1}} />
+            <small style={{color:'#666',fontSize:12,alignSelf:'center'}}>JSON массив или список URL через запятую</small>
+          </div>
+        </div>
+        <div style={{marginBottom:12}}>
+          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Дополнительные изображения (images2):</label>
+          <textarea value={images2} onChange={e=>setImages2(e.target.value)} placeholder='["/images/products/photo3.jpg", "/images/products/photo4.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+          <div style={{display:'flex',gap:8,marginTop:4}}>
+            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages2)} style={{flex:1}} />
+            <small style={{color:'#666',fontSize:12,alignSelf:'center'}}>JSON массив или список URL через запятую</small>
+          </div>
+        </div>
+        <div style={{marginBottom:12}}>
+          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Дополнительные изображения (images3):</label>
+          <textarea value={images3} onChange={e=>setImages3(e.target.value)} placeholder='["/images/products/photo5.jpg", "/images/products/photo6.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
+          <div style={{display:'flex',gap:8,marginTop:4}}>
+            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages3)} style={{flex:1}} />
+            <small style={{color:'#666',fontSize:12,alignSelf:'center'}}>JSON массив или список URL через запятую</small>
+          </div>
         </div>
         <div style={{marginBottom:12}}>
           <textarea value={shortDescription} onChange={e=>setShortDescription(e.target.value)} placeholder="Краткое описание (до 160 символов)" maxLength={160} style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:38}} />
