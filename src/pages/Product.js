@@ -184,31 +184,6 @@ const Product = () => {
               <>
                 <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 18}}>{product.name}</h1>
                 <div className="product-short-desc" style={{fontSize: '1.18rem', color: '#222', marginBottom: 10, fontWeight: 500, marginTop: 0}}>{shortDesc}</div>
-                
-                {/* Дополнительная информация о товаре */}
-                {(product.article || product.power || product.package) && (
-                  <div style={{marginBottom: 16, padding: '12px 16px', background: '#f8f9fa', borderRadius: 8, border: '1px solid #e9ecef'}}>
-                    {product.article && (
-                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 6}}>
-                        <span style={{color: '#666', fontSize: '0.9rem'}}>Артикул:</span>
-                        <span style={{fontWeight: 500, color: '#1a2236'}}>{product.article}</span>
-                      </div>
-                    )}
-                    {product.power && (
-                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 6}}>
-                        <span style={{color: '#666', fontSize: '0.9rem'}}>Мощность:</span>
-                        <span style={{fontWeight: 500, color: '#1a2236'}}>{product.power}</span>
-                      </div>
-                    )}
-                    {product.package && (
-                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: 6}}>
-                        <span style={{color: '#666', fontSize: '0.9rem'}}>Упаковка:</span>
-                        <span style={{fontWeight: 500, color: '#1a2236'}}>{product.package}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">
@@ -307,7 +282,7 @@ const Product = () => {
                 onClick={handlePrevImage} 
                 style={{
                   position: 'absolute',
-                  left: 20,
+                  left: -25,
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'rgba(255, 255, 255, 0.95)',
@@ -331,7 +306,7 @@ const Product = () => {
                 onClick={handleNextImage} 
                 style={{
                   position: 'absolute',
-                  right: 20,
+                  right: -25,
                   top: '50%',
                   transform: 'translateY(-50%)',
                   background: 'rgba(255, 255, 255, 0.95)',
