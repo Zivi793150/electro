@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const API_URL = '/api/products';
+const API_URL = 'http://localhost:5000/api/products';
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
@@ -28,6 +28,48 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     }
   };
   
+  // Функция для загрузки одного файла (для основного изображения)
+  const handleSingleFileUpload = async (event, setField) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      
+      const response = await fetch('http://localhost:5000/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ошибка загрузки файла');
+      }
+      
+      const result = await response.json();
+      
+      if (result.success && result.files.length > 0) {
+        // Заменяем URL основного изображения
+        const newUrl = result.files[0];
+        console.log('Загруженный URL для основного изображения:', newUrl);
+        setField(newUrl);
+        
+        alert(`✅ Файл успешно загружен!\n\nЗагруженный файл:\n${newUrl}\n\nURL автоматически добавлен в поле.`);
+      } else {
+        setError('Ошибка загрузки файла');
+      }
+    } catch (err) {
+      setError('Ошибка загрузки файла: ' + err.message);
+    } finally {
+      setLoading(false);
+      event.target.value = '';
+    }
+  };
+
   // Функция для загрузки файлов
   const handleFileUpload = async (event, setField) => {
     const files = Array.from(event.target.files);
@@ -42,22 +84,34 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         formData.append('file', file);
       });
       
-      const response = await fetch('/api/upload', {
+      const response = await fetch('http://localhost:5000/api/upload', {
         method: 'POST',
         body: formData
       });
       
       if (!response.ok) {
-        throw new Error('Ошибка загрузки файлов');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ошибка загрузки файлов');
       }
       
       const result = await response.json();
       
       if (result.success) {
-        // Добавляем новые URL к существующим
-        const currentUrls = parseImagesArray(setField === setImages ? images : setField === setImages2 ? images2 : images3);
-        const newUrls = [...currentUrls, ...result.files];
-        setField(JSON.stringify(newUrls));
+        // Добавляем новые URL к существующим используя функциональное обновление
+        setField(prevValue => {
+          const currentUrls = parseImagesArray(prevValue);
+          const newUrls = [...currentUrls, ...result.files];
+          const newJsonString = JSON.stringify(newUrls);
+          console.log('Текущие URL:', currentUrls);
+          console.log('Новые URL:', result.files);
+          console.log('Объединенные URL:', newUrls);
+          console.log('JSON строка:', newJsonString);
+          return newJsonString;
+        });
+        
+        // Показываем успешное сообщение с информацией о загруженных файлах
+        const fileList = result.files.join('\n');
+        alert(`✅ Успешно загружено ${result.files.length} файлов!\n\nЗагруженные файлы:\n${fileList}\n\nURL автоматически добавлены в поле.`);
       } else {
         setError('Ошибка загрузки файлов');
       }
@@ -65,6 +119,8 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       setError('Ошибка загрузки файлов: ' + err.message);
     } finally {
       setLoading(false);
+      // Очищаем input файла
+      event.target.value = '';
     }
   };
 
@@ -115,6 +171,17 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
       <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:340,maxWidth:500,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto'}}>
         <h3 style={{marginTop:0,marginBottom:18,fontWeight:700,fontSize:20}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
+        
+        <div style={{background:'#e3f2fd',border:'1px solid #2196f3',borderRadius:6,padding:12,marginBottom:16}}>
+          <div style={{fontWeight:600,color:'#1976d2',marginBottom:6}}>📸 Работа с изображениями:</div>
+          <div style={{fontSize:12,color:'#1565c0',lineHeight:1.4}}>
+            • <strong>Основное изображение</strong> - главное фото товара<br/>
+            • <strong>Галерея (images)</strong> - дополнительные фото<br/>
+            • <strong>Images2/3</strong> - еще больше фото<br/>
+            • Используйте кнопки "Добавить примеры" для быстрого заполнения<br/>
+            • <strong>Загрузка файлов:</strong> выберите файлы → они автоматически загрузятся на сервер
+          </div>
+        </div>
         <div style={{marginBottom:12}}>
           <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Название" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
         </div>
@@ -125,30 +192,39 @@ function ProductForm({ onClose, onSuccess, initialData }) {
           <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Категория" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
         </div>
         <div style={{marginBottom:12}}>
+          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Основное изображение:</label>
           <input value={image} onChange={e=>setImage(e.target.value)} placeholder="URL основного изображения" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
+          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
+            <input type="file" accept="image/*" onChange={(e)=>handleSingleFileUpload(e, setImage)} style={{flex:1,minWidth:200}} />
+            <button type="button" onClick={()=>setImage('/images/products/bolgarka-makita-125.jpg')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить пример</button>
+            <small style={{color:'#666',fontSize:11}}>💡 Главное фото товара (текущее: {image})</small>
+          </div>
         </div>
         <div style={{marginBottom:12}}>
           <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Галерея изображений (images):</label>
           <textarea value={images} onChange={e=>setImages(e.target.value)} placeholder='["/images/products/photo1.jpg", "/images/products/photo2.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-          <div style={{display:'flex',gap:8,marginTop:4}}>
-            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages)} style={{flex:1}} />
-            <small style={{color:'#666',fontSize:12,alignSelf:'center'}}>JSON массив или список URL через запятую</small>
+          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
+            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages)} style={{flex:1,minWidth:200}} />
+            <button type="button" onClick={()=>setImages('["/images/products/bolgarka-makita-125.jpg", "/images/products/drel.jpg"]')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить примеры</button>
+            <small style={{color:'#666',fontSize:11,width:'100%',marginTop:4}}>💡 JSON массив или список URL через запятую. Файлы автоматически загружаются на сервер (текущее: {images})</small>
           </div>
         </div>
         <div style={{marginBottom:12}}>
           <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Дополнительные изображения (images2):</label>
           <textarea value={images2} onChange={e=>setImages2(e.target.value)} placeholder='["/images/products/photo3.jpg", "/images/products/photo4.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-          <div style={{display:'flex',gap:8,marginTop:4}}>
-            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages2)} style={{flex:1}} />
-            <small style={{color:'#666',fontSize:12,alignSelf:'center'}}>JSON массив или список URL через запятую</small>
+          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
+            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages2)} style={{flex:1,minWidth:200}} />
+            <button type="button" onClick={()=>setImages2('["/images/products/perforator-bosch-gbh.jpg", "/images/products/shurupovert-dewalt-18v.jpg"]')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить примеры</button>
+            <small style={{color:'#666',fontSize:11,width:'100%',marginTop:4}}>💡 Дополнительные фото для галереи товара</small>
           </div>
         </div>
         <div style={{marginBottom:12}}>
           <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Дополнительные изображения (images3):</label>
           <textarea value={images3} onChange={e=>setImages3(e.target.value)} placeholder='["/images/products/photo5.jpg", "/images/products/photo6.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-          <div style={{display:'flex',gap:8,marginTop:4}}>
-            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages3)} style={{flex:1}} />
-            <small style={{color:'#666',fontSize:12,alignSelf:'center'}}>JSON массив или список URL через запятую</small>
+          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
+            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages3)} style={{flex:1,minWidth:200}} />
+            <button type="button" onClick={()=>setImages3('["/images/products/bolgarka-makita-125.jpg"]')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить примеры</button>
+            <small style={{color:'#666',fontSize:11,width:'100%',marginTop:4}}>💡 Еще дополнительные фото (например, детали, упаковка)</small>
           </div>
         </div>
         <div style={{marginBottom:12}}>

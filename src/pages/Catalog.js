@@ -14,12 +14,30 @@ const Catalog = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     setSelectedCategory(getCategoryFromQuery());
   }, [location.search]);
 
-  const API_URL = '/api/products';
+  // Закрытие выпадающего списка при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.category-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
+  const API_URL = 'http://localhost:5000/api/products';
 
   useEffect(() => {
     setLoading(true);
@@ -57,7 +75,7 @@ const Catalog = () => {
       <Header />
       <main className="catalog-main">
         <div className="container catalog-layout">
-          <aside className="catalog-sidebar">
+          <aside className="catalog-sidebar desktop-sidebar">
             <h3 className="sidebar-title">Категории</h3>
             <ul className="sidebar-categories">
               {categories.map(category => (
@@ -73,6 +91,33 @@ const Catalog = () => {
             </ul>
           </aside>
           <div className="catalog-content">
+            <div className="category-dropdown-container mobile-dropdown">
+              <div className={`category-dropdown ${isDropdownOpen ? 'open' : ''}`}>
+                <button 
+                  className="category-dropdown-btn"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <span>{categories.find(cat => cat.id === selectedCategory)?.name || 'Все товары'}</span>
+                  <span className="dropdown-arrow">▼</span>
+                </button>
+                {isDropdownOpen && (
+                  <div className="category-dropdown-menu">
+                    {categories.map(category => (
+                      <button
+                        key={category.id}
+                        className={`category-dropdown-item${selectedCategory === category.id ? ' active' : ''}`}
+                        onClick={() => {
+                          setSelectedCategory(category.id);
+                          setIsDropdownOpen(false);
+                        }}
+                      >
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               Каталог товаров
             </h1>
