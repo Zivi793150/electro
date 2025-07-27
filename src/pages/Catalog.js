@@ -54,6 +54,70 @@ const Catalog = () => {
       });
   }, []);
 
+  // Принудительное применение стилей для карточек
+  useEffect(() => {
+    const forceStyles = () => {
+      const grid = document.querySelector('.catalog-products-grid');
+      const cards = document.querySelectorAll('.product-card');
+      const images = document.querySelectorAll('.product-image');
+      const infos = document.querySelectorAll('.product-info');
+      
+      if (grid) {
+        grid.style.display = 'grid';
+        grid.style.gap = '0';
+        grid.style.margin = '0';
+        grid.style.padding = '0';
+        grid.style.borderCollapse = 'collapse';
+        grid.style.borderSpacing = '0';
+      }
+      
+      cards.forEach(card => {
+        card.style.margin = '-1px';
+        card.style.border = '1px solid #e3e6ea';
+        card.style.borderRadius = '0';
+        card.style.padding = '0';
+        card.style.background = '#fff';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.height = '100%';
+        card.style.position = 'relative';
+        card.style.overflow = 'hidden';
+        card.style.boxSizing = 'border-box';
+        card.style.minHeight = 'auto';
+      });
+      
+      images.forEach(img => {
+        img.style.height = '160px';
+        img.style.padding = '0';
+        img.style.margin = '0';
+      });
+      
+      infos.forEach(info => {
+        info.style.padding = '6px';
+        info.style.minHeight = '80px';
+      });
+    };
+
+    // Применяем стили сразу и после загрузки
+    forceStyles();
+    setTimeout(forceStyles, 50);
+    setTimeout(forceStyles, 100);
+    setTimeout(forceStyles, 200);
+    setTimeout(forceStyles, 500);
+    setTimeout(forceStyles, 1000);
+
+    // Применяем стили при изменении размера окна
+    const handleResize = () => {
+      setTimeout(forceStyles, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [products]);
+
   const categories = [
     { id: 'all', name: 'Все товары', icon: '🔧' },
     { id: 'drills', name: 'Дрели', icon: '🛠' },
@@ -135,14 +199,14 @@ const Catalog = () => {
                 >
                   <div
                     className="product-card kaspi-style mini-product-card"
-                    style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+                    style={{ cursor: 'pointer', minHeight: 'auto', position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', border: '1px solid #e3e6ea', margin: '-1px' }}
                   >
-                    <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <div className="product-image" style={{height: '160px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                       <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
                     </div>
                     <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
-                    <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
-                      <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                    <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '80px'}}>
+                      <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '20px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                       <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
                         <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                       </div>
