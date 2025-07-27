@@ -24,6 +24,17 @@ body, html {
   display: none !important;
 }
 
+/* На мобильных устройствах скрываем вертикальный список категорий */
+@media (max-width: 900px) {
+  .desktop-sidebar {
+    display: none !important;
+  }
+  
+  .mobile-dropdown {
+    display: block !important;
+  }
+}
+
 .category-dropdown {
   position: relative;
   display: inline-block;
@@ -212,6 +223,10 @@ body, html {
   .mobile-dropdown {
     display: block !important;
   }
+  /* Скрываем вертикальный список категорий на мобильных */
+  .catalog-sidebar {
+    display: none !important;
+  }
   .category-filter {
     gap: 6px;
     margin: 20px 0;
@@ -350,6 +365,10 @@ body, html {
     overflow-x: hidden;
     width: 100%;
   }
+  /* Скрываем вертикальный список категорий на мобильных */
+  .catalog-sidebar {
+    display: none !important;
+  }
   .catalog-title {
     font-size: 0.9rem;
     margin-bottom: 6px;
@@ -448,6 +467,10 @@ body, html {
     padding: 3px 0;
     overflow-x: hidden;
     width: 100%;
+  }
+  /* Скрываем вертикальный список категорий на мобильных */
+  .catalog-sidebar {
+    display: none !important;
   }
   .catalog-title {
     font-size: 0.85rem;
@@ -549,6 +572,10 @@ body, html {
     padding: 2px 0;
     overflow-x: hidden;
     width: 100%;
+  }
+  /* Скрываем вертикальный список категорий на мобильных */
+  .catalog-sidebar {
+    display: none !important;
   }
   .catalog-title {
     font-size: 0.75rem;
@@ -1285,6 +1312,11 @@ body, html {
     padding: 0 !important;
   }
   
+  /* Скрываем вертикальный список категорий на мобильных */
+  .catalog-sidebar {
+    display: none !important;
+  }
+  
   .catalog .catalog-content .catalog-products-grid .product-card {
     margin: -1px !important;
     border: 1px solid #e3e6ea !important;
@@ -1344,4 +1376,17 @@ body, html {
 
 .catalog-products-grid .product-card[style*="margin"] {
   margin: -1px !important;
+}
+
+/* ДОПОЛНИТЕЛЬНЫЕ ПРАВИЛА ДЛЯ СКРЫТИЯ ВЕРТИКАЛЬНОГО СПИСКА КАТЕГОРИЙ */
+/* На мобильных устройствах скрываем вертикальный список */
+@media (max-width: 900px) {
+  .catalog-sidebar,
+  .desktop-sidebar {
+    display: none !important;
+  }
+  
+  .mobile-dropdown {
+    display: block !important;
+  }
 } 
