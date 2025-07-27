@@ -19,6 +19,54 @@ const Home = () => {
       });
   }, []);
 
+  // Принудительное применение стилей для карточек мини-каталога
+  useEffect(() => {
+    const forceStyles = () => {
+      const grid = document.querySelector('.home-products-grid');
+      const cards = document.querySelectorAll('.home-products-grid .product-card');
+
+      if (grid) {
+        grid.style.display = 'grid';
+        grid.style.gap = '0';
+        grid.style.margin = '0';
+        grid.style.padding = '0';
+        grid.style.borderCollapse = 'collapse';
+        grid.style.borderSpacing = '0';
+      }
+
+      cards.forEach(card => {
+        card.style.margin = '-1px';
+        card.style.border = '1px solid #e3e6ea';
+        card.style.borderRadius = '0';
+        card.style.padding = '0';
+        card.style.background = '#fff';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.height = '100%';
+        card.style.position = 'relative';
+        card.style.overflow = 'hidden';
+        card.style.boxSizing = 'border-box';
+      });
+    };
+
+    forceStyles();
+    setTimeout(forceStyles, 50);
+    setTimeout(forceStyles, 100);
+    setTimeout(forceStyles, 200);
+    setTimeout(forceStyles, 500);
+    setTimeout(forceStyles, 1000);
+
+    const handleResize = () => {
+      setTimeout(forceStyles, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [miniProducts]);
+
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = () => {
