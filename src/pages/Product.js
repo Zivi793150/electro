@@ -56,7 +56,7 @@ const Product = () => {
   const allImages = getAllImages();
   const navigate = useNavigate();
 
-  const API_URL = 'http://localhost:5000/api/products';
+  const API_URL = '/api/products';
 
   useEffect(() => {
     setLoading(true);
