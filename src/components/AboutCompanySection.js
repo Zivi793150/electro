@@ -29,14 +29,16 @@ const AboutCompanySection = () => (
       </div>
       <div className="about-company-right">
         <div className="about-company-image-wrap">
-          <div className="about-company-image-placeholder">Фото</div>
+          <img 
+            src="/ChatGPT Image 26 июл. 2025 г., 10_35_59.png" 
+            alt="Компания Промкраска" 
+            className="about-company-image"
+            loading="lazy"
+          />
         </div>
         <div className="about-company-date">
           <span className="about-company-date-month">МАРТ</span>
           <span className="about-company-date-year">2014</span>
-        </div>
-        <div className="about-company-map-wrap">
-          <div className="about-company-map-placeholder">Карта</div>
         </div>
       </div>
     </div>

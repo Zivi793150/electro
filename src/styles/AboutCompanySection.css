@@ -123,21 +123,16 @@
   justify-content: center;
   margin-bottom: 24px;
   position: relative;
+  overflow: hidden;
+  border-radius: 4px;
 }
-.about-company-image-placeholder {
-  width: 340px;
-  height: 230px;
-  background: #e0e0e0;
-  color: #888;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
-  font-weight: 500;
+
+.about-company-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
   border-radius: 2px;
-  border: 6px solid #fff;
-  box-sizing: border-box;
 }
 
 .about-company-date {
@@ -164,29 +159,6 @@
   margin-bottom: -6px;
 }
 
-.about-company-map-wrap {
-  width: 370px;
-  height: 180px;
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.about-company-map-placeholder {
-  width: 340px;
-  height: 150px;
-  background: #e0e0e0;
-  color: #b0b0b0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
-  font-weight: 500;
-  border-radius: 8px;
-  border: none;
-}
-
 @media (max-width: 1100px) {
   .about-company-container {
     flex-direction: column;
@@ -199,7 +171,7 @@
     width: 100%;
     margin-top: 0;
   }
-  .about-company-image-wrap, .about-company-map-wrap {
+  .about-company-image-wrap {
     width: 100%;
     max-width: 370px;
   }
@@ -215,15 +187,30 @@
   .about-company-date-year {
     font-size: 36px;
   }
-  .about-company-image-placeholder, .about-company-map-placeholder {
-    font-size: 18px;
-    width: 100%;
-    height: 100px;
-  }
-  .about-company-image-wrap, .about-company-map-wrap {
-    height: 110px;
+  .about-company-image-wrap {
+    height: 200px;
     min-width: unset;
     width: 100%;
     max-width: 100%;
+  }
+  .about-company-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-company-title {
+    font-size: 28px;
+  }
+  .about-company-image-wrap {
+    height: 180px;
+  }
+  .about-company-date-month {
+    font-size: 24px;
+  }
+  .about-company-date-year {
+    font-size: 32px;
   }
 } 
