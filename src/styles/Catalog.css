@@ -1046,6 +1046,10 @@ body, html {
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Мобильная адаптация - категории сверху */
@@ -1053,6 +1057,10 @@ body, html {
   .catalog-layout {
     flex-direction: column !important;
     gap: 8px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   .catalog-sidebar {
     display: none !important;
@@ -1078,6 +1086,10 @@ body, html {
   .catalog-layout {
     flex-direction: column !important;
     gap: 6px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   .category-filter {
     gap: 3px;
@@ -1095,6 +1107,10 @@ body, html {
   .catalog-layout {
     flex-direction: column !important;
     gap: 4px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   .category-filter {
     gap: 2px;
@@ -1112,6 +1128,10 @@ body, html {
   .catalog-layout {
     flex-direction: column !important;
     gap: 3px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
   }
   .category-filter {
     gap: 1px;

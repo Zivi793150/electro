@@ -1,7 +1,7 @@
 /* --- Оптимизированные стили для главного блока --- */
 .home { background: #fff; min-height: 100vh; }
 .main-maket-section { background: #f8f9fa; padding: 24px 0; width: 100vw; min-width: 100vw; margin-left: 50%; transform: translateX(-50%); }
-.main-maket-container { display: flex; justify-content: center; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 8px; }
+.main-maket-container { display: flex; justify-content: center; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
 .main-maket-left { flex: 1 1 50%; display: flex; align-items: flex-end; }
 .main-maket-image { max-width: 520px; width: 100%; height: auto; object-fit: contain; display: block; }
 .main-maket-right { flex: 1 1 50%; display: flex; flex-direction: column; align-items: flex-start; }
@@ -15,7 +15,7 @@
 .main-maket-btn:hover { background: #e65c00; }
 
 /* Оптимизированные стили для мини-каталога */
-.mini-catalog-section { margin: 12px auto 0 auto; max-width: 1200px; padding: 0 8px 10px 8px; }
+.mini-catalog-section { margin: 12px auto 0 auto; max-width: 1200px; padding: 0 16px 10px 16px; }
 .mini-catalog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .mini-catalog-header h2 { font-size: 1.3rem; font-weight: 700; color: #1a2236; margin: 0; }
 .mini-catalog-link { font-size: 1rem; color: #1e88e5; font-weight: 600; text-decoration: none; border: none; background: none; padding: 6px 12px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
@@ -139,7 +139,7 @@
     flex-direction: column; 
     gap: 18px; 
     align-items: center; 
-    padding: 0 2px; 
+    padding: 0 16px; 
   } 
   .main-maket-left, .main-maket-right { 
     width: 100%; 
