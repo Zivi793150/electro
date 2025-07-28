@@ -984,7 +984,7 @@ body, html {
 
 .catalog-mini-catalog-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
 .product-card.catalog-mini-product-card { min-width: 0; max-width: 100%; border: none; border-radius: 0; background: #fff; display: flex; flex-direction: column; height: 100%; padding: 0; position: relative; min-height: 100px; }
-.catalog-mini-product-divider { width: 100%; max-width: 100%; border-top: 1px solid #bdbdbd; margin: 0 auto 0.15em auto; align-self: center; }
+.catalog-mini-product-divider { width: 600px; max-width: 700px; border-top: 1px solid #bdbdbd; margin: 0 auto 0.15em auto; align-self: center; }
 .product-info { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 8px 2px 8px; }
 .catalog-mini-product-name { font-size: 0.95rem; font-weight: 600; color: #1976d2; margin: 20px 0 0 0; min-height: 32px; line-height: 1.18; text-align: center; width: 100%; display: block; }
 .product-card.catalog-mini-product-card .product-info {

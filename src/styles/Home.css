@@ -128,7 +128,7 @@
   width: 100% !important;
   word-wrap: break-word !important;
   hyphens: auto !important;
-  display: block !important;
+    display: block !important;
   box-sizing: border-box !important;
   min-height: auto !important;
   max-height: none !important;

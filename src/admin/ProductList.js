@@ -66,29 +66,34 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     setError('');
     
     try {
-      // На Vercel загрузка файлов ограничена, поэтому показываем предупреждение
-      alert(`⚠️ Внимание! На Vercel загрузка файлов ограничена.\n\nДля демонстрации используйте:\n• Кнопки "Пример" для placeholder изображений\n• Внешние URL (например, https://via.placeholder.com/400x300)\n• Или переключитесь на локальную версию для полной функциональности`);
+      const formData = new FormData();
+      formData.append('file', files[0]);
       
-      // Создаем временный URL для предварительного просмотра
-      const file = files[0];
-      const tempUrl = URL.createObjectURL(file);
+      const response = await fetch('http://localhost:5000/api/upload', {
+        method: 'POST',
+        body: formData
+      });
       
-      // Показываем пользователю временный URL
-      const externalUrl = prompt(
-        `Файл "${file.name}" выбран.\n\nДля сохранения введите внешний URL изображения:\n(например: https://via.placeholder.com/400x300)`,
-        tempUrl
-      );
-      
-      if (externalUrl && externalUrl.trim()) {
-        setField(externalUrl.trim());
-        alert(`✅ URL установлен: ${externalUrl.trim()}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ошибка загрузки файла');
       }
       
-      // Освобождаем временный URL
-      URL.revokeObjectURL(tempUrl);
+      const result = await response.json();
       
+      if (result.success && result.files.length > 0) {
+        const newUrl = result.files[0];
+        setField(newUrl);
+        // Показываем уведомление без блокировки
+        setError('');
+        setTimeout(() => {
+          alert(`✅ Файл успешно загружен!\n\nURL: ${newUrl}\n\nURL автоматически добавлен в поле.`);
+        }, 100);
+      } else {
+        setError('Ошибка загрузки файла');
+      }
     } catch (err) {
-      setError('Ошибка обработки файла: ' + err.message);
+      setError('Ошибка загрузки файла: ' + err.message);
     } finally {
       setLoading(false);
       event.target.value = '';
@@ -210,7 +215,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input required value={image} onChange={e=>setImage(e.target.value)} placeholder="URL главного изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setImage)} style={{flex:1}} />
-              <button type="button" onClick={()=>setImage('https://via.placeholder.com/400x300/FF6B00/FFFFFF?text=Главное+фото')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setImage('/images/products/bolgarka-makita-125.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
           
@@ -219,7 +224,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={photo1} onChange={e=>setPhoto1(e.target.value)} placeholder="URL второго изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto1)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto1('https://via.placeholder.com/400x300/2196F3/FFFFFF?text=Фото+2')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setPhoto1('/images/products/drel.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
           
@@ -228,7 +233,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={photo2} onChange={e=>setPhoto2(e.target.value)} placeholder="URL третьего изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto2)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto2('https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Фото+3')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setPhoto2('/images/products/perforator-bosch-gbh.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
           
@@ -237,7 +242,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={photo3} onChange={e=>setPhoto3(e.target.value)} placeholder="URL четвертого изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto3)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto3('https://via.placeholder.com/400x300/9C27B0/FFFFFF?text=Фото+4')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setPhoto3('/images/products/shurupovert-dewalt-18v.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
         </div>
@@ -374,28 +379,28 @@ const ProductList = ({ onLogout }) => {
             <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>
           </div>
         </div>
-        {loading ? (
+      {loading ? (
           <div style={{padding: 32, textAlign: 'center'}}>Загрузка...</div>
-        ) : error ? (
+      ) : error ? (
           <div style={{color: '#e53935', padding: 32, textAlign: 'center'}}>{error}</div>
-        ) : (
+      ) : (
           <table style={{width: '100%', borderCollapse: 'collapse', fontSize: 15, background: '#fff'}}>
-            <thead>
-              <tr style={{background: '#f5f7fa'}}>
+          <thead>
+            <tr style={{background: '#f5f7fa'}}>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Фото</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Название</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Цена</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Категория</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Краткое описание</th>
                 <th style={{padding: '8px 6px', textAlign: 'center', fontWeight: 600, color: '#222'}}>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map(product => (
+            </tr>
+          </thead>
+          <tbody>
+            {products.map(product => (
                 <tr key={product._id} style={{borderBottom: '1px solid #e0e0e0'}}>
                   <td style={{padding: '6px 6px'}}>
                     <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: 44, height: 44, objectFit: 'contain', borderRadius: 5, background: '#f5f7fa', border: '1px solid #e0e0e0'}} />
-                  </td>
+                </td>
                   <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>{product.name}</td>
                   <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? Number(product.price).toLocaleString('ru-RU') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
@@ -403,12 +408,12 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
                     <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Редактировать</button>
                     <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer'}}>Удалить</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       </div>
       {showForm && <ProductForm onClose={handleFormClose} onSuccess={fetchProducts} initialData={editProduct} />}
     </div>
