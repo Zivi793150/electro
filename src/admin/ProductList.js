@@ -66,34 +66,29 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     setError('');
     
     try {
-      const formData = new FormData();
-      formData.append('file', files[0]);
+      // На Vercel загрузка файлов ограничена, поэтому показываем предупреждение
+      alert(`⚠️ Внимание! На Vercel загрузка файлов ограничена.\n\nДля демонстрации используйте:\n• Кнопки "Пример" для placeholder изображений\n• Внешние URL (например, https://via.placeholder.com/400x300)\n• Или переключитесь на локальную версию для полной функциональности`);
       
-      const response = await fetch('http://localhost:5000/api/upload', {
-        method: 'POST',
-        body: formData
-      });
+      // Создаем временный URL для предварительного просмотра
+      const file = files[0];
+      const tempUrl = URL.createObjectURL(file);
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка загрузки файла');
+      // Показываем пользователю временный URL
+      const externalUrl = prompt(
+        `Файл "${file.name}" выбран.\n\nДля сохранения введите внешний URL изображения:\n(например: https://via.placeholder.com/400x300)`,
+        tempUrl
+      );
+      
+      if (externalUrl && externalUrl.trim()) {
+        setField(externalUrl.trim());
+        alert(`✅ URL установлен: ${externalUrl.trim()}`);
       }
       
-      const result = await response.json();
+      // Освобождаем временный URL
+      URL.revokeObjectURL(tempUrl);
       
-      if (result.success && result.files.length > 0) {
-        const newUrl = result.files[0];
-        setField(newUrl);
-        // Показываем уведомление без блокировки
-        setError('');
-        setTimeout(() => {
-          alert(`✅ Файл успешно загружен!\n\nURL: ${newUrl}\n\nURL автоматически добавлен в поле.`);
-        }, 100);
-      } else {
-        setError('Ошибка загрузки файла');
-      }
     } catch (err) {
-      setError('Ошибка загрузки файла: ' + err.message);
+      setError('Ошибка обработки файла: ' + err.message);
     } finally {
       setLoading(false);
       event.target.value = '';
@@ -215,7 +210,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input required value={image} onChange={e=>setImage(e.target.value)} placeholder="URL главного изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setImage)} style={{flex:1}} />
-              <button type="button" onClick={()=>setImage('/images/products/bolgarka-makita-125.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setImage('https://via.placeholder.com/400x300/FF6B00/FFFFFF?text=Главное+фото')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
           
@@ -224,7 +219,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={photo1} onChange={e=>setPhoto1(e.target.value)} placeholder="URL второго изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto1)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto1('/images/products/drel.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setPhoto1('https://via.placeholder.com/400x300/2196F3/FFFFFF?text=Фото+2')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
           
@@ -233,7 +228,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={photo2} onChange={e=>setPhoto2(e.target.value)} placeholder="URL третьего изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto2)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto2('/images/products/perforator-bosch-gbh.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setPhoto2('https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Фото+3')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
           
@@ -242,7 +237,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={photo3} onChange={e=>setPhoto3(e.target.value)} placeholder="URL четвертого изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
               <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto3)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto3('/images/products/shurupovert-dewalt-18v.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <button type="button" onClick={()=>setPhoto3('https://via.placeholder.com/400x300/9C27B0/FFFFFF?text=Фото+4')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
           </div>
         </div>
