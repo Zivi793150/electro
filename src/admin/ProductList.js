@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-  const API_URL = '/api/products';
+  const API_URL = 'http://localhost:5000/api/products';
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
   const [price, setPrice] = useState(initialData?.price !== undefined ? String(initialData.price) : '');
   const [category, setCategory] = useState(initialData?.category || '');
+  const [article, setArticle] = useState(initialData?.article || '');
   const [image, setImage] = useState(initialData?.image || '');
-  const [images, setImages] = useState(initialData?.images ? JSON.stringify(initialData.images) : '');
-  const [images2, setImages2] = useState(initialData?.images2 ? JSON.stringify(initialData.images2) : '');
-  const [images3, setImages3] = useState(initialData?.images3 ? JSON.stringify(initialData.images3) : '');
+  const [photo1, setPhoto1] = useState(initialData?.images?.[0] || '');
+  const [photo2, setPhoto2] = useState(initialData?.images?.[1] || '');
+  const [photo3, setPhoto3] = useState(initialData?.images?.[2] || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
   const [characteristics, setCharacteristics] = useState(initialData?.characteristics || '');
@@ -17,19 +18,47 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  // Функция для парсинга JSON строки в массив
-  const parseImagesArray = (imagesStr) => {
-    if (!imagesStr) return [];
-    try {
-      return JSON.parse(imagesStr);
-    } catch {
-      // Если не JSON, разбиваем по запятым
-      return imagesStr.split(',').map(url => url.trim()).filter(url => url);
+  // Состояние для динамических характеристик
+  const [characteristicFields, setCharacteristicFields] = useState(() => {
+    if (initialData?.characteristics) {
+      try {
+        // Пытаемся распарсить существующие характеристики
+        const parsed = JSON.parse(initialData.characteristics);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch {
+        // Если не JSON, разбиваем по строкам
+        const lines = initialData.characteristics.split('\n').filter(line => line.trim());
+        return lines.map(line => {
+          const parts = line.split(':');
+          if (parts.length >= 2) {
+            return {
+              parameter: parts[0].trim(),
+              value: parts.slice(1).join(':').trim()
+            };
+          }
+          return { parameter: line.trim(), value: '' };
+        });
+      }
     }
-  };
+    // Начальные поля
+    return [
+      { parameter: 'Код товара', value: '' },
+      { parameter: 'Тип патрона', value: '' },
+      { parameter: 'Тип инструмента', value: '' },
+      { parameter: 'Количество скоростей работы', value: '' },
+      { parameter: 'Диаметр патрона', value: '' },
+      { parameter: 'Максимальное число оборотов холостого хода', value: '' },
+      { parameter: 'Максимальный крутящий момент', value: '' },
+      { parameter: 'Потребляемая мощность', value: '' },
+      { parameter: 'Максимальный диаметр сверления дерева', value: '' },
+      { parameter: 'Максимальный диаметр сверления металла', value: '' }
+    ];
+  });
   
-  // Функция для загрузки одного файла (для основного изображения)
-  const handleSingleFileUpload = async (event, setField) => {
+  // Функция для загрузки одного файла
+  const handleFileUpload = async (event, setField) => {
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
     
@@ -40,7 +69,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const formData = new FormData();
       formData.append('file', files[0]);
       
-      const response = await fetch('/api/upload', {
+      const response = await fetch('http://localhost:5000/api/upload', {
         method: 'POST',
         body: formData
       });
@@ -53,12 +82,13 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const result = await response.json();
       
       if (result.success && result.files.length > 0) {
-        // Заменяем URL основного изображения
         const newUrl = result.files[0];
-        console.log('Загруженный URL для основного изображения:', newUrl);
         setField(newUrl);
-        
-        alert(`✅ Файл успешно загружен!\n\nЗагруженный файл:\n${newUrl}\n\nURL автоматически добавлен в поле.`);
+        // Показываем уведомление без блокировки
+        setError('');
+        setTimeout(() => {
+          alert(`✅ Файл успешно загружен!\n\nURL: ${newUrl}\n\nURL автоматически добавлен в поле.`);
+        }, 100);
       } else {
         setError('Ошибка загрузки файла');
       }
@@ -70,58 +100,27 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     }
   };
 
-  // Функция для загрузки файлов
-  const handleFileUpload = async (event, setField) => {
-    const files = Array.from(event.target.files);
-    if (files.length === 0) return;
-    
-    setLoading(true);
-    setError('');
-    
-    try {
-      const formData = new FormData();
-      files.forEach(file => {
-        formData.append('file', file);
-      });
-      
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка загрузки файлов');
-      }
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        // Добавляем новые URL к существующим используя функциональное обновление
-        setField(prevValue => {
-          const currentUrls = parseImagesArray(prevValue);
-          const newUrls = [...currentUrls, ...result.files];
-          const newJsonString = JSON.stringify(newUrls);
-          console.log('Текущие URL:', currentUrls);
-          console.log('Новые URL:', result.files);
-          console.log('Объединенные URL:', newUrls);
-          console.log('JSON строка:', newJsonString);
-          return newJsonString;
-        });
-        
-        // Показываем успешное сообщение с информацией о загруженных файлах
-        const fileList = result.files.join('\n');
-        alert(`✅ Успешно загружено ${result.files.length} файлов!\n\nЗагруженные файлы:\n${fileList}\n\nURL автоматически добавлены в поле.`);
-      } else {
-        setError('Ошибка загрузки файлов');
-      }
-    } catch (err) {
-      setError('Ошибка загрузки файлов: ' + err.message);
-    } finally {
-      setLoading(false);
-      // Очищаем input файла
-      event.target.value = '';
-    }
+  // Функции для работы с характеристиками
+  const addCharacteristic = () => {
+    setCharacteristicFields([...characteristicFields, { parameter: '', value: '' }]);
+  };
+
+  const removeCharacteristic = (index) => {
+    setCharacteristicFields(characteristicFields.filter((_, i) => i !== index));
+  };
+
+  const updateCharacteristic = (index, field, value) => {
+    const newFields = [...characteristicFields];
+    newFields[index][field] = value;
+    setCharacteristicFields(newFields);
+  };
+
+  // Преобразование характеристик в строку для сохранения
+  const formatCharacteristics = () => {
+    return characteristicFields
+      .filter(field => field.parameter.trim() && field.value.trim())
+      .map(field => `${field.parameter}: ${field.value}`)
+      .join('\n');
   };
 
   const isEdit = Boolean(initialData && initialData._id);
@@ -130,7 +129,8 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     e.preventDefault();
     setLoading(true);
     setError('');
-    // Преобразуем цену к числу с плавающей точкой, поддерживаем запятую и точку
+    
+    // Преобразуем цену к числу с плавающей точкой
     let parsedPrice = String(price).replace(',', '.');
     if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
       setError('Введите корректную цену (например: 19.65 или 19,65)');
@@ -138,26 +138,34 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       return;
     }
     parsedPrice = Number(parsedPrice);
+    
+    // Собираем все фото в массив
+    const allPhotos = [photo1, photo2, photo3].filter(photo => photo.trim() !== '');
+    
     try {
       let payload = { 
         name, 
         price: parsedPrice, 
         category, 
         image, 
-        images: parseImagesArray(images),
-        images2: parseImagesArray(images2),
-        images3: parseImagesArray(images3),
+        images: allPhotos,
+        images2: [],
+        images3: [],
         description, 
         'Short description': shortDescription, 
-        characteristics, 
-        equipment 
+        characteristics: formatCharacteristics(), 
+        equipment, 
+        article 
       };
+      
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+      
       if (!res.ok) throw new Error(isEdit ? 'Ошибка при обновлении товара' : 'Ошибка при добавлении товара');
+      
       setLoading(false);
       onSuccess();
       onClose();
@@ -169,80 +177,146 @@ function ProductForm({ onClose, onSuccess, initialData }) {
 
   return (
     <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:340,maxWidth:500,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto'}}>
-        <h3 style={{marginTop:0,marginBottom:18,fontWeight:700,fontSize:20}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
+      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:400,maxWidth:600,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto'}}>
+        <h3 style={{marginTop:0,marginBottom:20,fontWeight:700,fontSize:22,color:'#333'}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
         
-        <div style={{background:'#e3f2fd',border:'1px solid #2196f3',borderRadius:6,padding:12,marginBottom:16}}>
-          <div style={{fontWeight:600,color:'#1976d2',marginBottom:6}}>📸 Работа с изображениями:</div>
-          <div style={{fontSize:12,color:'#1565c0',lineHeight:1.4}}>
-            • <strong>Основное изображение</strong> - главное фото товара<br/>
-            • <strong>Галерея (images)</strong> - дополнительные фото<br/>
-            • <strong>Images2/3</strong> - еще больше фото<br/>
-            • Используйте кнопки "Добавить примеры" для быстрого заполнения<br/>
-            • <strong>Загрузка файлов:</strong> выберите файлы → они автоматически загрузятся на сервер
+        {/* Основная информация */}
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+          <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>📋 Основная информация</h4>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Название товара *</label>
+            <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Введите название товара" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Цена *</label>
+            <input required type="text" value={price} onChange={e=>setPrice(e.target.value)} placeholder="Например: 19.65 или 19,65" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Категория</label>
+            <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Например: Электроинструменты" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          
+          <div style={{marginBottom:0}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Артикул</label>
+            <input value={article} onChange={e=>setArticle(e.target.value)} placeholder="Например: 119356208" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <small style={{color:'#6c757d',fontSize:12}}>Уникальный код товара</small>
           </div>
         </div>
-        <div style={{marginBottom:12}}>
-          <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Название" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
-        </div>
-        <div style={{marginBottom:12}}>
-          <input required type="text" value={price} onChange={e=>setPrice(e.target.value)} placeholder="Цена (например: 19.65)" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
-        </div>
-        <div style={{marginBottom:12}}>
-          <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Категория" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
-        </div>
-        <div style={{marginBottom:12}}>
-          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Основное изображение:</label>
-          <input value={image} onChange={e=>setImage(e.target.value)} placeholder="URL основного изображения" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15}} />
-          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
-            <input type="file" accept="image/*" onChange={(e)=>handleSingleFileUpload(e, setImage)} style={{flex:1,minWidth:200}} />
-            <button type="button" onClick={()=>setImage('/images/products/bolgarka-makita-125.jpg')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить пример</button>
-            <small style={{color:'#666',fontSize:11}}>💡 Главное фото товара (текущее: {image})</small>
+
+        {/* Изображения */}
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+          <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>📸 Изображения</h4>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Главное фото *</label>
+            <input required value={image} onChange={e=>setImage(e.target.value)} placeholder="URL главного изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <div style={{display:'flex',gap:8,marginTop:6}}>
+              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setImage)} style={{flex:1}} />
+              <button type="button" onClick={()=>setImage('/images/products/bolgarka-makita-125.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+            </div>
+          </div>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото 2</label>
+            <input value={photo1} onChange={e=>setPhoto1(e.target.value)} placeholder="URL второго изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <div style={{display:'flex',gap:8,marginTop:6}}>
+              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto1)} style={{flex:1}} />
+              <button type="button" onClick={()=>setPhoto1('/images/products/drel.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+            </div>
+          </div>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото 3</label>
+            <input value={photo2} onChange={e=>setPhoto2(e.target.value)} placeholder="URL третьего изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <div style={{display:'flex',gap:8,marginTop:6}}>
+              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto2)} style={{flex:1}} />
+              <button type="button" onClick={()=>setPhoto2('/images/products/perforator-bosch-gbh.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+            </div>
+          </div>
+          
+          <div style={{marginBottom:0}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото 4</label>
+            <input value={photo3} onChange={e=>setPhoto3(e.target.value)} placeholder="URL четвертого изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <div style={{display:'flex',gap:8,marginTop:6}}>
+              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto3)} style={{flex:1}} />
+              <button type="button" onClick={()=>setPhoto3('/images/products/shurupovert-dewalt-18v.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+            </div>
           </div>
         </div>
-        <div style={{marginBottom:12}}>
-          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Галерея изображений (images):</label>
-          <textarea value={images} onChange={e=>setImages(e.target.value)} placeholder='["/images/products/photo1.jpg", "/images/products/photo2.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
-            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages)} style={{flex:1,minWidth:200}} />
-            <button type="button" onClick={()=>setImages('["/images/products/bolgarka-makita-125.jpg", "/images/products/drel.jpg"]')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить примеры</button>
-            <small style={{color:'#666',fontSize:11,width:'100%',marginTop:4}}>💡 JSON массив или список URL через запятую. Файлы автоматически загружаются на сервер (текущее: {images})</small>
+
+        {/* Описания */}
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+          <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>📝 Описания</h4>
+          
+          <div style={{marginBottom:12}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Краткое описание</label>
+            <textarea value={shortDescription} onChange={e=>setShortDescription(e.target.value)} placeholder="Краткое описание товара (до 160 символов)" maxLength={160} style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14,minHeight:60,resize:'vertical'}} />
+            <small style={{color:'#6c757d',fontSize:12}}>Используется для карточек товаров</small>
+          </div>
+          
+          <div style={{marginBottom:0}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Полное описание</label>
+            <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Подробное описание товара, его особенности и преимущества" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14,minHeight:80,resize:'vertical'}} />
           </div>
         </div>
-        <div style={{marginBottom:12}}>
-          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Дополнительные изображения (images2):</label>
-          <textarea value={images2} onChange={e=>setImages2(e.target.value)} placeholder='["/images/products/photo3.jpg", "/images/products/photo4.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
-            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages2)} style={{flex:1,minWidth:200}} />
-            <button type="button" onClick={()=>setImages2('["/images/products/perforator-bosch-gbh.jpg", "/images/products/shurupovert-dewalt-18v.jpg"]')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить примеры</button>
-            <small style={{color:'#666',fontSize:11,width:'100%',marginTop:4}}>💡 Дополнительные фото для галереи товара</small>
+
+        {/* Характеристики и комплектация */}
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+          <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>⚙️ Характеристики и комплектация</h4>
+          
+          <div style={{marginBottom:16}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <label style={{fontWeight:500,color:'#333',fontSize:14}}>Технические характеристики</label>
+              <button type="button" onClick={addCharacteristic} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>+ Добавить</button>
+            </div>
+            
+            <div style={{maxHeight:300,overflowY:'auto',border:'1px solid #ced4da',borderRadius:6,padding:8,background:'#fff'}}>
+              {characteristicFields.map((field, index) => (
+                <div key={index} style={{display:'flex',gap:8,marginBottom:8,alignItems:'center'}}>
+                  <input
+                    value={field.parameter}
+                    onChange={(e) => updateCharacteristic(index, 'parameter', e.target.value)}
+                    placeholder="Параметр (например: Код товара)"
+                    style={{flex:1,padding:8,borderRadius:4,border:'1px solid #ced4da',fontSize:13}}
+                  />
+                  <input
+                    value={field.value}
+                    onChange={(e) => updateCharacteristic(index, 'value', e.target.value)}
+                    placeholder="Значение (например: 119356208)"
+                    style={{flex:1,padding:8,borderRadius:4,border:'1px solid #ced4da',fontSize:13}}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeCharacteristic(index)}
+                    style={{background:'#dc3545',color:'#fff',border:'none',borderRadius:4,padding:'6px 8px',fontSize:12,cursor:'pointer',minWidth:30}}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <small style={{color:'#6c757d',fontSize:12,marginTop:8,display:'block'}}>
+              💡 Каждая характеристика будет отображаться как "Параметр: Значение". 
+              Пустые поля автоматически исключаются.
+            </small>
+          </div>
+          
+          <div style={{marginBottom:0}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Комплектация</label>
+            <textarea value={equipment} onChange={e=>setEquipment(e.target.value)} placeholder="• Основной инструмент&#10;• Защитный кожух&#10;• Ключ для замены диска&#10;• Инструкция по эксплуатации" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14,minHeight:80,resize:'vertical'}} />
+            <small style={{color:'#6c757d',fontSize:12}}>Что входит в комплект поставки</small>
           </div>
         </div>
-        <div style={{marginBottom:12}}>
-          <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333'}}>Дополнительные изображения (images3):</label>
-          <textarea value={images3} onChange={e=>setImages3(e.target.value)} placeholder='["/images/products/photo5.jpg", "/images/products/photo6.jpg"]' style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-          <div style={{display:'flex',gap:8,marginTop:4,flexWrap:'wrap'}}>
-            <input type="file" multiple accept="image/*" onChange={(e)=>handleFileUpload(e, setImages3)} style={{flex:1,minWidth:200}} />
-            <button type="button" onClick={()=>setImages3('["/images/products/bolgarka-makita-125.jpg"]')} style={{background:'#4CAF50',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>Добавить примеры</button>
-            <small style={{color:'#666',fontSize:11,width:'100%',marginTop:4}}>💡 Еще дополнительные фото (например, детали, упаковка)</small>
-          </div>
-        </div>
-        <div style={{marginBottom:12}}>
-          <textarea value={shortDescription} onChange={e=>setShortDescription(e.target.value)} placeholder="Краткое описание (до 160 символов)" maxLength={160} style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:38}} />
-        </div>
-        <div style={{marginBottom:12}}>
-          <textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Описание" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-        </div>
-        <div style={{marginBottom:12}}>
-          <textarea value={characteristics} onChange={e=>setCharacteristics(e.target.value)} placeholder="Характеристики" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-        </div>
-        <div style={{marginBottom:16}}>
-          <textarea value={equipment} onChange={e=>setEquipment(e.target.value)} placeholder="Комплектация" style={{width:'100%',padding:8,borderRadius:6,border:'1px solid #e0e0e0',fontSize:15,minHeight:54}} />
-        </div>
-        {error && <div style={{color:'#e53935',marginBottom:10}}>{error}</div>}
-        <div style={{display:'flex',justifyContent:'flex-end',gap:10}}>
-          <button type="button" onClick={onClose} style={{background:'#f5f7fa',color:'#222',border:'1px solid #e0e0e0',borderRadius:6,padding:'7px 16px',fontWeight:500,cursor:'pointer'}}>Отмена</button>
-          <button type="submit" disabled={loading} style={{background:'#FF6B00',color:'#fff',border:'none',borderRadius:6,padding:'7px 16px',fontWeight:600,cursor:'pointer'}}>{loading ? (isEdit ? 'Сохранение...' : 'Добавление...') : (isEdit ? 'Сохранить' : 'Добавить')}</button>
+
+        {error && <div style={{color:'#dc3545',marginBottom:16,padding:12,background:'#f8d7da',border:'1px solid #f5c6cb',borderRadius:6}}>{error}</div>}
+        
+        <div style={{display:'flex',justifyContent:'flex-end',gap:12}}>
+          <button type="button" onClick={onClose} style={{background:'#6c757d',color:'#fff',border:'none',borderRadius:6,padding:'10px 20px',fontWeight:500,cursor:'pointer',fontSize:14}}>Отмена</button>
+          <button type="submit" disabled={loading} style={{background:'#FF6B00',color:'#fff',border:'none',borderRadius:6,padding:'10px 20px',fontWeight:600,cursor:'pointer',fontSize:14}}>{loading ? (isEdit ? 'Сохранение...' : 'Добавление...') : (isEdit ? 'Сохранить' : 'Добавить товар')}</button>
         </div>
       </form>
     </div>

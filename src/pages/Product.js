@@ -183,6 +183,11 @@ const Product = () => {
             <div className="product-info-block">
               <>
                 <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 18}}>{product.name}</h1>
+                {product.article && (
+                  <div style={{fontSize: '0.9rem', color: '#666', marginBottom: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
+                    <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span> {product.article}
+                  </div>
+                )}
                 <div className="product-short-desc" style={{fontSize: '1.18rem', color: '#222', marginBottom: 10, fontWeight: 500, marginTop: 0}}>{shortDesc}</div>
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
