@@ -9,7 +9,7 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
 
-  const API_URL = '/api/products';
+  const API_URL = 'https://electro-celx.onrender.com/api/products';
 
   useEffect(() => {
     fetch(`${API_URL}?limit=8`)

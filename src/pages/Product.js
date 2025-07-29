@@ -56,7 +56,7 @@ const Product = () => {
   const allImages = getAllImages();
   const navigate = useNavigate();
 
-  const API_URL = '/api/products';
+  const API_URL = 'https://electro-celx.onrender.com/api/products';
 
   useEffect(() => {
     setLoading(true);

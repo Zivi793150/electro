@@ -3,8 +3,8 @@ services:
     name: eltok-api
     env: node
     plan: free
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node index.js
     envVars:
       - key: NODE_ENV
         value: production

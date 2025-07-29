@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-  const API_URL = '/api/products';
+  const API_URL = 'https://electro-celx.onrender.com/api/products';
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');

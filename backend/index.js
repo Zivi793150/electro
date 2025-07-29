@@ -9,15 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const mongoUri = process.env.MONGO_URI
+const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Tanker_tools';
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoUri)
   .then(() => console.log('MongoDB подключена'))
   .catch(err => console.error('Ошибка подключения к MongoDB:', err));
 
 app.get('/', (req, res) => {
-  res.send('Backend работает!');
+  res.json({ message: 'Backend работает!', timestamp: new Date().toISOString() });
 });
 
 // Модель продукта
@@ -31,6 +31,7 @@ app.get('/api/products', async (req, res) => {
     const products = await Product.find().limit(limit);
     res.json(products);
   } catch (err) {
+    console.error('Ошибка получения продуктов:', err);
     res.status(500).json({ error: 'Ошибка при получении продуктов' });
   }
 });
@@ -42,6 +43,7 @@ app.get('/api/products/:id', async (req, res) => {
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
     res.json(product);
   } catch (err) {
+    console.error('Ошибка получения продукта:', err);
     res.status(500).json({ error: 'Ошибка при получении товара' });
   }
 });
@@ -53,6 +55,7 @@ app.post('/api/products', async (req, res) => {
     const savedProduct = await product.save();
     res.status(201).json(savedProduct);
   } catch (err) {
+    console.error('Ошибка создания продукта:', err);
     res.status(500).json({ error: 'Ошибка при создании товара' });
   }
 });
@@ -68,6 +71,7 @@ app.put('/api/products/:id', async (req, res) => {
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
     res.json(product);
   } catch (err) {
+    console.error('Ошибка обновления продукта:', err);
     res.status(500).json({ error: 'Ошибка при обновлении товара' });
   }
 });
@@ -79,15 +83,20 @@ app.delete('/api/products/:id', async (req, res) => {
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
     res.json({ success: true, message: 'Товар удален' });
   } catch (err) {
+    console.error('Ошибка удаления продукта:', err);
     res.status(500).json({ error: 'Ошибка при удалении товара' });
   }
 });
 
 // Скрипт для массовой замены фото у всех товаров
 async function updateAllProductImages() {
-  const newImage = '/images/products/bolgarka-makita-125.jpg';
-  await Product.updateMany({}, { $set: { image: newImage, images: [newImage] } });
-  console.log('Все фото товаров заменены на', newImage);
+  try {
+    const newImage = '/images/products/bolgarka-makita-125.jpg';
+    await Product.updateMany({}, { $set: { image: newImage, images: [newImage] } });
+    console.log('Все фото товаров заменены на', newImage);
+  } catch (err) {
+    console.error('Ошибка обновления изображений:', err);
+  }
 }
 
 // API endpoint для загрузки файлов
