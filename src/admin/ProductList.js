@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-  const API_URL = 'http://localhost:5000/api/products';
+  const API_URL = '/api/products';
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
@@ -69,7 +69,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const formData = new FormData();
       formData.append('file', files[0]);
       
-      const response = await fetch('http://localhost:5000/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
