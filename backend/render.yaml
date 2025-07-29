@@ -3,12 +3,8 @@ services:
     name: eltok-api
     env: node
     plan: free
-    buildCommand: |
-      cd backend
-      npm install
-      cp -r node_modules ../node_modules
-      cp package.json ../package.json
-    startCommand: node backend/index.js
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
