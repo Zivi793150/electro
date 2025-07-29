@@ -20,9 +20,9 @@ const AdminApp = () => {
   return (
     <Routes>
       <Route path="/login" element={<AdminLogin onLogin={handleLogin} />} />
-      <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/admin/login" />} />
-      <Route path="/" element={<Navigate to="/admin/products" />} />
-      <Route path="*" element={<Navigate to="/admin/products" />} />
+      <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/login" />} />
+      <Route path="/" element={<Navigate to="/products" />} />
+      <Route path="*" element={<Navigate to="/products" />} />
     </Routes>
   );
 };

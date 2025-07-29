@@ -2,12 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
+const path = require('path');
 const upload = require('./upload');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Статическая раздача загруженных файлов
+app.use('/images/products', express.static(path.join(__dirname, 'uploads')));
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Tanker_tools';
 const PORT = process.env.PORT || 5000;
