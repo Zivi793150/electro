@@ -56,7 +56,7 @@ const Product = () => {
   const allImages = getAllImages();
   const navigate = useNavigate();
 
-  const API_URL = 'https://electro-celx.onrender.com/api/products';
+  const API_URL = 'https://electro-a8bl.onrender.com/api/products';
 
   useEffect(() => {
     setLoading(true);
@@ -183,11 +183,6 @@ const Product = () => {
             <div className="product-info-block">
               <>
                 <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 18}}>{product.name}</h1>
-                {product.article && (
-                  <div style={{fontSize: '0.9rem', color: '#666', marginBottom: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
-                    <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span> {product.article}
-                  </div>
-                )}
                 <div className="product-short-desc" style={{fontSize: '1.18rem', color: '#222', marginBottom: 10, fontWeight: 500, marginTop: 0}}>{shortDesc}</div>
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
@@ -208,6 +203,11 @@ const Product = () => {
                     <button className="product-btn-buy" onClick={handleBuy}>Купить</button>
                   </div>
                 </div>
+                {product.article && (
+                  <div style={{fontSize: '0.9rem', color: '#666', marginTop: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
+                    <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span> {product.article}
+                  </div>
+                )}
                 <div className="product-divider"></div>
                 <div style={{marginTop: 14, background: '#f5f7fa', borderRadius: 10, padding: '10px 12px 8px 12px', fontSize: '0.98rem', color: '#222', boxShadow: 'none', maxWidth: 320}}>
                   <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem'}}>

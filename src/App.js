@@ -46,7 +46,6 @@ function App() {
           <Route path="/cooperation" element={<Cooperation />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin/*" element={<AdminApp />} />
-          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>

@@ -1,14 +1,27 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AdminLogin from './Login';
 import AdminProductList from './ProductList';
 
 const AdminApp = () => {
+  const navigate = useNavigate();
   const isAuth = !!localStorage.getItem('admin_token');
+
+  const handleLogin = () => {
+    localStorage.setItem('admin_token', 'admin');
+    navigate('/admin/products');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_token');
+    navigate('/admin/login');
+  };
+
   return (
     <Routes>
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route path="/admin/products" element={isAuth ? <AdminProductList /> : <Navigate to="/admin/login" />} />
+      <Route path="/login" element={<AdminLogin onLogin={handleLogin} />} />
+      <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/admin/login" />} />
+      <Route path="/" element={<Navigate to="/admin/products" />} />
       <Route path="*" element={<Navigate to="/admin/products" />} />
     </Routes>
   );

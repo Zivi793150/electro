@@ -37,7 +37,7 @@ const Catalog = () => {
     };
   }, [isDropdownOpen]);
 
-          const API_URL = 'https://electro-celx.onrender.com/api/products';
+          const API_URL = 'https://electro-a8bl.onrender.com/api/products';
 
   useEffect(() => {
     setLoading(true);
