@@ -336,7 +336,12 @@
   align-items: stretch;
   gap: 0;
   width: max-content;
-  animation: mini-catalog-scroll 30s linear infinite;
+  animation: mini-catalog-scroll 40s linear infinite;
+  will-change: transform;
+}
+
+.mini-catalog-slider:hover {
+  animation-play-state: paused;
 }
 @keyframes mini-catalog-scroll {
   0% { transform: translateX(0); }

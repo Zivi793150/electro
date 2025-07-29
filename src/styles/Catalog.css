@@ -238,7 +238,7 @@ body, html {
     font-size: 0.95rem;
   }
   .catalog-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(1, 1fr) !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -323,7 +323,7 @@ body, html {
     font-size: 0.9rem; 
   } 
     .catalog-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(1, 1fr) !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -395,7 +395,7 @@ body, html {
     font-size: 0.8rem;
   }
   .catalog-products-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
     gap: 0;
     margin-bottom: 4px;
   }
@@ -498,7 +498,7 @@ body, html {
     font-size: 0.7rem;
   }
   .catalog-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(1, 1fr) !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -603,7 +603,7 @@ body, html {
     font-size: 0.65rem;
   }
   .catalog-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(1, 1fr) !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;

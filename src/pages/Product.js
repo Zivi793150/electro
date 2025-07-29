@@ -204,8 +204,8 @@ const Product = () => {
                   </div>
                 </div>
                 {product.article && (
-                  <div style={{fontSize: '0.9rem', color: 'red', marginTop: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
-                    <span style={{fontWeight: 500, color: 'red'}}>Артикул:</span> {product.article}
+                  <div style={{fontSize: '0.9rem', color: '#666', marginTop: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
+                    <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span> {product.article}
                   </div>
                 )}
                 <div className="product-divider"></div>
@@ -248,9 +248,10 @@ const Product = () => {
         </div>
         <div className="mini-catalog-slider-wrapper">
           <div className="mini-catalog-slider">
+            {/* Первый набор карточек */}
             {miniProducts.map(product => (
               <div
-                key={product._id}
+                key={`first-${product._id}`}
                 className="product-card catalog-mini-product-card"
                 onClick={() => window.location.href = `/product/${product._id}`}
                 style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
@@ -267,9 +268,33 @@ const Product = () => {
                   <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
                     <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? product.price + ' ₸' : ''}</span>
                     <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
-            </div>
+                  </div>
                 </div>
-            </div>
+              </div>
+            ))}
+            {/* Дублированный набор карточек для бесконечной прокрутки */}
+            {miniProducts.map(product => (
+              <div
+                key={`second-${product._id}`}
+                className="product-card catalog-mini-product-card"
+                onClick={() => window.location.href = `/product/${product._id}`}
+                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
+              >
+                <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
+                </div>
+                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
+                <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
+                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '32px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                  <div style={{width:'100%', textAlign:'left', margin:'0 0 1px 0'}}>
+                    <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
+                  </div>
+                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
+                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? product.price + ' ₸' : ''}</span>
+                    <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
