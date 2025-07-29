@@ -69,7 +69,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const formData = new FormData();
       formData.append('file', files[0]);
       
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/upload.php', {
         method: 'POST',
         body: formData
       });
