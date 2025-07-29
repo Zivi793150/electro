@@ -10,7 +10,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'build')));
 
 // MongoDB подключение
 const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Tanker_tools';
@@ -27,7 +26,7 @@ const Product = mongoose.model('Product', productSchema);
 // Настройка multer для загрузки файлов
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, 'public', 'uploads');
+    const uploadDir = path.join(__dirname, 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -138,11 +137,11 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 // Обслуживание статических файлов из папки uploads
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// React Router - все остальные запросы направляем на React приложение
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// Тестовый endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'API работает!', timestamp: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {
