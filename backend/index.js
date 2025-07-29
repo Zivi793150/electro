@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const multer = require('multer');
-const upload = require('./upload');
 require('dotenv').config();
 
 const app = express();
@@ -90,35 +88,12 @@ app.delete('/api/products/:id', async (req, res) => {
 
 
 
-// API endpoint для загрузки файлов
-app.post('/api/upload', upload.array('file', 10), (req, res) => {
-  try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: 'Файлы не были загружены' });
-    }
-
-    // Возвращаем URL существующих изображений вместо загруженных
-    const existingImages = [
-      '/images/products/bolgarka-makita-125.jpg',
-      '/images/products/drel.jpg',
-      '/images/products/perforator-bosch-gbh.jpg',
-      '/images/products/shurupovert-dewalt-18v.jpg'
-    ];
-
-    const uploadedFiles = req.files.map((file, index) => {
-      // Используем существующие изображения по кругу
-      return existingImages[index % existingImages.length];
-    });
-
-    res.json({
-      success: true,
-      files: uploadedFiles,
-      message: `Загружено ${uploadedFiles.length} файлов`
-    });
-  } catch (error) {
-    console.error('Ошибка загрузки:', error);
-    res.status(500).json({ error: 'Ошибка при загрузке файлов' });
-  }
+// API endpoint для загрузки файлов (перенаправляем на основной хостинг)
+app.post('/api/upload', (req, res) => {
+  res.status(400).json({ 
+    error: 'Загрузка файлов должна производиться на основном хостинге',
+    message: 'Используйте /api/upload на основном домене'
+  });
 });
 
 // Обработка ошибок multer
