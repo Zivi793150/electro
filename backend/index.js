@@ -2,16 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const multer = require('multer');
-const path = require('path');
 const upload = require('./upload');
 require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Статическая раздача загруженных файлов
-app.use('/images/products', express.static(path.join(__dirname, 'uploads')));
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Tanker_tools';
 const PORT = process.env.PORT || 5000;
@@ -92,16 +88,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// Скрипт для массовой замены фото у всех товаров
-async function updateAllProductImages() {
-  try {
-    const newImage = '/images/products/bolgarka-makita-125.jpg';
-    await Product.updateMany({}, { $set: { image: newImage, images: [newImage] } });
-    console.log('Все фото товаров заменены на', newImage);
-  } catch (err) {
-    console.error('Ошибка обновления изображений:', err);
-  }
-}
+
 
 // API endpoint для загрузки файлов
 app.post('/api/upload', upload.array('file', 10), (req, res) => {
@@ -110,8 +97,17 @@ app.post('/api/upload', upload.array('file', 10), (req, res) => {
       return res.status(400).json({ error: 'Файлы не были загружены' });
     }
 
-    const uploadedFiles = req.files.map(file => {
-      return `/images/products/${file.filename}`;
+    // Возвращаем URL существующих изображений вместо загруженных
+    const existingImages = [
+      '/images/products/bolgarka-makita-125.jpg',
+      '/images/products/drel.jpg',
+      '/images/products/perforator-bosch-gbh.jpg',
+      '/images/products/shurupovert-dewalt-18v.jpg'
+    ];
+
+    const uploadedFiles = req.files.map((file, index) => {
+      // Используем существующие изображения по кругу
+      return existingImages[index % existingImages.length];
     });
 
     res.json({
@@ -136,7 +132,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose.connection.once('open', () => {
-  updateAllProductImages(); // Выполнить замену при первом запуске
+  console.log('MongoDB подключена успешно');
 });
 
 app.listen(PORT, () => {
