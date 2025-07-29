@@ -204,8 +204,8 @@ const Product = () => {
                   </div>
                 </div>
                 {product.article && (
-                  <div style={{fontSize: '0.9rem', color: '#666', marginTop: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
-                    <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span> {product.article}
+                  <div style={{fontSize: '0.9rem', color: 'red', marginTop: 8, padding: '4px 8px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef'}}>
+                    <span style={{fontWeight: 500, color: 'red'}}>Артикул:</span> {product.article}
                   </div>
                 )}
                 <div className="product-divider"></div>
