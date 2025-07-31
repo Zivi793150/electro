@@ -30,6 +30,11 @@ const Product = () => {
   const getAllImages = () => {
     const images = [];
     
+    // Добавляем основное изображение из поля image (если есть)
+    if (product?.image) {
+      images.push(product.image);
+    }
+    
     // Добавляем изображения из поля images
     if (Array.isArray(product?.images)) {
       images.push(...product.images);
@@ -163,17 +168,17 @@ const Product = () => {
             <div className="product-gallery">
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
-                  <img src={allImages[activeImage]} alt={product.name} loading="lazy" />
+                  <img src={product.image || allImages[activeImage]} alt={product.name} loading="lazy" />
                 </div>
                 {allImages.length > 1 && (
                   <>
+                    <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 20, marginBottom: 8, border:'none'}}>
+                      Чтобы увеличить, нажмите на картинку
+                    </div>
                     <div className="product-thumbs">
                       {allImages.map((img, idx) => (
                         <img key={idx} src={img} alt={product.name + idx} className={activeImage === idx ? "active" : ""} onClick={() => setActiveImage(idx)} loading="lazy" />
                       ))}
-                    </div>
-                    <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 4, marginBottom: 12, border:'none'}}>
-                      Чтобы увеличить, нажмите на картинку
                     </div>
                   </>
                 )}
@@ -182,8 +187,8 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 18}}>{product.name}</h1>
-                <div className="product-short-desc" style={{fontSize: '1.18rem', color: '#222', marginBottom: 10, fontWeight: 500, marginTop: 0}}>{shortDesc}</div>
+                <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
+                <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">
@@ -195,6 +200,23 @@ const Product = () => {
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
+                    {product.article && (
+                      <div style={{
+                        fontSize: '0.85rem', 
+                        color: '#666', 
+                        marginTop: 6, 
+                        textAlign: 'left',
+                        wordBreak: 'break-word',
+                        width: '140px',
+                        minWidth: '140px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start'
+                      }}>
+                        <span style={{fontWeight: 500, color: '#495057'}}>Арт:</span>
+                        <span style={{marginTop: 2}}>{product.article}</span>
+                      </div>
+                    )}
                   </div>
                   <span className="product-price-divider"></span>
                   <div className="product-buy-btns">
@@ -203,11 +225,6 @@ const Product = () => {
                     <button className="product-btn-buy" onClick={handleBuy}>Купить</button>
                   </div>
                 </div>
-                {product.article && (
-                  <div style={{fontSize: '0.85rem', color: '#666', marginTop: 8, padding: '3px 6px', background: '#f8f9fa', borderRadius: 4, display: 'inline-block', border: '1px solid #e9ecef', maxWidth: '100%', wordBreak: 'break-word'}}>
-                    <span style={{fontWeight: 500, color: '#495057'}}>Арт:</span> {product.article}
-                  </div>
-                )}
                 <div className="product-divider"></div>
                 <div style={{marginTop: 14, background: '#f5f7fa', borderRadius: 10, padding: '10px 12px 8px 12px', fontSize: '0.98rem', color: '#222', boxShadow: 'none', maxWidth: 320}}>
                   <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem'}}>
