@@ -22,6 +22,35 @@ app.get('/', (req, res) => {
 const productSchema = new mongoose.Schema({}, { strict: false, collection: 'products' });
 const Product = mongoose.model('Product', productSchema);
 
+// Модель настроек сайта
+const settingsSchema = new mongoose.Schema({
+  city: { type: String, default: 'Алматы' },
+  deliveryInfo: {
+    freeDelivery: { type: String, default: 'Бесплатная доставка по городу' },
+    freeDeliveryNote: { type: String, default: 'Сегодня — БЕСПЛАТНО' },
+    pickupAddress: { type: String, default: 'ул. Толе би 216Б' },
+    pickupInfo: { type: String, default: 'Сегодня с 9:00 до 18:00 — больше 5' },
+    deliveryNote: { type: String, default: 'Срок доставки рассчитывается менеджером после оформления заказа' }
+  },
+  contactInfo: {
+    phone: { type: String, default: '+7 707 703-31-13' },
+    phoneName: { type: String, default: 'Виталий' },
+    officePhone: { type: String, default: '+7 727 347 07 53' },
+    officeName: { type: String, default: 'Офис' },
+    address: { type: String, default: 'ул. Казыбаева 9/1 г. Алматы' },
+    email: { type: String, default: 'info@промкраска.kz' }
+  },
+  companyInfo: {
+    name: { type: String, default: 'ТОО «Long Partners»' },
+    bin: { type: String, default: '170540006129' },
+    iik: { type: String, default: 'KZ256018861000677041' },
+    kbe: { type: String, default: '17' },
+    bank: { type: String, default: 'АО «Народный Банк Казахстана»' }
+  }
+}, { collection: 'settings' });
+
+const Settings = mongoose.model('Settings', settingsSchema);
+
 // API endpoint для получения всех продуктов с поддержкой лимита
 app.get('/api/products', async (req, res) => {
   try {
@@ -83,6 +112,52 @@ app.delete('/api/products/:id', async (req, res) => {
   } catch (err) {
     console.error('Ошибка удаления продукта:', err);
     res.status(500).json({ error: 'Ошибка при удалении товара' });
+  }
+});
+
+// API endpoint для получения настроек сайта
+app.get('/api/settings', async (req, res) => {
+  try {
+    let settings = await Settings.findOne();
+    
+    // Если настроек нет, создаем с дефолтными значениями
+    if (!settings) {
+      settings = new Settings();
+      await settings.save();
+    }
+    
+    res.json({ settings });
+  } catch (err) {
+    console.error('Ошибка получения настроек:', err);
+    res.status(500).json({ error: 'Ошибка при получении настроек' });
+  }
+});
+
+// API endpoint для сохранения настроек сайта
+app.post('/api/settings', async (req, res) => {
+  try {
+    const { settings } = req.body;
+    
+    if (!settings) {
+      return res.status(400).json({ error: 'Данные настроек не предоставлены' });
+    }
+    
+    let existingSettings = await Settings.findOne();
+    
+    if (existingSettings) {
+      // Обновляем существующие настройки
+      Object.assign(existingSettings, settings);
+      await existingSettings.save();
+    } else {
+      // Создаем новые настройки
+      existingSettings = new Settings(settings);
+      await existingSettings.save();
+    }
+    
+    res.json({ success: true, settings: existingSettings });
+  } catch (err) {
+    console.error('Ошибка сохранения настроек:', err);
+    res.status(500).json({ error: 'Ошибка при сохранении настроек' });
   }
 });
 

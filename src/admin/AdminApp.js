@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AdminLogin from './Login';
 import AdminProductList from './ProductList';
+import SiteSettings from './SiteSettings';
 
 const AdminApp = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const AdminApp = () => {
     <Routes>
       <Route path="/login" element={<AdminLogin onLogin={handleLogin} />} />
       <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/login" />} />
+      <Route path="/settings" element={isAuth ? <SiteSettings onLogout={handleLogout} /> : <Navigate to="/login" />} />
       <Route path="/" element={<Navigate to="/products" />} />
       <Route path="*" element={<Navigate to="/products" />} />
     </Routes>
