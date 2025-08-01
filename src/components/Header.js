@@ -57,14 +57,13 @@ const Header = () => {
         {/* Desktop Logo */}
         <div className="header-logo desktop-logo">
           <div className="logo">
-            <div className="logo-icon">⚡</div>
-            <div className="logo-text">Tanker Tools</div>
+            <img src="/logo.png" alt="Tanker Tools" className="logo-image" />
           </div>
         </div>
         
         {/* Mobile Title */}
         <div className="mobile-title">
-          <div className="mobile-title-text">Tanker Tools</div>
+          <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
         </div>
         
         {/* Desktop Navigation */}
@@ -116,7 +115,7 @@ const Header = () => {
         <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <div className="mobile-title">
-              <div className="mobile-title-text">Tanker Tools</div>
+              <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
             </div>
             <button className="mobile-menu-close" onClick={closeMenu}>×</button>
           </div>

@@ -23,24 +23,30 @@
 .desktop-logo {
   display: flex;
   align-items: center;
+  overflow: visible;
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
+  overflow: visible;
 }
 
-.logo-icon {
-  font-size: 24px;
-  color: #ffc107;
+.logo-image {
+  height: 160px;
+  width: auto;
+  object-fit: contain;
+  margin-top: -30px;
+  margin-bottom: -30px;
 }
 
-.logo-text {
-  font-size: 24px;
-  font-weight: 600;
-  color: #222;
-  white-space: nowrap;
+.mobile-logo-image {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+  margin-top: -15px;
+  margin-bottom: -15px;
 }
 
 /* Десктопная навигация */
@@ -133,13 +139,11 @@
 /* Мобильный заголовок */
 .mobile-title {
   display: none;
+  align-items: center;
 }
 
 .mobile-title-text {
-  font-size: 20px;
-  font-weight: 600;
-  color: #222;
-  white-space: nowrap;
+  display: none;
 }
 
 /* Кнопка бургер-меню */
@@ -373,9 +377,7 @@
     min-height: 56px;
   }
   
-  .mobile-title-text {
-    font-size: 18px;
-  }
+
   
   .mobile-menu-content {
     width: 280px;
@@ -388,9 +390,7 @@
     min-height: 52px;
   }
   
-  .mobile-title-text {
-    font-size: 16px;
-  }
+
   
   .mobile-menu-content {
     width: 260px;
@@ -403,9 +403,7 @@
     min-height: 48px;
   }
   
-  .mobile-title-text {
-    font-size: 14px;
-  }
+
   
   .mobile-menu-content {
     width: 240px;
