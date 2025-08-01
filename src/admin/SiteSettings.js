@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://electro-a8bl.onrender.com/api/settings';
+const API_URL = 'https://electro-a8bl.onrender.com/api/information';
 
 const SiteSettings = ({ onLogout }) => {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState({
+  const [information, setInformation] = useState({
     city: 'Алматы',
     deliveryInfo: {
       freeDelivery: 'Бесплатная доставка по городу',
@@ -35,23 +35,23 @@ const SiteSettings = ({ onLogout }) => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetchSettings();
+    fetchInformation();
   }, []);
 
-  const fetchSettings = async () => {
+  const fetchInformation = async () => {
     setLoading(true);
     try {
       const response = await fetch(API_URL);
       if (response.ok) {
         const data = await response.json();
-        if (data.settings) {
-          setSettings(data.settings);
+        if (data.information) {
+          setInformation(data.information);
         }
       } else {
-        console.log('Настройки не найдены, используются значения по умолчанию');
+        console.log('Информация не найдена, используются значения по умолчанию');
       }
     } catch (error) {
-      console.log('Ошибка загрузки настроек, используются значения по умолчанию:', error);
+      console.log('Ошибка загрузки информации, используются значения по умолчанию:', error);
     } finally {
       setLoading(false);
     }
@@ -65,13 +65,13 @@ const SiteSettings = ({ onLogout }) => {
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings })
+        body: JSON.stringify({ information })
       });
       
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          setMessage('✅ Настройки успешно сохранены!');
+          setMessage('✅ Информация успешно сохранена!');
           setTimeout(() => setMessage(''), 3000);
         } else {
           throw new Error(data.error || 'Ошибка сохранения');
@@ -81,7 +81,7 @@ const SiteSettings = ({ onLogout }) => {
         throw new Error(errorData.error || 'Ошибка сохранения');
       }
     } catch (error) {
-      setMessage(`❌ Ошибка при сохранении настроек: ${error.message}`);
+      setMessage(`❌ Ошибка при сохранении информации: ${error.message}`);
       setTimeout(() => setMessage(''), 5000);
     } finally {
       setSaving(false);
@@ -89,7 +89,7 @@ const SiteSettings = ({ onLogout }) => {
   };
 
   const updateDeliveryInfo = (field, value) => {
-    setSettings(prev => ({
+    setInformation(prev => ({
       ...prev,
       deliveryInfo: {
         ...prev.deliveryInfo,
@@ -99,7 +99,7 @@ const SiteSettings = ({ onLogout }) => {
   };
 
   const updateContactInfo = (field, value) => {
-    setSettings(prev => ({
+    setInformation(prev => ({
       ...prev,
       contactInfo: {
         ...prev.contactInfo,
@@ -109,7 +109,7 @@ const SiteSettings = ({ onLogout }) => {
   };
 
   const updateCompanyInfo = (field, value) => {
-    setSettings(prev => ({
+    setInformation(prev => ({
       ...prev,
       companyInfo: {
         ...prev.companyInfo,
@@ -162,8 +162,8 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Город по умолчанию</label>
             <input 
-              value={settings.city} 
-              onChange={(e) => setSettings(prev => ({...prev, city: e.target.value}))}
+              value={information.city} 
+              onChange={(e) => setInformation(prev => ({...prev, city: e.target.value}))}
               placeholder="Например: Алматы"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
             />
@@ -178,7 +178,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Бесплатная доставка</label>
             <input 
-              value={settings.deliveryInfo.freeDelivery} 
+              value={information.deliveryInfo.freeDelivery} 
               onChange={(e) => updateDeliveryInfo('freeDelivery', e.target.value)}
               placeholder="Бесплатная доставка по городу"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -188,7 +188,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Примечание к доставке</label>
             <input 
-              value={settings.deliveryInfo.freeDeliveryNote} 
+              value={information.deliveryInfo.freeDeliveryNote} 
               onChange={(e) => updateDeliveryInfo('freeDeliveryNote', e.target.value)}
               placeholder="Сегодня — БЕСПЛАТНО"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -198,7 +198,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Адрес самовывоза</label>
             <input 
-              value={settings.deliveryInfo.pickupAddress} 
+              value={information.deliveryInfo.pickupAddress} 
               onChange={(e) => updateDeliveryInfo('pickupAddress', e.target.value)}
               placeholder="ул. Толе би 216Б"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -208,7 +208,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Информация о самовывозе</label>
             <input 
-              value={settings.deliveryInfo.pickupInfo} 
+              value={information.deliveryInfo.pickupInfo} 
               onChange={(e) => updateDeliveryInfo('pickupInfo', e.target.value)}
               placeholder="Сегодня с 9:00 до 18:00 — больше 5"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -218,7 +218,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 0}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Примечание о сроке доставки</label>
             <input 
-              value={settings.deliveryInfo.deliveryNote} 
+              value={information.deliveryInfo.deliveryNote} 
               onChange={(e) => updateDeliveryInfo('deliveryNote', e.target.value)}
               placeholder="Срок доставки рассчитывается менеджером после оформления заказа"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -234,7 +234,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Телефон</label>
               <input 
-                value={settings.contactInfo.phone} 
+                value={information.contactInfo.phone} 
                 onChange={(e) => updateContactInfo('phone', e.target.value)}
                 placeholder="+7 707 703-31-13"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -243,7 +243,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Имя контакта</label>
               <input 
-                value={settings.contactInfo.phoneName} 
+                value={information.contactInfo.phoneName} 
                 onChange={(e) => updateContactInfo('phoneName', e.target.value)}
                 placeholder="Виталий"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -255,7 +255,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Офисный телефон</label>
               <input 
-                value={settings.contactInfo.officePhone} 
+                value={information.contactInfo.officePhone} 
                 onChange={(e) => updateContactInfo('officePhone', e.target.value)}
                 placeholder="+7 727 347 07 53"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -264,7 +264,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Название офиса</label>
               <input 
-                value={settings.contactInfo.officeName} 
+                value={information.contactInfo.officeName} 
                 onChange={(e) => updateContactInfo('officeName', e.target.value)}
                 placeholder="Офис"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -275,7 +275,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Адрес</label>
             <input 
-              value={settings.contactInfo.address} 
+              value={information.contactInfo.address} 
               onChange={(e) => updateContactInfo('address', e.target.value)}
               placeholder="ул. Казыбаева 9/1 г. Алматы"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -285,7 +285,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 0}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Email</label>
             <input 
-              value={settings.contactInfo.email} 
+              value={information.contactInfo.email} 
               onChange={(e) => updateContactInfo('email', e.target.value)}
               placeholder="info@промкраска.kz"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -300,7 +300,7 @@ const SiteSettings = ({ onLogout }) => {
           <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Название компании</label>
             <input 
-              value={settings.companyInfo.name} 
+              value={information.companyInfo.name} 
               onChange={(e) => updateCompanyInfo('name', e.target.value)}
               placeholder="ТОО «Long Partners»"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -311,7 +311,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>БИН</label>
               <input 
-                value={settings.companyInfo.bin} 
+                value={information.companyInfo.bin} 
                 onChange={(e) => updateCompanyInfo('bin', e.target.value)}
                 placeholder="170540006129"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -320,7 +320,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>ИИК</label>
               <input 
-                value={settings.companyInfo.iik} 
+                value={information.companyInfo.iik} 
                 onChange={(e) => updateCompanyInfo('iik', e.target.value)}
                 placeholder="KZ256018861000677041"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -332,7 +332,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>КБЕ</label>
               <input 
-                value={settings.companyInfo.kbe} 
+                value={information.companyInfo.kbe} 
                 onChange={(e) => updateCompanyInfo('kbe', e.target.value)}
                 placeholder="17"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
@@ -341,7 +341,7 @@ const SiteSettings = ({ onLogout }) => {
             <div>
               <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Банк</label>
               <input 
-                value={settings.companyInfo.bank} 
+                value={information.companyInfo.bank} 
                 onChange={(e) => updateCompanyInfo('bank', e.target.value)}
                 placeholder="АО «Народный Банк Казахстана»"
                 style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}

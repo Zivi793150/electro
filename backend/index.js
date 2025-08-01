@@ -22,8 +22,8 @@ app.get('/', (req, res) => {
 const productSchema = new mongoose.Schema({}, { strict: false, collection: 'products' });
 const Product = mongoose.model('Product', productSchema);
 
-// Модель настроек сайта
-const settingsSchema = new mongoose.Schema({
+// Модель информации сайта
+const informationSchema = new mongoose.Schema({
   city: { type: String, default: 'Алматы' },
   deliveryInfo: {
     freeDelivery: { type: String, default: 'Бесплатная доставка по городу' },
@@ -47,9 +47,9 @@ const settingsSchema = new mongoose.Schema({
     kbe: { type: String, default: '17' },
     bank: { type: String, default: 'АО «Народный Банк Казахстана»' }
   }
-}, { collection: 'settings' });
+}, { collection: 'information' });
 
-const Settings = mongoose.model('Settings', settingsSchema);
+const Information = mongoose.model('Information', informationSchema);
 
 // API endpoint для получения всех продуктов с поддержкой лимита
 app.get('/api/products', async (req, res) => {
@@ -115,49 +115,49 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-// API endpoint для получения настроек сайта
-app.get('/api/settings', async (req, res) => {
+// API endpoint для получения информации сайта
+app.get('/api/information', async (req, res) => {
   try {
-    let settings = await Settings.findOne();
+    let information = await Information.findOne();
     
-    // Если настроек нет, создаем с дефолтными значениями
-    if (!settings) {
-      settings = new Settings();
-      await settings.save();
+    // Если информации нет, создаем с дефолтными значениями
+    if (!information) {
+      information = new Information();
+      await information.save();
     }
     
-    res.json({ settings });
+    res.json({ information });
   } catch (err) {
-    console.error('Ошибка получения настроек:', err);
-    res.status(500).json({ error: 'Ошибка при получении настроек' });
+    console.error('Ошибка получения информации:', err);
+    res.status(500).json({ error: 'Ошибка при получении информации' });
   }
 });
 
-// API endpoint для сохранения настроек сайта
-app.post('/api/settings', async (req, res) => {
+// API endpoint для сохранения информации сайта
+app.post('/api/information', async (req, res) => {
   try {
-    const { settings } = req.body;
+    const { information } = req.body;
     
-    if (!settings) {
-      return res.status(400).json({ error: 'Данные настроек не предоставлены' });
+    if (!information) {
+      return res.status(400).json({ error: 'Данные информации не предоставлены' });
     }
     
-    let existingSettings = await Settings.findOne();
+    let existingInformation = await Information.findOne();
     
-    if (existingSettings) {
-      // Обновляем существующие настройки
-      Object.assign(existingSettings, settings);
-      await existingSettings.save();
+    if (existingInformation) {
+      // Обновляем существующую информацию
+      Object.assign(existingInformation, information);
+      await existingInformation.save();
     } else {
-      // Создаем новые настройки
-      existingSettings = new Settings(settings);
-      await existingSettings.save();
+      // Создаем новую информацию
+      existingInformation = new Information(information);
+      await existingInformation.save();
     }
     
-    res.json({ success: true, settings: existingSettings });
+    res.json({ success: true, information: existingInformation });
   } catch (err) {
-    console.error('Ошибка сохранения настроек:', err);
-    res.status(500).json({ error: 'Ошибка при сохранении настроек' });
+    console.error('Ошибка сохранения информации:', err);
+    res.status(500).json({ error: 'Ошибка при сохранении информации' });
   }
 });
 

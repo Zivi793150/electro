@@ -4,6 +4,12 @@ import '../styles/Header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [siteSettings, setSiteSettings] = useState({
+    contactInfo: {
+      phone: '+7 (777) 777-77-77',
+      email: 'info@tankertools.kz'
+    }
+  });
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -15,6 +21,20 @@ const Header = () => {
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isMenuOpen]);
+
+  // Загружаем информацию сайта
+  useEffect(() => {
+    fetch('https://electro-a8bl.onrender.com/api/information')
+      .then(res => res.json())
+      .then(data => {
+        if (data.information) {
+          setSiteSettings(data.information);
+        }
+      })
+      .catch(error => {
+        console.log('Ошибка загрузки информации в Header, используются значения по умолчанию:', error);
+      });
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -63,8 +83,8 @@ const Header = () => {
         {/* Desktop Contact Info */}
         <div className="header-right-blocks desktop-contacts">
           <div className="header-right-col">
-            <div className="top-bar-address">Алматы</div>
-            <div className="top-bar-email">info@tankertools.kz</div>
+            <div className="top-bar-address">{siteSettings.city}</div>
+            <div className="top-bar-email">{siteSettings.contactInfo.email}</div>
           </div>
           <div className="header-right-col">
             <div className="top-bar-socials">
@@ -81,7 +101,7 @@ const Header = () => {
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
-            <div className="top-bar-phone">+7 (777) 777-77-77</div>
+            <div className="top-bar-phone">{siteSettings.contactInfo.phone}</div>
           </div>
         </div>
 

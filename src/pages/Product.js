@@ -25,6 +25,16 @@ const Product = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [showImageModal, setShowImageModal] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
+  const [siteSettings, setSiteSettings] = useState({
+    city: 'Алматы',
+    deliveryInfo: {
+      freeDelivery: 'Бесплатная доставка по городу',
+      freeDeliveryNote: 'Сегодня — БЕСПЛАТНО',
+      pickupAddress: 'ул. Толе би 216Б',
+      pickupInfo: 'Сегодня с 9:00 до 18:00 — больше 5',
+      deliveryNote: 'Срок доставки рассчитывается менеджером после оформления заказа'
+    }
+  });
   
   // Объединяем все изображения из разных полей
   const getAllImages = () => {
@@ -88,6 +98,20 @@ const Product = () => {
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
+      });
+  }, []);
+
+  // Загружаем информацию сайта
+  useEffect(() => {
+    fetch('https://electro-a8bl.onrender.com/api/information')
+      .then(res => res.json())
+      .then(data => {
+        if (data.information) {
+          setSiteSettings(data.information);
+        }
+      })
+      .catch(error => {
+        console.log('Ошибка загрузки информации, используются значения по умолчанию:', error);
       });
   }, []);
 
@@ -228,25 +252,25 @@ const Product = () => {
                 <div className="product-divider"></div>
                 <div style={{marginTop: 14, background: '#f5f7fa', borderRadius: 10, padding: '10px 12px 8px 12px', fontSize: '0.98rem', color: '#222', boxShadow: 'none', maxWidth: 320}}>
                   <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem'}}>
-                    Ваш город: <a href="#" style={{color:'#1e88e5', textDecoration:'underline', cursor:'pointer'}}>Алматы</a>
+                    Ваш город: <a href="#" style={{color:'#1e88e5', textDecoration:'underline', cursor:'pointer'}}>{siteSettings.city}</a>
                   </div>
                   <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
                     <span style={{fontSize:17, marginTop:2}}>🚚</span>
                     <div>
-                      <div style={{fontWeight:500, color:'#222'}}>Бесплатная доставка по городу</div>
-                      <div style={{color:'#1e88e5', fontWeight:600, fontSize:13}}>Сегодня — БЕСПЛАТНО</div>
+                      <div style={{fontWeight:500, color:'#222'}}>{siteSettings.deliveryInfo.freeDelivery}</div>
+                      <div style={{color:'#1e88e5', fontWeight:600, fontSize:13}}>{siteSettings.deliveryInfo.freeDeliveryNote}</div>
                     </div>
                   </div>
                   <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
                     <span style={{fontSize:17, marginTop:2}}>🏬</span>
                     <div>
-                      <div style={{fontWeight:500, color:'#222'}}>Самовывоз из магазина <a href="#" style={{color:'#1e88e5'}}>ул. Толе би 216Б</a></div>
-                      <div style={{color:'#222', fontSize:13}}>Сегодня с 9:00 до 18:00 — больше 5</div>
+                      <div style={{fontWeight:500, color:'#222'}}>Самовывоз из магазина <a href="#" style={{color:'#1e88e5'}}>{siteSettings.deliveryInfo.pickupAddress}</a></div>
+                      <div style={{color:'#222', fontSize:13}}>{siteSettings.deliveryInfo.pickupInfo}</div>
                     </div>
                   </div>
                   <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
                     <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
-                    <span>Срок доставки рассчитывается менеджером после оформления заказа</span>
+                    <span>{siteSettings.deliveryInfo.deliveryNote}</span>
                   </div>
                 </div>
               </>
