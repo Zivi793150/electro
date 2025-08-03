@@ -6,12 +6,12 @@ const Footer = () => {
   const [siteSettings, setSiteSettings] = useState({
     city: 'Алматы',
     contactInfo: {
-      phone: '+7 (777) 777-77-77',
-      email: 'info@tankertools.kz',
-      address: 'г. Алматы, Казахстан'
+      phone: '+77474777989',
+      email: 'info@eltok.kz',
+      address: 'Аймусина 1в'
     },
     companyInfo: {
-      name: 'ТОО "Танкер Тулс"',
+      name: 'ТОО «Eltok.kz»',
       bin: '123456789000',
       iik: 'KZ123456789',
       kbe: '17'
@@ -76,7 +76,7 @@ const Footer = () => {
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; 2024 {siteSettings.companyInfo.name}. Все права защищены.</p>
+        <p>&copy; 2020 {siteSettings.companyInfo.name}. Все права защищены.</p>
       </div>
     </footer>
   );

@@ -7,15 +7,14 @@ const AboutCompanySection = () => (
       <div className="about-company-content">
         <div className="about-company-header">
           <div className="header-line"></div>
-          <h1 className="about-company-title">Промкраска</h1>
+          <h1 className="about-company-title">Tanker</h1>
           <div className="header-line"></div>
         </div>
         <div className="about-company-subtitle">
-          Ваш надежный партнер<br/>
-          в мире красок и<br/>
-          технологий!
+          инструмент, которому<br/>
+          доверяют мастера и<br/>
+          компании.
         </div>
-        <button className="about-company-btn">Оставить заявку</button>
       </div>
     </div>
   </section>

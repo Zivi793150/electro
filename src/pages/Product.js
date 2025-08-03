@@ -211,7 +211,7 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
+                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
                 <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
                 <div className="product-subtitle">{product.subtitle}</div>
                 <div className="product-divider"></div>
@@ -237,7 +237,7 @@ const Product = () => {
                         flexDirection: 'column',
                         alignItems: 'flex-start'
                       }}>
-                        <span style={{fontWeight: 500, color: '#495057'}}>Арт:</span>
+                        <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span>
                         <span style={{marginTop: 2}}>{product.article}</span>
                       </div>
                     )}

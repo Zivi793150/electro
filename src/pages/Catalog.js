@@ -15,6 +15,8 @@ const Catalog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(24);
 
   useEffect(() => {
     setSelectedCategory(getCategoryFromQuery());
@@ -134,6 +136,22 @@ const Catalog = () => {
     ? products
     : products.filter(product => product.category === selectedCategory);
 
+  // Пагинация
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Сброс на первую страницу при смене категории
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="catalog">
       <Header />
@@ -191,7 +209,7 @@ const Catalog = () => {
               <div style={{color: 'red', padding: 32}}>{error}</div>
             ) : (
             <div className="catalog-products-grid" style={{gap: 0}}>
-              {filteredProducts.map(product => (
+              {currentProducts.map(product => (
                 <Link
                   to={`/product/${product._id}`}
                   key={product._id}
@@ -220,6 +238,102 @@ const Catalog = () => {
               ))}
             </div>
             )}
+            
+            {/* Пагинация */}
+            {totalPages > 1 && (
+              <div className="pagination-container" style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '40px',
+                marginBottom: '20px',
+                gap: '8px'
+              }}>
+                {/* Кнопка "Предыдущая" */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #e3e6ea',
+                    background: currentPage === 1 ? '#f5f5f5' : '#fff',
+                    color: currentPage === 1 ? '#999' : '#333',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  ← Назад
+                </button>
+                
+                {/* Номера страниц */}
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map(pageNumber => {
+                  // Показываем только первые 5 страниц, последние 5 и текущую с соседними
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => handlePageChange(pageNumber)}
+                        style={{
+                          padding: '8px 12px',
+                          border: '1px solid #e3e6ea',
+                          background: currentPage === pageNumber ? '#e86c0a' : '#fff',
+                          color: currentPage === pageNumber ? '#fff' : '#333',
+                          cursor: 'pointer',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          minWidth: '40px'
+                        }}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  } else if (
+                    pageNumber === currentPage - 2 ||
+                    pageNumber === currentPage + 2
+                  ) {
+                    return (
+                      <span
+                        key={pageNumber}
+                        style={{
+                          padding: '8px 4px',
+                          color: '#999',
+                          fontSize: '14px'
+                        }}
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                })}
+                
+                {/* Кнопка "Следующая" */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #e3e6ea',
+                    background: currentPage === totalPages ? '#f5f5f5' : '#fff',
+                    color: currentPage === totalPages ? '#999' : '#333',
+                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Вперед →
+                </button>
+              </div>
+            )}
+            
             <section className="seo-description">
               <h2>Электроинструменты: качество и надёжность</h2>
               <p>Мы предлагаем широкий ассортимент профессиональных электроинструментов от ведущих мировых производителей. В нашем каталоге вы найдёте дрели, шуруповёрты, болгарки, перфораторы и многое другое. Вся продукция сертифицирована и имеет гарантию от производителя.</p>
