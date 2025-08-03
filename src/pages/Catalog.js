@@ -17,6 +17,8 @@ const Catalog = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(24);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     setSelectedCategory(getCategoryFromQuery());
@@ -41,6 +43,7 @@ const Catalog = () => {
 
           const API_URL = 'https://electro-a8bl.onrender.com/api/products';
 
+  // Загрузка товаров
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -55,6 +58,32 @@ const Catalog = () => {
         setLoading(false);
       });
   }, []);
+
+  // Извлечение категорий из товаров
+  useEffect(() => {
+    if (products.length > 0) {
+      setCategoriesLoading(true);
+      
+      // Извлекаем уникальные категории из товаров
+      const uniqueCategories = [...new Set(products.map(product => product.category))].filter(Boolean);
+      
+      if (uniqueCategories.length > 0) {
+        // Добавляем категорию "Все товары" в начало
+        const allCategories = [
+          { id: 'all', name: 'Все товары' },
+          ...uniqueCategories.map(category => ({
+            id: category,
+            name: category
+          }))
+        ];
+        setCategories(allCategories);
+      } else {
+        // Если нет категорий в товарах, используем статические
+        setCategories(staticCategories);
+      }
+      setCategoriesLoading(false);
+    }
+  }, [products]);
 
   // Принудительное применение стилей для карточек
   useEffect(() => {
@@ -120,17 +149,20 @@ const Catalog = () => {
     };
   }, [products]);
 
-  const categories = [
-    { id: 'all', name: 'Все товары', icon: '🔧' },
-    { id: 'drills', name: 'Дрели', icon: '🛠' },
-    { id: 'grinders', name: 'Болгарки', icon: '🪚' },
-    { id: 'screwdrivers', name: 'Шуруповёрты', icon: '🔧' },
-    { id: 'hammers', name: 'Перфораторы', icon: '🔌' },
-    { id: 'jigsaws', name: 'Лобзики', icon: '🧰' },
-    { id: 'levels', name: 'Лазерные уровни', icon: '🔦' },
-    { id: 'generators', name: 'Генераторы', icon: '🧲' },
-    { id: 'measuring', name: 'Измерители', icon: '📏' }
+  // Статические категории для fallback
+  const staticCategories = [
+    { id: 'all', name: 'Все товары' },
+    { id: 'drills', name: 'Дрели' },
+    { id: 'grinders', name: 'Болгарки' },
+    { id: 'screwdrivers', name: 'Шуруповёрты' },
+    { id: 'hammers', name: 'Перфораторы' },
+    { id: 'jigsaws', name: 'Лобзики' },
+    { id: 'levels', name: 'Лазерные уровни' },
+    { id: 'generators', name: 'Генераторы' },
+    { id: 'measuring', name: 'Измерители' }
   ];
+
+
 
   const filteredProducts = selectedCategory === 'all'
     ? products
@@ -159,18 +191,24 @@ const Catalog = () => {
         <div className="container catalog-layout">
           <aside className="catalog-sidebar desktop-sidebar">
             <h3 className="sidebar-title">Категории</h3>
-            <ul className="sidebar-categories">
-              {categories.map(category => (
-                <li key={category.id}>
-                  <button
-                    className={`sidebar-category-btn${selectedCategory === category.id ? ' active' : ''}`}
-                    onClick={() => setSelectedCategory(category.id)}
-                  >
-                    {category.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {categoriesLoading ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                Загрузка категорий...
+              </div>
+            ) : (
+              <ul className="sidebar-categories">
+                {categories.map(category => (
+                  <li key={category.id}>
+                    <button
+                      className={`sidebar-category-btn${selectedCategory === category.id ? ' active' : ''}`}
+                      onClick={() => setSelectedCategory(category.id)}
+                    >
+                      {category.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </aside>
           <div className="catalog-content">
             <div className="category-dropdown-container mobile-dropdown">
@@ -178,11 +216,17 @@ const Catalog = () => {
                 <button 
                   className="category-dropdown-btn"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  disabled={categoriesLoading}
                 >
-                  <span>{categories.find(cat => cat.id === selectedCategory)?.name || 'Все товары'}</span>
+                  <span>
+                    {categoriesLoading 
+                      ? 'Загрузка...' 
+                      : categories.find(cat => cat.id === selectedCategory)?.name || 'Все товары'
+                    }
+                  </span>
                   <span className="dropdown-arrow">▼</span>
                 </button>
-                {isDropdownOpen && (
+                {isDropdownOpen && !categoriesLoading && (
                   <div className="category-dropdown-menu">
                     {categories.map(category => (
                       <button
@@ -201,7 +245,12 @@ const Catalog = () => {
               </div>
             </div>
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
-              Каталог товаров
+              {categoriesLoading 
+                ? 'Каталог товаров' 
+                : selectedCategory === 'all' 
+                  ? 'Каталог товаров' 
+                  : categories.find(cat => cat.id === selectedCategory)?.name || 'Каталог товаров'
+              }
             </h1>
             {loading ? (
               <div style={{padding: 32}}>Загрузка...</div>

@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.e797e324.css",
-    "main.js": "/static/js/main.7e6ac40b.js",
+    "main.js": "/static/js/main.c6cfeb98.js",
     "static/css/417.469f8874.chunk.css": "/static/css/417.469f8874.chunk.css",
     "static/js/417.bb4ded46.chunk.js": "/static/js/417.bb4ded46.chunk.js",
     "static/css/282.1e06cb65.chunk.css": "/static/css/282.1e06cb65.chunk.css",
@@ -23,7 +23,7 @@
     "static/media/dotted-world-map-white-background_132079-967.avif": "/static/media/dotted-world-map-white-background_132079-967.eba781fb27279edf0cce.avif",
     "index.html": "/index.html",
     "main.e797e324.css.map": "/static/css/main.e797e324.css.map",
-    "main.7e6ac40b.js.map": "/static/js/main.7e6ac40b.js.map",
+    "main.c6cfeb98.js.map": "/static/js/main.c6cfeb98.js.map",
     "417.469f8874.chunk.css.map": "/static/css/417.469f8874.chunk.css.map",
     "417.bb4ded46.chunk.js.map": "/static/js/417.bb4ded46.chunk.js.map",
     "282.1e06cb65.chunk.css.map": "/static/css/282.1e06cb65.chunk.css.map",
@@ -45,6 +45,6 @@
   },
   "entrypoints": [
     "static/css/main.e797e324.css",
-    "static/js/main.7e6ac40b.js"
+    "static/js/main.c6cfeb98.js"
   ]
 }
