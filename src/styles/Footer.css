@@ -42,6 +42,11 @@
   color: #ffc107;
 }
 
+/* Белые SVG иконки в подвале */
+.footer img[src*=".svg"] {
+  filter: brightness(0) invert(1);
+}
+
 .footer-bottom {
   margin-top: 30px;
   padding-top: 20px;

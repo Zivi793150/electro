@@ -179,8 +179,39 @@ function ProductForm({ onClose, onSuccess, initialData }) {
 
   return (
     <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:400,maxWidth:600,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto'}}>
-        <h3 style={{marginTop:0,marginBottom:20,fontWeight:700,fontSize:22,color:'#333'}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
+      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:700,maxWidth:1000,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto',position:'relative'}}>
+        <button 
+          type="button" 
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 15,
+            right: 15,
+            background: 'none',
+            border: 'none',
+            fontSize: 24,
+            color: '#666',
+            cursor: 'pointer',
+            width: 30,
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.background = '#f0f0f0';
+            e.target.style.color = '#333';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = 'none';
+            e.target.style.color = '#666';
+          }}
+        >
+          ✕
+        </button>
+        <h3 style={{marginTop:0,marginBottom:20,fontWeight:700,fontSize:22,color:'#333',paddingRight:40}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
         
         {/* Основная информация */}
         <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
@@ -423,6 +454,32 @@ const ProductList = ({ onLogout }) => {
     }
   };
 
+  const handleDuplicate = async (product) => {
+    if (!window.confirm(`Дублировать товар "${product.name}"?`)) return;
+
+    try {
+      // Создаем копию товара без _id
+      const productCopy = { ...product };
+      delete productCopy._id;
+      
+      // Добавляем "(копия)" к названию
+      productCopy.name = productCopy.name + ' (копия)';
+      
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productCopy)
+      });
+
+      if (!response.ok) throw new Error('Ошибка при дублировании товара');
+
+      fetchProducts();
+      alert('Товар успешно дублирован!');
+    } catch (e) {
+      alert('Ошибка при дублировании товара: ' + e.message);
+    }
+  };
+
   // Сброс выбора при изменении списка товаров
   useEffect(() => {
     setSelectedProducts([]);
@@ -539,6 +596,7 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['Short description'] || ''}</td>
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
                     <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Редактировать</button>
+                    <button onClick={()=>handleDuplicate(product)} style={{background: '#28a745', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Дублировать</button>
                     <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer'}}>Удалить</button>
                   </td>
                 </tr>

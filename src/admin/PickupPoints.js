@@ -174,8 +174,39 @@ const PickupPoints = ({ onLogout }) => {
       </div>
 
       {/* Форма добавления нового пункта */}
-      <div className="admin-form" style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
-        <h2 className="admin-header" style={{ marginTop: 0, color: '#333' }}>Добавить новый пункт самовывоза</h2>
+      <div className="admin-form" style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '30px', position: 'relative' }}>
+        <button 
+          type="button" 
+          onClick={() => setNewPoint({ address: '', description: '', workingHours: 'Пн-Пт: 9:00-18:00' })}
+          style={{
+            position: 'absolute',
+            top: 15,
+            right: 15,
+            background: 'none',
+            border: 'none',
+            fontSize: 20,
+            color: '#666',
+            cursor: 'pointer',
+            width: 30,
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.background = '#f0f0f0';
+            e.target.style.color = '#333';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.background = 'none';
+            e.target.style.color = '#666';
+          }}
+        >
+          ✕
+        </button>
+        <h2 className="admin-header" style={{ marginTop: 0, color: '#333', paddingRight: 40 }}>Добавить новый пункт самовывоза</h2>
         <form onSubmit={handleAddPoint} style={{ display: 'grid', gap: '15px', maxWidth: '600px' }}>
           <div>
             <label className="admin-label" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
@@ -274,7 +305,30 @@ const PickupPoints = ({ onLogout }) => {
               >
                 {editingPoint && editingPoint._id === point._id ? (
                   // Форма редактирования
-                  <form onSubmit={handleUpdatePoint} style={{ display: 'grid', gap: '15px' }}>
+                  <form onSubmit={handleUpdatePoint} style={{ display: 'grid', gap: '15px', position: 'relative' }}>
+                    <button 
+                      type="button" 
+                      onClick={cancelEditing}
+                      style={{
+                        position: 'absolute',
+                        top: -10,
+                        right: -10,
+                        background: '#dc3545',
+                        border: 'none',
+                        fontSize: 18,
+                        color: '#fff',
+                        cursor: 'pointer',
+                        width: 30,
+                        height: 30,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '50%',
+                        zIndex: 10
+                      }}
+                    >
+                      ✕
+                    </button>
                     <div>
                       <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
                         Адрес: *

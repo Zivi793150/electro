@@ -5,6 +5,19 @@ import '../styles/Catalog.css';
 import { Link, useLocation } from 'react-router-dom';
 
 const Catalog = () => {
+  // Статические категории для fallback
+  const staticCategories = [
+    { id: 'all', name: 'Все товары' },
+    { id: 'drills', name: 'Дрели' },
+    { id: 'grinders', name: 'Болгарки' },
+    { id: 'screwdrivers', name: 'Шуруповёрты' },
+    { id: 'hammers', name: 'Перфораторы' },
+    { id: 'jigsaws', name: 'Лобзики' },
+    { id: 'levels', name: 'Лазерные уровни' },
+    { id: 'generators', name: 'Генераторы' },
+    { id: 'measuring', name: 'Измерители' }
+  ];
+
   const location = useLocation();
   const getCategoryFromQuery = () => {
     const params = new URLSearchParams(location.search);
@@ -64,8 +77,8 @@ const Catalog = () => {
     if (products.length > 0) {
       setCategoriesLoading(true);
       
-      // Извлекаем уникальные категории из товаров
-      const uniqueCategories = [...new Set(products.map(product => product.category))].filter(Boolean);
+      // Извлекаем уникальные категории из товаров и сортируем их
+      const uniqueCategories = [...new Set(products.map(product => product.category))].filter(Boolean).sort();
       
       if (uniqueCategories.length > 0) {
         // Добавляем категорию "Все товары" в начало
@@ -148,21 +161,6 @@ const Catalog = () => {
       window.removeEventListener('resize', handleResize);
     };
   }, [products]);
-
-  // Статические категории для fallback
-  const staticCategories = [
-    { id: 'all', name: 'Все товары' },
-    { id: 'drills', name: 'Дрели' },
-    { id: 'grinders', name: 'Болгарки' },
-    { id: 'screwdrivers', name: 'Шуруповёрты' },
-    { id: 'hammers', name: 'Перфораторы' },
-    { id: 'jigsaws', name: 'Лобзики' },
-    { id: 'levels', name: 'Лазерные уровни' },
-    { id: 'generators', name: 'Генераторы' },
-    { id: 'measuring', name: 'Измерители' }
-  ];
-
-
 
   const filteredProducts = selectedCategory === 'all'
     ? products

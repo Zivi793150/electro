@@ -34,7 +34,7 @@ const Contacts = () => {
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/map.svg" alt="Адрес" width={24} height={24} /></span><span>Адрес</span></div>
-                <div className="contact-card-content">г. Алматы, ул. Аймусина, 1в<br />Достык М-Н, Ауэзовский район</div>
+                <div className="contact-card-content">г. Алматы, Аймусин улица, 1в<br />Достык М-Н, Ауэзовский район</div>
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/clock.svg" alt="Часы" width={24} height={24} /></span><span>Режим работы</span></div>
@@ -57,17 +57,17 @@ const Contacts = () => {
             </div>
           </div>
           <section className="map-section">
-            <h2>Как нас найти</h2>
+            <h2>Как нас найти - Аймусин улица, 1в</h2>
             <div className="map-container">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2906.1234567890123!2d76.91234567890123!3d43.21234567890123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDPCsDEyJzQ1LjAiTiA3NsKwNTQnNDUuMCJF!5e0!3m2!1sru!2skz!4v1234567890123"
+                src="https://www.google.com/maps?q=43.233801,76.816602&z=17&output=embed"
                 width="100%"
                 height="450"
                 style={{ border: 0 }}
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Карта офиса Танкер Тулс - Аймусина 1в"
+                title="Карта офиса Танкер Тулс - Аймусин улица, 1в"
               ></iframe>
             </div>
           </section>

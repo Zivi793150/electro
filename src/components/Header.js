@@ -154,7 +154,7 @@ const Header = () => {
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Телефон:</div>
-              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value" style={{letterSpacing: '2px'}}>
+              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value">
                 {siteSettings.contactInfo.phone}
               </a>
             </div>

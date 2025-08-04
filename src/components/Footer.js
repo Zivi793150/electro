@@ -50,7 +50,7 @@ const Footer = () => {
           <ul>
             <li>
               <img src="/icons/telephone.svg" alt="Телефон" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
-              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} style={{color: 'inherit', textDecoration: 'none', letterSpacing: '2px'}}>
+              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} style={{color: 'inherit', textDecoration: 'none'}}>
                 {siteSettings.contactInfo.phone}
               </a>
             </li>

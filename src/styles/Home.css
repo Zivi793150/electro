@@ -5,13 +5,13 @@
 .main-maket-left { flex: 1 1 50%; display: flex; align-items: flex-end; }
 .main-maket-image { max-width: 520px; width: 100%; height: auto; object-fit: contain; display: block; }
 .main-maket-right { flex: 1 1 50%; display: flex; flex-direction: column; align-items: flex-start; }
-.main-maket-title { font-size: 2rem; font-weight: 700; color: #222; margin: 0 0 8px 0; }
-.main-maket-subtitle { font-size: 1.1rem; color: #1e88e5; margin-bottom: 6px; }
-.main-maket-text { font-size: 1rem; color: #444; margin-bottom: 8px; }
+.main-maket-title { font-size: 20px; font-weight: 700; color: #222; margin: 0 0 8px 0; }
+.main-maket-subtitle { font-size: 16px; color: #1e88e5; margin-bottom: 6px; }
+.main-maket-text { font-size: 16px; color: #444; margin-bottom: 8px; }
 .main-maket-advantages { list-style: none; padding: 0; margin: 0 0 10px 0; }
-.main-maket-adv-item { display: flex; align-items: center; font-size: 1rem; color: #222; }
+.main-maket-adv-item { display: flex; align-items: center; font-size: 16px; color: #222; }
 .main-maket-arrow { display: flex; align-items: center; margin-right: 4px; color: #FF6B00; }
-.main-maket-btn { background: #FF6B00; color: #fff; font-size: 1rem; border: none; border-radius: 6px; padding: 10px 20px; cursor: pointer; }
+.main-maket-btn { background: #FF6B00; color: #fff; font-size: 16px; border: none; border-radius: 6px; padding: 10px 20px; cursor: pointer; }
 .main-maket-btn:hover { background: #e65c00; }
 
 /* Оптимизированные стили для мини-каталога */
@@ -196,19 +196,19 @@
     padding: 16px 0 8px 0;
   }
   .main-maket-title {
-    font-size: 1.5rem;
+    font-size: 16px;
   }
   .main-maket-subtitle {
-    font-size: 1rem;
+    font-size: 14px;
   }
   .main-maket-text {
-    font-size: 0.95rem;
+    font-size: 14px;
   }
   .main-maket-advantages {
     margin-bottom: 8px;
   }
   .main-maket-adv-item {
-    font-size: 0.95rem;
+    font-size: 14px;
   }
   .mini-catalog-header h2 {
     font-size: 1.2rem;
@@ -241,19 +241,19 @@
     padding: 8px 0 4px 0; 
   } 
   .main-maket-title { 
-    font-size: 1.1rem; 
+    font-size: 16px; 
   } 
   .main-maket-subtitle {
-    font-size: 0.9rem;
+    font-size: 14px;
   }
   .main-maket-text {
-    font-size: 0.9rem;
+    font-size: 14px;
   }
   .main-maket-adv-item {
-    font-size: 0.9rem;
+    font-size: 14px;
   }
   .main-maket-btn { 
-    font-size: 0.9rem; 
+    font-size: 14px; 
     padding: 8px 12px; 
   } 
   .mini-catalog-grid { 
@@ -297,19 +297,19 @@
     padding: 6px 0 3px 0;
   }
   .main-maket-title {
-    font-size: 1rem;
+    font-size: 16px;
   }
   .main-maket-subtitle {
-    font-size: 0.85rem;
+    font-size: 14px;
   }
   .main-maket-text {
-    font-size: 0.85rem;
+    font-size: 14px;
   }
   .main-maket-adv-item {
-    font-size: 0.85rem;
+    font-size: 14px;
   }
   .main-maket-btn {
-    font-size: 0.85rem;
+    font-size: 14px;
     padding: 6px 10px;
   }
   .mini-catalog-header h2 {
