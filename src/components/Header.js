@@ -6,9 +6,11 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [siteSettings, setSiteSettings] = useState({
     contactInfo: {
-      phone: '+7 (777) 777-77-77',
-      email: 'info@tankertools.kz'
-    }
+      phone: '+7 747 477 79 89',
+      email: 'info@eltok.kz',
+      address: 'Аймусина 1в'
+    },
+    city: 'Алматы'
   });
 
   useEffect(() => {
@@ -28,6 +30,7 @@ const Header = () => {
       .then(res => res.json())
       .then(data => {
         if (data.information) {
+          console.log('Header: Загруженные данные из БД:', data.information);
           setSiteSettings(data.information);
         }
       })
@@ -82,15 +85,19 @@ const Header = () => {
         {/* Desktop Contact Info */}
         <div className="header-right-blocks desktop-contacts">
           <div className="header-right-col">
-            <div className="top-bar-address">{siteSettings.city}</div>
-            <div className="top-bar-email">{siteSettings.contactInfo.email}</div>
+            <div className="top-bar-address">
+              {siteSettings.city || 'Алматы'}
+            </div>
+            <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteSettings.contactInfo.email}`} className="top-bar-email" target="_blank" rel="noopener noreferrer">
+              {siteSettings.contactInfo.email}
+            </a>
           </div>
           <div className="header-right-col">
             <div className="top-bar-socials">
               <a href="#" className="top-bar-social" title="Instagram" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} style={{display:'block'}} />
               </a>
-              <a href="#" className="top-bar-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} style={{display:'block'}} />
               </a>
               <a href="#" className="top-bar-social" title="Telegram" target="_blank" rel="noopener noreferrer">
@@ -100,7 +107,9 @@ const Header = () => {
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
-            <div className="top-bar-phone">{siteSettings.contactInfo.phone}</div>
+            <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone" target="_blank" rel="noopener noreferrer">
+              {siteSettings.contactInfo.phone}
+            </a>
           </div>
         </div>
 
@@ -132,22 +141,28 @@ const Header = () => {
           {/* Mobile Contact Info */}
           <div className="mobile-contacts">
             <div className="mobile-contact-item">
-              <div className="mobile-contact-label">Город:</div>
-              <div className="mobile-contact-value">Алматы</div>
+              <div className="mobile-contact-label">Адрес:</div>
+              <div className="mobile-contact-value">
+                {siteSettings.city || 'Алматы'}
+              </div>
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Email:</div>
-              <div className="mobile-contact-value">info@tankertools.kz</div>
+              <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteSettings.contactInfo.email}`} className="mobile-contact-value" target="_blank" rel="noopener noreferrer">
+                {siteSettings.contactInfo.email}
+              </a>
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Телефон:</div>
-              <div className="mobile-contact-value">+7 (777) 777-77-77</div>
+              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value" style={{letterSpacing: '2px'}} target="_blank" rel="noopener noreferrer">
+                {siteSettings.contactInfo.phone}
+              </a>
             </div>
             <div className="mobile-socials">
               <a href="#" className="mobile-social" title="Instagram" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} />
               </a>
-              <a href="#" className="mobile-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} />
               </a>
               <a href="#" className="mobile-social" title="Telegram" target="_blank" rel="noopener noreferrer">

@@ -24,6 +24,7 @@ const Footer = () => {
       .then(res => res.json())
       .then(data => {
         if (data.information) {
+          console.log('Footer: Загруженные данные из БД:', data.information);
           setSiteSettings(data.information);
         }
       })
@@ -39,7 +40,7 @@ const Footer = () => {
           <ul>
             <li>{siteSettings.companyInfo.name}</li>
             <li>БИН: {siteSettings.companyInfo.bin}</li>
-            <li>Юр. адрес: {siteSettings.contactInfo.address}</li>
+            <li>Юр. адрес: {siteSettings.city || 'Алматы'}</li>
             <li>КБЕ: {siteSettings.companyInfo.kbe}, ИИК: {siteSettings.companyInfo.iik}</li>
           </ul>
         </div>
@@ -47,10 +48,25 @@ const Footer = () => {
         <div className="footer-column">
           <h4>Контакты</h4>
           <ul>
-            <li><img src="/icons/telephone.svg" alt="Телефон" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> {siteSettings.contactInfo.phone}</li>
-            <li>✉ {siteSettings.contactInfo.email}</li>
-            <li><img src="/icons/map.svg" alt="Адрес" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> {siteSettings.contactInfo.address}</li>
-            <li><img src="/icons/clock.svg" alt="Часы" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Пн-Пт: 9:00-18:00</li>
+            <li>
+              <img src="/icons/telephone.svg" alt="Телефон" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} style={{color: 'inherit', textDecoration: 'none', letterSpacing: '2px'}} target="_blank" rel="noopener noreferrer">
+                {siteSettings.contactInfo.phone}
+              </a>
+            </li>
+            <li>
+              ✉ <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteSettings.contactInfo.email}`} style={{color: 'inherit', textDecoration: 'none'}} target="_blank" rel="noopener noreferrer">
+                {siteSettings.contactInfo.email}
+              </a>
+            </li>
+            <li>
+              <img src="/icons/map.svg" alt="Адрес" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              {siteSettings.city || 'Алматы'}
+            </li>
+            <li>
+              <img src="/icons/clock.svg" alt="Часы" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              {siteSettings.workingHours || 'Пн-Пт: 9:00-18:00'}
+            </li>
           </ul>
         </div>
         
@@ -67,16 +83,28 @@ const Footer = () => {
         <div className="footer-column">
           <h4>Доставка и оплата</h4>
           <ul>
-            <li><img src="/icons/truck.svg" alt="Доставка" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Доставка по Алматы</li>
-            <li><img src="/icons/box.svg" alt="Самовывоз" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Самовывоз</li>
-            <li><img src="/icons/card.svg" alt="Оплата" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Kaspi, Visa, наличные</li>
-            <li><img src="/icons/lightning.svg" alt="Быстро" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} /> Быстрая обработка заказов</li>
+            <li>
+              <img src="/icons/truck.svg" alt="Доставка" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              {siteSettings.deliveryInfo?.freeDelivery || 'Доставка по Алматы'}
+            </li>
+            <li>
+              <img src="/icons/box.svg" alt="Самовывоз" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              Самовывоз: {siteSettings.deliveryInfo?.pickupAddress || 'ул. Толе би 216Б'}
+            </li>
+            <li>
+              <img src="/icons/card.svg" alt="Оплата" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              {siteSettings.paymentMethods || 'Kaspi, Visa, наличные'}
+            </li>
+            <li>
+              <img src="/icons/lightning.svg" alt="Быстро" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
+              {siteSettings.deliveryInfo?.deliveryNote || 'Быстрая обработка заказов'}
+            </li>
           </ul>
         </div>
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; 2020 {siteSettings.companyInfo.name}. Все права защищены.</p>
+        <p>&copy; {siteSettings.copyrightYear || '2020'} {siteSettings.companyInfo.name}. Все права защищены.</p>
       </div>
     </footer>
   );

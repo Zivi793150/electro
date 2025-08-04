@@ -34,11 +34,12 @@
 }
 
 .logo-image {
-  height: 160px;
+  height: 70px;
   width: auto;
   object-fit: contain;
-  margin-top: -30px;
-  margin-bottom: -30px;
+  margin-top: -10px;
+  margin-bottom: -10px;
+  margin-left: 40px;
 }
 
 .mobile-logo-image {
@@ -53,7 +54,7 @@
 .desktop-nav {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
   font-family: 'Roboto', Arial, sans-serif;
   font-weight: 400;
 }
@@ -61,10 +62,10 @@
 .desktop-nav a {
   color: #222;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 500;
   transition: color 0.2s;
-  padding: 8px 12px;
+  padding: 8px 16px;
 }
 
 .desktop-nav a:hover {
@@ -101,6 +102,13 @@
   color: #1e88e5;
   font-size: 0.95rem;
   font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.top-bar-email:hover {
+  color: #1565c0;
+  text-decoration: underline;
 }
 
 .top-bar-socials {
@@ -134,6 +142,14 @@
   color: #1e88e5;
   font-size: 0.95rem;
   font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s;
+  letter-spacing: 2px;
+}
+
+.top-bar-phone:hover {
+  color: #1565c0;
+  text-decoration: underline;
 }
 
 /* Мобильный заголовок */
@@ -323,6 +339,13 @@
   font-size: 16px;
   color: #222;
   font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.mobile-contact-value:hover {
+  color: #1e88e5;
+  text-decoration: underline;
 }
 
 .mobile-socials {
