@@ -34,7 +34,7 @@ const Contacts = () => {
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/map.svg" alt="Адрес" width={24} height={24} /></span><span>Адрес</span></div>
-                <div className="contact-card-content">г. Алматы, ул. Примерная 1<br />Бизнес-центр "Танкер", офис 205</div>
+                <div className="contact-card-content">г. Алматы, ул. Аймусина, 1в<br />Достык М-Н, Ауэзовский район</div>
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/clock.svg" alt="Часы" width={24} height={24} /></span><span>Режим работы</span></div>
@@ -67,7 +67,7 @@ const Contacts = () => {
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Карта офиса Танкер Тулс"
+                title="Карта офиса Танкер Тулс - Аймусина 1в"
               ></iframe>
             </div>
           </section>

@@ -55,6 +55,46 @@ const Product = () => {
   
   const [detectingCity, setDetectingCity] = useState(false);
   
+  // Функция для автоматического определения города
+  const detectUserCity = () => {
+    if (navigator.geolocation) {
+      setDetectingCity(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // Используем обратное геокодирование для определения города
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.address && data.address.city) {
+                const detectedCity = data.address.city;
+                // Проверяем, есть ли этот город в нашем списке
+                if (cities.includes(detectedCity)) {
+                  setSelectedCity(detectedCity);
+                  localStorage.setItem('selectedCity', detectedCity);
+                }
+              }
+              setDetectingCity(false);
+            })
+            .catch(error => {
+              console.log('Ошибка определения города:', error);
+              setDetectingCity(false);
+            });
+        },
+        (error) => {
+          console.log('Ошибка получения геолокации:', error);
+          setDetectingCity(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 минут
+        }
+      );
+    }
+  };
+  
   // Список городов Казахстана
   const cities = [
     'Алматы',
@@ -278,46 +318,6 @@ const Product = () => {
     const newPickup = e.target.value;
     setSelectedPickup(newPickup);
     localStorage.setItem('selectedPickup', newPickup);
-  };
-  
-  // Функция для автоматического определения города
-  const detectUserCity = () => {
-    if (navigator.geolocation) {
-      setDetectingCity(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          
-          // Используем обратное геокодирование для определения города
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`)
-            .then(response => response.json())
-            .then(data => {
-              if (data.address && data.address.city) {
-                const detectedCity = data.address.city;
-                // Проверяем, есть ли этот город в нашем списке
-                if (cities.includes(detectedCity)) {
-                  setSelectedCity(detectedCity);
-                  localStorage.setItem('selectedCity', detectedCity);
-                }
-              }
-              setDetectingCity(false);
-            })
-            .catch(error => {
-              console.log('Ошибка определения города:', error);
-              setDetectingCity(false);
-            });
-        },
-        (error) => {
-          console.log('Ошибка получения геолокации:', error);
-          setDetectingCity(false);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 минут
-        }
-      );
-    }
   };
 
   const shortDesc = product['Short description'] || 'краткое описание';

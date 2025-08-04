@@ -108,7 +108,7 @@ const Header = () => {
               </a>
             </div>
             <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone">
-              Тел: {siteSettings.contactInfo.phone}
+              {siteSettings.contactInfo.phone}
             </a>
           </div>
         </div>

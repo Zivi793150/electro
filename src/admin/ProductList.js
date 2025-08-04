@@ -131,14 +131,15 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     setLoading(true);
     setError('');
     
-    // Преобразуем цену к числу с плавающей точкой
+    // Проверяем корректность цены, но сохраняем как строку
     let parsedPrice = String(price).replace(',', '.');
     if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
       setError('Введите корректную цену (например: 19.65 или 19,65)');
       setLoading(false);
       return;
     }
-    parsedPrice = Number(parsedPrice);
+    // Сохраняем цену как строку, чтобы не терять нули
+    parsedPrice = String(parsedPrice);
     
     // Собираем все фото в массив
     const allPhotos = [photo1, photo2, photo3].filter(photo => photo.trim() !== '');
@@ -533,7 +534,7 @@ const ProductList = ({ onLogout }) => {
                     <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: 44, height: 44, objectFit: 'contain', borderRadius: 5, background: '#f5f7fa', border: '1px solid #e0e0e0'}} />
                   </td>
                   <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>{product.name}</td>
-                  <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? Number(product.price).toLocaleString('ru-RU') + ' ₸' : ''}</td>
+                  <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? String(product.price).replace('.', ',') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
                   <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['Short description'] || ''}</td>
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
