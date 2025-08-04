@@ -50,7 +50,7 @@ const Footer = () => {
           <ul>
             <li>
               <img src="/icons/telephone.svg" alt="Телефон" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
-              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} style={{color: 'inherit', textDecoration: 'none', letterSpacing: '2px'}} target="_blank" rel="noopener noreferrer">
+              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} style={{color: 'inherit', textDecoration: 'none', letterSpacing: '2px'}}>
                 {siteSettings.contactInfo.phone}
               </a>
             </li>
@@ -104,7 +104,7 @@ const Footer = () => {
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; {siteSettings.copyrightYear || '2020'} {siteSettings.companyInfo.name}. Все права защищены.</p>
+        <p>&copy; {siteSettings.copyrightYear || '2020-2025'} {siteSettings.companyInfo.name}. Все права защищены.</p>
       </div>
     </footer>
   );

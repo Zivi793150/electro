@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const pickupPointsRouter = require('./api/pickup-points');
 
 const app = express();
 
@@ -135,6 +136,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     res.status(500).json({ error: 'Ошибка загрузки файла: ' + error.message });
   }
 });
+
+// Роуты для пунктов самовывоза
+app.use('/api/pickup-points', pickupPointsRouter);
 
 // Обслуживание статических файлов из папки uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

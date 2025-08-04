@@ -36,6 +36,75 @@ const Product = () => {
     }
   });
   
+  const [selectedCity, setSelectedCity] = useState(() => {
+    const savedCity = localStorage.getItem('selectedCity');
+    return savedCity || 'Алматы';
+  });
+  
+  const [selectedPickup, setSelectedPickup] = useState(() => {
+    const savedPickup = localStorage.getItem('selectedPickup');
+    return savedPickup || 'ул. Толе би 216Б';
+  });
+  
+  const [pickupPoints, setPickupPoints] = useState([
+    'ул. Толе би 216Б',
+    'ул. Аймусина 1в',
+    'ул. Достык 123',
+    'ул. Абая 45'
+  ]);
+  
+  const [detectingCity, setDetectingCity] = useState(false);
+  
+  // Список городов Казахстана
+  const cities = [
+    'Алматы',
+    'Астана',
+    'Шымкент',
+    'Актобе',
+    'Караганда',
+    'Тараз',
+    'Павлодар',
+    'Семей',
+    'Усть-Каменогорск',
+    'Уральск',
+    'Кызылорда',
+    'Костанай',
+    'Петропавловск',
+    'Атырау',
+    'Актау',
+    'Темиртау',
+    'Туркестан',
+    'Кокшетау',
+    'Талдыкорган',
+    'Экибастуз',
+    'Рудный',
+    'Жанаозен',
+    'Жезказган',
+    'Балхаш',
+    'Кентау',
+    'Сатпаев',
+    'Капчагай',
+    'Риддер',
+    'Степногорск',
+    'Аральск',
+    'Аркалык',
+    'Житикара',
+    'Кандыагаш',
+    'Лисаковск',
+    'Шахтинск',
+    'Абай',
+    'Аягоз',
+    'Зайсан',
+    'Курчатов',
+    'Приозерск',
+    'Серебрянск',
+    'Текели',
+    'Уштобе',
+    'Чарск',
+    'Шемонаиха',
+    'Щучинск'
+  ];
+  
   // Объединяем все изображения из разных полей
   const getAllImages = () => {
     const images = [];
@@ -114,6 +183,38 @@ const Product = () => {
         console.log('Ошибка загрузки информации, используются значения по умолчанию:', error);
       });
   }, []);
+  
+  // Инициализируем выбранный город из localStorage и автоматически определяем город
+  useEffect(() => {
+    const savedCity = localStorage.getItem('selectedCity');
+    const savedPickup = localStorage.getItem('selectedPickup');
+    
+    if (savedPickup) {
+      setSelectedPickup(savedPickup);
+    }
+    
+    // Если есть сохраненный город, используем его
+    if (savedCity) {
+      setSelectedCity(savedCity);
+    } else {
+      // Если нет сохраненного города, пытаемся определить автоматически
+      detectUserCity();
+    }
+  }, []);
+  
+  // Загружаем пункты самовывоза из базы данных
+  useEffect(() => {
+    fetch('https://electro-a8bl.onrender.com/api/pickup-points')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPickupPoints(data.map(point => point.address));
+        }
+      })
+      .catch(error => {
+        console.log('Ошибка загрузки пунктов самовывоза, используются значения по умолчанию:', error);
+      });
+  }, []);
 
   if (loading) {
     return <div style={{padding: 48, textAlign: 'center'}}>Загрузка...</div>;
@@ -166,6 +267,58 @@ const Product = () => {
     e.stopPropagation();
     setActiveImage((prev) => (prev + 1) % allImages.length);
   };
+  
+  const handleCityChange = (e) => {
+    const newCity = e.target.value;
+    setSelectedCity(newCity);
+    localStorage.setItem('selectedCity', newCity);
+  };
+  
+  const handlePickupChange = (e) => {
+    const newPickup = e.target.value;
+    setSelectedPickup(newPickup);
+    localStorage.setItem('selectedPickup', newPickup);
+  };
+  
+  // Функция для автоматического определения города
+  const detectUserCity = () => {
+    if (navigator.geolocation) {
+      setDetectingCity(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          // Используем обратное геокодирование для определения города
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.address && data.address.city) {
+                const detectedCity = data.address.city;
+                // Проверяем, есть ли этот город в нашем списке
+                if (cities.includes(detectedCity)) {
+                  setSelectedCity(detectedCity);
+                  localStorage.setItem('selectedCity', detectedCity);
+                }
+              }
+              setDetectingCity(false);
+            })
+            .catch(error => {
+              console.log('Ошибка определения города:', error);
+              setDetectingCity(false);
+            });
+        },
+        (error) => {
+          console.log('Ошибка получения геолокации:', error);
+          setDetectingCity(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 минут
+        }
+      );
+    }
+  };
 
   const shortDesc = product['Short description'] || 'краткое описание';
 
@@ -213,7 +366,7 @@ const Product = () => {
               <>
                 <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
                 <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
-                <div className="product-subtitle">{product.subtitle}</div>
+                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{product.subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">
                   <div className="product-price-block">
@@ -237,7 +390,7 @@ const Product = () => {
                         flexDirection: 'column',
                         alignItems: 'flex-start'
                       }}>
-                        <span style={{fontWeight: 500, color: '#495057'}}>Артикул:</span>
+                        <span style={{fontWeight: 500, color: '#495057'}}>Артикул</span>
                         <span style={{marginTop: 2}}>{product.article}</span>
                       </div>
                     )}
@@ -251,8 +404,21 @@ const Product = () => {
                 </div>
                 <div className="product-divider"></div>
                 <div style={{marginTop: 14, background: '#f5f7fa', borderRadius: 10, padding: '10px 12px 8px 12px', fontSize: '0.98rem', color: '#222', boxShadow: 'none', maxWidth: 320}}>
-                  <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem'}}>
-                    Ваш город: <a href="#" style={{color:'#1e88e5', textDecoration:'underline', cursor:'pointer'}}>{siteSettings.city}</a>
+                  <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                    <span>Ваш город:</span>
+                    {detectingCity ? (
+                      <span style={{color: '#666', fontSize: '0.9rem'}}>📍 Определяем...</span>
+                    ) : (
+                      <select 
+                        value={selectedCity} 
+                        onChange={handleCityChange}
+                        className="city-select"
+                      >
+                        {cities.map(city => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
                     <span style={{fontSize:17, marginTop:2}}>🚚</span>
@@ -263,8 +429,18 @@ const Product = () => {
                   </div>
                   <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
                     <span style={{fontSize:17, marginTop:2}}>🏬</span>
-                    <div>
-                      <div style={{fontWeight:500, color:'#222'}}>Самовывоз из магазина <a href="#" style={{color:'#1e88e5'}}>{siteSettings.deliveryInfo.pickupAddress}</a></div>
+                    <div style={{flex: 1}}>
+                      <div style={{fontWeight:500, color:'#222', marginBottom: 4}}>Самовывоз из магазина:</div>
+                      <select 
+                        value={selectedPickup} 
+                        onChange={handlePickupChange}
+                        className="city-select"
+                        style={{width: '100%', marginBottom: 4}}
+                      >
+                        {pickupPoints.map(point => (
+                          <option key={point} value={point}>{point}</option>
+                        ))}
+                      </select>
                       <div style={{color:'#222', fontSize:13}}>{siteSettings.deliveryInfo.pickupInfo}</div>
                     </div>
                   </div>

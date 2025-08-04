@@ -107,8 +107,8 @@ const Header = () => {
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
-            <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone" target="_blank" rel="noopener noreferrer">
-              {siteSettings.contactInfo.phone}
+            <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone">
+              Тел: {siteSettings.contactInfo.phone}
             </a>
           </div>
         </div>
@@ -154,7 +154,7 @@ const Header = () => {
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Телефон:</div>
-              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value" style={{letterSpacing: '2px'}} target="_blank" rel="noopener noreferrer">
+              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value" style={{letterSpacing: '2px'}}>
                 {siteSettings.contactInfo.phone}
               </a>
             </div>

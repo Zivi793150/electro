@@ -129,13 +129,14 @@ const SiteSettings = ({ onLogout }) => {
   }
 
   return (
-    <div style={{minHeight: '100vh', background: '#f5f7fa', padding: '32px 0'}}>
+    <div className="admin-container" style={{minHeight: '100vh', background: '#f5f7fa', padding: '32px 0'}}>
       <div style={{maxWidth: 1100, margin: '0 auto', background: '#fff', borderRadius: 10, border: '1.5px solid #e0e0e0', padding: 24}}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
-          <h2 style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Настройки сайта</h2>
+          <h2 className="admin-header" style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Настройки сайта</h2>
           <div>
             <button onClick={() => navigate('/admin/products')} style={{background: '#6c757d', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📦 Товары</button>
-            <button onClick={handleSave} disabled={saving} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>
+            <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
+            <button onClick={handleSave} disabled={saving} style={{background: '#007bff', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>
               {saving ? 'Сохранение...' : '💾 Сохранить'}
             </button>
             <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>

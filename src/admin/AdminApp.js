@@ -3,8 +3,10 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import AdminLogin from './Login';
 import AdminProductList from './ProductList';
 import SiteSettings from './SiteSettings';
+import PickupPoints from './PickupPoints';
 import { isAdminAuthenticated, setAdminToken, removeAdminToken } from '../utils/auth';
 import { testAdminSecurity } from '../utils/securityTest';
+import '../styles/Admin.css';
 
 const AdminApp = () => {
   const navigate = useNavigate();
@@ -38,6 +40,7 @@ const AdminApp = () => {
       <Route path="/login" element={<AdminLogin onLogin={handleLogin} />} />
       <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/login" />} />
       <Route path="/settings" element={isAuth ? <SiteSettings onLogout={handleLogout} /> : <Navigate to="/login" />} />
+      <Route path="/pickup-points" element={isAuth ? <PickupPoints onLogout={handleLogout} /> : <Navigate to="/login" />} />
       <Route path="/" element={isAuth ? <Navigate to="/products" /> : <Navigate to="/login" />} />
       <Route path="*" element={isAuth ? <Navigate to="/products" /> : <Navigate to="/login" />} />
     </Routes>

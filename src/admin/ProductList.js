@@ -330,6 +330,8 @@ const ProductList = ({ onLogout }) => {
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const navigate = useNavigate();
 
@@ -372,25 +374,139 @@ const ProductList = ({ onLogout }) => {
     }
   };
 
+  // Функции для работы с галочками
+  const handleSelectProduct = (productId) => {
+    setSelectedProducts(prev => {
+      if (prev.includes(productId)) {
+        return prev.filter(id => id !== productId);
+      } else {
+        return [...prev, productId];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedProducts([]);
+      setSelectAll(false);
+    } else {
+      setSelectedProducts(products.map(product => product._id));
+      setSelectAll(true);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedProducts.length === 0) {
+      alert('Выберите товары для удаления');
+      return;
+    }
+
+    const confirmMessage = selectedProducts.length === 1 
+      ? `Удалить выбранный товар?` 
+      : `Удалить ${selectedProducts.length} выбранных товаров?`;
+
+    if (!window.confirm(confirmMessage)) return;
+
+    try {
+      const deletePromises = selectedProducts.map(productId => 
+        fetch(`${API_URL}/${productId}`, { method: 'DELETE' })
+      );
+
+      await Promise.all(deletePromises);
+      setSelectedProducts([]);
+      setSelectAll(false);
+      fetchProducts();
+      alert(`Успешно удалено ${selectedProducts.length} товаров`);
+    } catch (e) {
+      alert('Ошибка при удалении товаров');
+    }
+  };
+
+  // Сброс выбора при изменении списка товаров
+  useEffect(() => {
+    setSelectedProducts([]);
+    setSelectAll(false);
+  }, [products]);
+
   return (
-    <div style={{minHeight: '100vh', background: '#f5f7fa', padding: '32px 0'}}>
+    <div className="admin-container" style={{minHeight: '100vh', background: '#f5f7fa', padding: '32px 0'}}>
       <div style={{maxWidth: 1100, margin: '0 auto', background: '#fff', borderRadius: 10, border: '1.5px solid #e0e0e0', padding: 24}}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18}}>
-          <h2 style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Товары</h2>
+          <h2 className="admin-header" style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Товары</h2>
           <div>
             <button onClick={()=>{setShowForm(true);setEditProduct(null);}} style={{background: '#FF6B00', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>+ Добавить товар</button>
+            {selectedProducts.length > 0 && (
+              <button 
+                onClick={handleDeleteSelected} 
+                style={{
+                  background: '#dc3545', 
+                  color: '#fff', 
+                  fontWeight: 600, 
+                  fontSize: 15, 
+                  border: 'none', 
+                  borderRadius: 7, 
+                  padding: '8px 18px', 
+                  marginRight: 12, 
+                  cursor: 'pointer'
+                }}
+              >
+                🗑️ Удалить выбранные ({selectedProducts.length})
+              </button>
+            )}
             <button onClick={() => navigate('/admin/settings')} style={{background: '#1e88e5', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>⚙️ Настройки</button>
+            <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
             <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>
           </div>
         </div>
+        
+        {/* Информация о выбранных товарах */}
+        {selectedProducts.length > 0 && (
+          <div style={{
+            background: '#e3f2fd', 
+            border: '1px solid #2196f3', 
+            borderRadius: '6px', 
+            padding: '12px 16px', 
+            marginBottom: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span style={{color: '#1976d2', fontWeight: 500}}>
+              Выбрано товаров: {selectedProducts.length} из {products.length}
+            </span>
+            <button 
+              onClick={() => {setSelectedProducts([]); setSelectAll(false);}}
+              style={{
+                background: 'none',
+                border: '1px solid #2196f3',
+                color: '#2196f3',
+                padding: '4px 12px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Снять выделение
+            </button>
+          </div>
+        )}
+        
       {loading ? (
           <div style={{padding: 32, textAlign: 'center'}}>Загрузка...</div>
       ) : error ? (
           <div style={{color: '#e53935', padding: 32, textAlign: 'center'}}>{error}</div>
       ) : (
-          <table style={{width: '100%', borderCollapse: 'collapse', fontSize: 15, background: '#fff'}}>
+          <table className="admin-table" style={{width: '100%', borderCollapse: 'collapse', fontSize: 15, background: '#fff'}}>
           <thead>
             <tr style={{background: '#f5f7fa'}}>
+                <th style={{padding: '8px 6px', textAlign: 'center', fontWeight: 600, color: '#222', width: '40px'}}>
+                  <input 
+                    type="checkbox" 
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    style={{width: '16px', height: '16px', cursor: 'pointer'}}
+                  />
+                </th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Фото</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Название</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Цена</th>
@@ -401,10 +517,21 @@ const ProductList = ({ onLogout }) => {
           </thead>
           <tbody>
             {products.map(product => (
-                <tr key={product._id} style={{borderBottom: '1px solid #e0e0e0'}}>
+                <tr key={product._id} style={{
+                  borderBottom: '1px solid #e0e0e0',
+                  backgroundColor: selectedProducts.includes(product._id) ? '#f8f9fa' : 'transparent'
+                }}>
+                  <td style={{padding: '6px 6px', textAlign: 'center'}}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedProducts.includes(product._id)}
+                      onChange={() => handleSelectProduct(product._id)}
+                      style={{width: '16px', height: '16px', cursor: 'pointer'}}
+                    />
+                  </td>
                   <td style={{padding: '6px 6px'}}>
                     <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: 44, height: 44, objectFit: 'contain', borderRadius: 5, background: '#f5f7fa', border: '1px solid #e0e0e0'}} />
-                </td>
+                  </td>
                   <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>{product.name}</td>
                   <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? Number(product.price).toLocaleString('ru-RU') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
@@ -412,8 +539,8 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
                     <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Редактировать</button>
                     <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer'}}>Удалить</button>
-                </td>
-              </tr>
+                  </td>
+                </tr>
             ))}
           </tbody>
         </table>
