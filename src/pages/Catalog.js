@@ -77,8 +77,23 @@ const Catalog = () => {
     if (products.length > 0) {
       setCategoriesLoading(true);
       
-      // Извлекаем уникальные категории из товаров и сортируем их
-      const uniqueCategories = [...new Set(products.map(product => product.category))].filter(Boolean).sort();
+      // Извлекаем уникальные категории из товаров, нормализуем и сортируем их
+      const categoryMap = new Map();
+      
+      products.forEach(product => {
+        if (product.category) {
+          // Нормализуем название категории: убираем лишние пробелы и приводим к нижнему регистру
+          const normalizedCategory = product.category.trim().toLowerCase();
+          const originalCategory = product.category.trim();
+          
+          // Если такой нормализованной категории еще нет, добавляем её
+          if (!categoryMap.has(normalizedCategory)) {
+            categoryMap.set(normalizedCategory, originalCategory);
+          }
+        }
+      });
+      
+      const uniqueCategories = Array.from(categoryMap.values()).sort();
       
       if (uniqueCategories.length > 0) {
         // Добавляем категорию "Все товары" в начало
@@ -164,7 +179,7 @@ const Catalog = () => {
 
   const filteredProducts = selectedCategory === 'all'
     ? products
-    : products.filter(product => product.category === selectedCategory);
+    : products.filter(product => product.category && product.category.trim() === selectedCategory);
 
   // Пагинация
   const indexOfLastProduct = currentPage * productsPerPage;
