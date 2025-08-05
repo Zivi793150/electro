@@ -595,9 +595,11 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
                   <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['Short description'] || ''}</td>
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
-                    <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Редактировать</button>
-                    <button onClick={()=>handleDuplicate(product)} style={{background: '#28a745', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, marginRight: 6, cursor: 'pointer'}}>Дублировать</button>
-                    <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer'}}>Удалить</button>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
+                      <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Редактировать</button>
+                      <button onClick={()=>handleDuplicate(product)} style={{background: '#28a745', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Дублировать</button>
+                      <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Удалить</button>
+                    </div>
                   </td>
                 </tr>
             ))}

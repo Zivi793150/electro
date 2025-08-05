@@ -15,13 +15,13 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 1000px;
-  height: 900px;
+  width: 1200px;
+  height: 1100px;
   background-image: url('../../public/images/dotted-world-map-white-background_132079-967.avif');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.2;
+  opacity: 0.3;
   pointer-events: none;
 }
 
@@ -43,6 +43,8 @@
   align-items: center;
   text-align: center;
   max-width: 600px;
+  position: relative;
+  z-index: 2;
 }
 
 .about-company-header {
@@ -112,9 +114,29 @@
   }
 }
 
+/* Для очень больших экранов - делаем фоновое изображение еще меньше */
+@media (min-width: 1400px) {
+  .about-company-section::before {
+    width: 1000px;
+    height: 900px;
+    opacity: 0.2;
+  }
+}
+
 @media (max-width: 700px) {
   .about-company-section {
-    padding: 60px 0;
+    padding: 15px 0;
+    min-height: 300px;
+  }
+  
+  .about-company-section::before {
+    width: 600px;
+    height: 500px;
+    opacity: 0.5;
+  }
+  
+  .about-company-header {
+    margin-bottom: 15px;
   }
   
   .about-company-title {
@@ -123,7 +145,7 @@
   
   .about-company-subtitle {
     font-size: 28px;
-    margin-bottom: 40px;
+    margin-bottom: 15px;
   }
   
   .header-line {
@@ -133,7 +155,18 @@
 
 @media (max-width: 480px) {
   .about-company-section {
-    padding: 40px 0;
+    padding: 10px 0;
+    min-height: 200px;
+  }
+  
+  .about-company-section::before {
+    width: 400px;
+    height: 300px;
+    opacity: 0.25;
+  }
+  
+  .about-company-header {
+    margin-bottom: 10px;
   }
   
   .about-company-title {
@@ -142,10 +175,38 @@
   
   .about-company-subtitle {
     font-size: 24px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
   
   .header-line {
     width: 25px;
+  }
+}
+
+@media (max-width: 320px) {
+  .about-company-section {
+    padding: 5px 0;
+    min-height: 150px;
+  }
+  
+  .about-company-section::before {
+    display: none;
+  }
+  
+  .about-company-header {
+    margin-bottom: 8px;
+  }
+  
+  .about-company-title {
+    font-size: 28px;
+  }
+  
+  .about-company-subtitle {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  
+  .header-line {
+    width: 20px;
   }
 } 

@@ -8,14 +8,14 @@
 .main-maket-title { font-size: 20px; font-weight: 700; color: #222; margin: 0 0 8px 0; }
 .main-maket-subtitle { font-size: 16px; color: #1e88e5; margin-bottom: 6px; }
 .main-maket-text { font-size: 16px; color: #444; margin-bottom: 8px; }
-.main-maket-advantages { list-style: none; padding: 0; margin: 0 0 10px 0; }
+.main-maket-advantages { list-style: none; padding: 0; margin: 0 0 15px 0; }
 .main-maket-adv-item { display: flex; align-items: center; font-size: 16px; color: #222; }
 .main-maket-arrow { display: flex; align-items: center; margin-right: 4px; color: #FF6B00; }
-.main-maket-btn { background: #FF6B00; color: #fff; font-size: 16px; border: none; border-radius: 6px; padding: 10px 20px; cursor: pointer; }
+.main-maket-btn { background: #FF6B00; color: #fff; font-size: 16px; border: none; border-radius: 6px; padding: 12px 24px; cursor: pointer; margin: 0 auto; display: block; }
 .main-maket-btn:hover { background: #e65c00; }
 
 /* Оптимизированные стили для мини-каталога */
-.mini-catalog-section { margin: 12px auto 0 auto; max-width: 1200px; padding: 0 16px 10px 16px; }
+.mini-catalog-section { margin: 20px auto 0 auto; max-width: 1200px; padding: 0 16px 10px 16px; }
 .mini-catalog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .mini-catalog-header h2 { font-size: 1.3rem; font-weight: 700; color: #1a2236; margin: 0; }
 .mini-catalog-link { font-size: 1rem; color: #1e88e5; font-weight: 600; text-decoration: none; border: none; background: none; padding: 6px 12px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
@@ -108,7 +108,7 @@
   flex-direction: column !important;
   align-items: center !important;
   justify-content: flex-start !important;
-  padding: 8px 12px 12px 12px !important;
+  padding: 12px 12px 12px 12px !important;
   background: #fff !important;
   border: none !important;
   border-radius: 0 !important;
@@ -118,7 +118,7 @@
 }
 
 .home-products-grid .product-card .product-info span {
-  font-size: 0.9rem !important;
+  font-size: 1.1rem !important;
   font-weight: 500 !important;
   color: #1a2236 !important;
   margin: 0 !important;
@@ -149,7 +149,7 @@
     max-width: 100vw; 
   } 
   .mini-catalog-grid { 
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: 1fr; 
   } 
   
   /* МОБИЛЬНЫЕ СТИЛИ ДЛЯ ГЛАВНОЙ СТРАНИЦЫ */
@@ -181,12 +181,12 @@
   }
   
   .home-products-grid .product-card .product-info {
-    padding: 6px 8px 8px 8px !important;
+    padding: 10px 8px 8px 8px !important;
     min-height: 50px !important;
   }
   
   .home-products-grid .product-card .product-info span {
-    font-size: 0.85rem !important;
+    font-size: 1.05rem !important;
     line-height: 1.15 !important;
   }
 }
@@ -205,10 +205,14 @@
     font-size: 14px;
   }
   .main-maket-advantages {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
   .main-maket-adv-item {
     font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .main-maket-adv-item:last-child {
+    margin-bottom: 0;
   }
   .mini-catalog-header h2 {
     font-size: 1.2rem;
@@ -226,12 +230,12 @@
   }
   
   .home-products-grid .product-card .product-info {
-    padding: 4px 6px 6px 6px !important;
+    padding: 8px 6px 6px 6px !important;
     min-height: 45px !important;
   }
   
   .home-products-grid .product-card .product-info span {
-    font-size: 0.8rem !important;
+    font-size: 1rem !important;
     line-height: 1.1 !important;
   }
 }
@@ -251,13 +255,20 @@
   }
   .main-maket-adv-item {
     font-size: 14px;
+    margin-bottom: 10px;
+  }
+  .main-maket-adv-item:last-child {
+    margin-bottom: 0;
   }
   .main-maket-btn { 
-    font-size: 14px; 
-    padding: 8px 12px; 
+    font-size: 16px; 
+    padding: 14px 28px; 
   } 
   .mini-catalog-grid { 
     grid-template-columns: 1fr; 
+  }
+  .home-products-grid {
+    grid-template-columns: 1fr !important;
   } 
   .product-image { 
     height: 60px; 
@@ -276,18 +287,18 @@
   
   /* СТИЛИ ДЛЯ 600px */
   .home-products-grid .product-card .product-image {
-    height: 90px !important;
-    min-height: 90px !important;
-    max-height: 90px !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    max-height: 160px !important;
   }
   
   .home-products-grid .product-card .product-info {
-    padding: 3px 5px 5px 5px !important;
-    min-height: 40px !important;
+    padding: 0px 2px 0px 2px !important;
+    min-height: 8px !important;
   }
   
   .home-products-grid .product-card .product-info span {
-    font-size: 0.75rem !important;
+    font-size: 0.9rem !important;
     line-height: 1.1 !important;
   }
 }
@@ -307,10 +318,14 @@
   }
   .main-maket-adv-item {
     font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .main-maket-adv-item:last-child {
+    margin-bottom: 0;
   }
   .main-maket-btn {
-    font-size: 14px;
-    padding: 6px 10px;
+    font-size: 16px;
+    padding: 14px 28px;
   }
   .mini-catalog-header h2 {
     font-size: 1rem;
@@ -333,37 +348,43 @@
   
   /* СТИЛИ ДЛЯ 480px */
   .home-products-grid .product-card .product-image {
-    height: 80px !important;
-    min-height: 80px !important;
-    max-height: 80px !important;
+    height: 140px !important;
+    min-height: 140px !important;
+    max-height: 140px !important;
   }
   
   .home-products-grid .product-card .product-info {
-    padding: 2px 4px 4px 4px !important;
-    min-height: 35px !important;
+    padding: 0px 1px 0px 1px !important;
+    min-height: 6px !important;
   }
   
   .home-products-grid .product-card .product-info span {
-    font-size: 0.7rem !important;
+    font-size: 0.85rem !important;
     line-height: 1.1 !important;
   }
 }
 
 @media (max-width: 320px) {
   /* СТИЛИ ДЛЯ 320px */
+  .main-maket-adv-item {
+    margin-bottom: 14px;
+  }
+  .main-maket-adv-item:last-child {
+    margin-bottom: 0;
+  }
   .home-products-grid .product-card .product-image {
-    height: 70px !important;
-    min-height: 70px !important;
-    max-height: 70px !important;
+    height: 120px !important;
+    min-height: 120px !important;
+    max-height: 120px !important;
   }
   
   .home-products-grid .product-card .product-info {
-    padding: 2px 3px 3px 3px !important;
-    min-height: 30px !important;
+    padding: 0px 1px 0px 1px !important;
+    min-height: 5px !important;
   }
   
   .home-products-grid .product-card .product-info span {
-    font-size: 0.65rem !important;
+    font-size: 0.8rem !important;
     line-height: 1.1 !important;
   }
 }
@@ -393,7 +414,7 @@
 
 @media (max-width: 900px) {
   .mini-catalog-section .home-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: 1fr !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -416,7 +437,7 @@
 
 @media (max-width: 600px) {
   .mini-catalog-section .home-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: 1fr !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -439,7 +460,7 @@
 
 @media (max-width: 480px) {
   .mini-catalog-section .home-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: 1fr !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -462,7 +483,7 @@
 
 @media (max-width: 320px) {
   .mini-catalog-section .home-products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: 1fr !important;
     gap: 0 !important;
     margin: 0 !important;
     padding: 0 !important;

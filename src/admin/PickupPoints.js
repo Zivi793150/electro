@@ -10,7 +10,9 @@ const PickupPoints = ({ onLogout }) => {
     workingHours: 'Пн-Пт: 9:00-18:00'
   });
 
-  const API_URL = 'https://electro-a8bl.onrender.com/api/pickup-points';
+  const API_URL = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5000/api/pickup-points' 
+    : 'https://electro-a8bl.onrender.com/api/pickup-points';
 
   useEffect(() => {
     fetchPickupPoints();
@@ -19,11 +21,21 @@ const PickupPoints = ({ onLogout }) => {
   const fetchPickupPoints = async () => {
     try {
       setLoading(true);
+      console.log('Загружаем пункты самовывоза с:', API_URL);
       const response = await fetch(API_URL);
-      const data = await response.json();
-      setPickupPoints(data);
+      console.log('Статус загрузки:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Загруженные данные:', data);
+        setPickupPoints(data);
+      } else {
+        console.error('Ошибка загрузки:', response.status, response.statusText);
+        setPickupPoints([]);
+      }
     } catch (error) {
       console.error('Ошибка загрузки пунктов самовывоза:', error);
+      setPickupPoints([]);
     } finally {
       setLoading(false);
     }
@@ -37,6 +49,7 @@ const PickupPoints = ({ onLogout }) => {
     }
 
     try {
+      console.log('Отправляем данные:', newPoint);
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -45,17 +58,29 @@ const PickupPoints = ({ onLogout }) => {
         body: JSON.stringify(newPoint),
       });
 
+      console.log('Статус ответа:', response.status);
+      console.log('Заголовки ответа:', response.headers);
+
       if (response.ok) {
+        const result = await response.json();
+        console.log('Успешный ответ:', result);
         setNewPoint({ address: '', description: '', workingHours: 'Пн-Пт: 9:00-18:00' });
         fetchPickupPoints();
         alert('Пункт самовывоза добавлен');
       } else {
-        const error = await response.json();
-        alert(`Ошибка: ${error.error}`);
+        let errorMessage = 'Неизвестная ошибка';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || `HTTP ${response.status}`;
+        } catch (parseError) {
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        console.error('Ошибка сервера:', errorMessage);
+        alert(`Ошибка: ${errorMessage}`);
       }
     } catch (error) {
-      console.error('Ошибка добавления пункта самовывоза:', error);
-      alert('Ошибка при добавлении пункта самовывоза');
+      console.error('Ошибка сети:', error);
+      alert(`Ошибка сети: ${error.message}`);
     }
   };
 

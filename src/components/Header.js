@@ -126,7 +126,6 @@ const Header = () => {
             <div className="mobile-title">
               <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
             </div>
-            <button className="mobile-menu-close" onClick={closeMenu}>×</button>
           </div>
           
           {/* Mobile Navigation */}
