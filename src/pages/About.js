@@ -16,7 +16,7 @@ const About = () => (
             <p>Мы специализируемся на поставке качественных электроинструментов от мировых производителей. Наша миссия — обеспечить профессионалов и любителей надёжным инструментом для любых задач.</p>
             </div>
             <div className="about-hero-image">
-            <img src="https://via.placeholder.com/500x300?text=О+компании" alt="О компании Танкер Тулс" loading="lazy" />
+            <img src="https://via.placeholder.com/500x300?text=О+компании" alt="О компании Танкер Тулс" loading="lazy" width="500" height="300" />
             </div>
           </section>
           <section className="about-experience">
@@ -50,20 +50,20 @@ const About = () => (
           <section className="about-partners">
             <h2>Наши партнёры</h2>
             <div className="partners-grid">
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Makita" alt="Makita" loading="lazy" /><h4>Makita</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=DeWalt" alt="DeWalt" loading="lazy" /><h4>DeWalt</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Bosch" alt="Bosch" loading="lazy" /><h4>Bosch</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Hitachi" alt="Hitachi" loading="lazy" /><h4>Hitachi</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Metabo" alt="Metabo" loading="lazy" /><h4>Metabo</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Milwaukee" alt="Milwaukee" loading="lazy" /><h4>Milwaukee</h4></div>
+            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Makita" alt="Makita" loading="lazy" width="150" height="80" /><h4>Makita</h4></div>
+            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=DeWalt" alt="DeWalt" loading="lazy" width="150" height="80" /><h4>DeWalt</h4></div>
+            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Bosch" alt="Bosch" loading="lazy" width="150" height="80" /><h4>Bosch</h4></div>
+            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Hitachi" alt="Hitachi" loading="lazy" width="150" height="80" /><h4>Hitachi</h4></div>
+            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Metabo" alt="Metabo" loading="lazy" width="150" height="80" /><h4>Metabo</h4></div>
+            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Milwaukee" alt="Milwaukee" loading="lazy" width="150" height="80" /><h4>Milwaukee</h4></div>
             </div>
           </section>
           <section className="about-team">
             <h2>Наша команда</h2>
             <div className="team-grid">
-            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Директор" alt="Директор" loading="lazy" /><h3>Александр Петров</h3><p>Генеральный директор</p><p>15 лет опыта в сфере поставок электроинструментов</p></div>
-            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Менеджер" alt="Менеджер" loading="lazy" /><h3>Мария Сидорова</h3><p>Менеджер по продажам</p><p>Специалист по работе с корпоративными клиентами</p></div>
-            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Техник" alt="Техник" loading="lazy" /><h3>Дмитрий Козлов</h3><p>Технический специалист</p><p>Консультации по выбору и обслуживанию инструмента</p></div>
+            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Директор" alt="Директор" loading="lazy" width="200" height="200" /><h3>Александр Петров</h3><p>Генеральный директор</p><p>15 лет опыта в сфере поставок электроинструментов</p></div>
+            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Менеджер" alt="Менеджер" loading="lazy" width="200" height="200" /><h3>Мария Сидорова</h3><p>Менеджер по продажам</p><p>Специалист по работе с корпоративными клиентами</p></div>
+            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Техник" alt="Техник" loading="lazy" width="200" height="200" /><h3>Дмитрий Козлов</h3><p>Технический специалист</p><p>Консультации по выбору и обслуживанию инструмента</p></div>
             </div>
           </section>
         </div>

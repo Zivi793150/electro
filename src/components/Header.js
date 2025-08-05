@@ -60,13 +60,19 @@ const Header = () => {
         {/* Desktop Logo */}
         <div className="header-logo desktop-logo">
           <div className="logo">
-            <img src="/logo.png" alt="Tanker Tools" className="logo-image" />
+            <picture>
+              <source srcSet="/logo.webp" type="image/webp" />
+              <img src="/logo.png" alt="Tanker Tools" className="logo-image" width="133" height="41" />
+            </picture>
           </div>
         </div>
         
         {/* Mobile Title */}
         <div className="mobile-title">
-          <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
+          <picture>
+            <source srcSet="/logo.webp" type="image/webp" />
+            <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" width="133" height="41" />
+          </picture>
         </div>
         
         {/* Desktop Navigation */}
@@ -124,7 +130,10 @@ const Header = () => {
         <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
           <div className="mobile-menu-header">
             <div className="mobile-title">
-              <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
+              <picture>
+                <source srcSet="/logo.webp" type="image/webp" />
+                <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" width="133" height="41" />
+              </picture>
             </div>
           </div>
           

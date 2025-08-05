@@ -38,7 +38,7 @@ const Category = () => {
             <p className="category-subtitle">{categoryData.description}</p>
           </div>
           <div className="category-preview">
-            <img src={categoryData.image} alt={categoryData.name} loading="lazy" />
+            <img src={categoryData.image} alt={categoryData.name} loading="lazy" width="800" height="300" />
           </div>
           <div className="category-products">
             <h2>Товары в категории "{categoryData.name}"</h2>
@@ -46,7 +46,7 @@ const Category = () => {
               {categoryData.products.map(product => (
                 <div key={product.id} className="product-card">
                   <div className="product-image">
-                    <img src={product.image} alt={product.name} loading="lazy" />
+                    <img src={product.image} alt={product.name} loading="lazy" width="300" height="200" />
                   </div>
                   <div className="product-info">
                     <h3 className="product-name">{product.name}</h3>

@@ -1,14 +1,15 @@
-const CACHE_NAME = 'tanker-cache-v1';
+const CACHE_NAME = 'electro-cache-v1';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
   '/static/css/main.css',
-  '/images/hero/hero-main.jpg',
+  '/static/js/main.js',
+  '/images/hero/hero-main.webp',
+  '/logo.png',
   '/fonts/Bounded-Regular.ttf',
-  '/fonts/Hemico.ttf'
+  '/fonts/hemico.ttf'
 ];
 
-// Установка service worker
+// Установка Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,19 +20,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Перехват запросов
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Возвращаем кешированную версию или делаем сетевой запрос
-        return response || fetch(event.request);
-      }
-    )
-  );
-});
-
-// Обновление кеша
+// Активация Service Worker
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -44,5 +33,38 @@ self.addEventListener('activate', event => {
         })
       );
     })
+  );
+});
+
+// Перехват запросов
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Возвращаем кэшированный ответ, если он есть
+        if (response) {
+          return response;
+        }
+
+        // Иначе делаем сетевой запрос
+        return fetch(event.request).then(
+          response => {
+            // Проверяем, что ответ валидный
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            // Клонируем ответ
+            const responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          }
+        );
+      })
   );
 }); 

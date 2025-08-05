@@ -41,15 +41,18 @@ const Home = () => {
         <div className="main-maket-container">
           <div className="main-maket-left">
             <picture>
-              <source srcSet="/images/hero/hero-main.webp" type="image/webp" />
+              <source 
+                srcSet="/images/hero/hero-main.webp" 
+                type="image/webp"
+              />
               <img 
                 src="/images/hero/hero-main.jpg" 
                 alt="Электроинструменты для профессионалов" 
                 className="main-maket-image" 
                 fetchPriority="high"
-                width="520"
-                height="520"
-                style={{width: '100%', height: 'auto', maxWidth: '520px'}}
+                width="380"
+                height="380"
+                style={{width: '100%', height: 'auto', maxWidth: '380px'}}
               />
             </picture>
           </div>

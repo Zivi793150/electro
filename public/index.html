@@ -27,16 +27,27 @@
     <meta name="twitter:image" content="/images/hero/hero-main.jpg" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     
-    <!-- Preconnect для внешних ресурсов -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://electro-a8bl.onrender.com">
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <!-- Preconnect для внешних доменов -->
+    <link rel="preconnect" href="https://electro-a8bl.onrender.com" crossorigin>
     <link rel="dns-prefetch" href="https://electro-a8bl.onrender.com">
+    <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossorigin>
+    <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org">
+    <link rel="preconnect" href="https://www.google.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.google.com">
+    <link rel="preconnect" href="https://maps.googleapis.com" crossorigin>
+    <link rel="dns-prefetch" href="https://maps.googleapis.com">
+    <link rel="preconnect" href="https://api.electro-a8bl.onrender.com" crossorigin>
+    <link rel="dns-prefetch" href="https://api.electro-a8bl.onrender.com">
     
     <!-- Preload критических ресурсов -->
-    <link rel="preload" href="/images/hero/hero-main.jpg" as="image" type="image/jpeg">
+    <link rel="preload" href="/images/hero/hero-main.webp" as="image" type="image/webp" fetchpriority="high">
+    <link rel="preload" href="/logo.png" as="image" type="image/png" fetchpriority="high">
+    <link rel="preload" href="/images/dotted-world-map-white-background_132079-967.avif" as="image" type="image/avif">
+    
+    <!-- Асинхронная загрузка CSS -->
+    <link rel="preload" href="/static/css/main.css" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/static/css/main.css"></noscript>
+    
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -51,23 +62,15 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <link rel="preload" href="/fonts/Advaken Sans.otf" as="font" type="font/otf" crossorigin>
-    <link rel="preload" href="/fonts/Farabee Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <!-- Шрифт Hemico © Dan P. Lyons, лицензия CC BY-SA 3.0 https://fontstruct.com/fontstructions/show/1164777 -->
-    <link rel="preload" href="/fonts/hemico.ttf" as="font" type="font/ttf" crossorigin>
-    <!-- Шрифт Bounded © Dan P. Lyons, лицензия CC BY-SA 3.0 https://fontstruct.com/fontstructions/show/1164777 -->
+    
+    <!-- Preload шрифтов -->
     <link rel="preload" href="/fonts/Bounded-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/fonts/hemico.ttf" as="font" type="font/ttf" crossorigin>
+    
     <style>
       @font-face {
-        font-family: 'Advaken Sans';
-        src: url('/fonts/Advaken Sans.otf') format('opentype');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
-      @font-face {
-        font-family: 'Farabee';
-        src: url('/fonts/Farabee Regular.ttf') format('truetype');
+        font-family: 'Bounded';
+        src: url('/fonts/Bounded-Regular.ttf') format('truetype');
         font-weight: normal;
         font-style: normal;
         font-display: swap;
@@ -79,13 +82,6 @@
         font-style: normal;
         font-display: swap;
       }
-      @font-face {
-        font-family: 'Bounded';
-        src: url('/fonts/Bounded-Regular.ttf') format('truetype');
-        font-weight: normal;
-        font-style: normal;
-        font-display: swap;
-      }
       body, html, * {
         font-family: 'Bounded', Arial, sans-serif !important;
       }
@@ -93,7 +89,129 @@
         font-family: 'Hemico', Arial, sans-serif !important;
       }
       
+      /* Оптимизации для изображений */
+      img {
+        content-visibility: auto;
+      }
+      
+      /* Оптимизации для фоновых изображений */
+      [style*="background-image"] {
+        content-visibility: auto;
+      }
+      
       /* Критический CSS для главной страницы */
+      .main-maket-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 600px;
+        background: #fff;
+      }
+      
+      .main-maket-container {
+        display: flex;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 20px;
+        gap: 40px;
+      }
+      
+      .main-maket-left {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .main-maket-image {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        /* Предотвращаем CLS */
+        aspect-ratio: 1;
+        object-fit: cover;
+      }
+      
+      .main-maket-right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      
+      .main-maket-title {
+        font-size: 48px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+      
+      .main-maket-subtitle {
+        font-size: 24px;
+        color: #666;
+        margin-bottom: 20px;
+        line-height: 1.4;
+      }
+      
+      .main-maket-text {
+        font-size: 16px;
+        color: #777;
+        line-height: 1.6;
+        margin-bottom: 30px;
+      }
+      
+      .main-maket-btn {
+        background: #e86c0a;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        padding: 16px 40px;
+        cursor: pointer;
+        transition: background 0.2s;
+        align-self: flex-start;
+      }
+      
+      .main-maket-btn:hover {
+        background: #d15a00;
+      }
+      
+      /* Мобильные стили */
+      @media (max-width: 768px) {
+        .main-maket-container {
+          flex-direction: column;
+          gap: 20px;
+        }
+        
+        .main-maket-title {
+          font-size: 32px;
+        }
+        
+        .main-maket-subtitle {
+          font-size: 20px;
+        }
+        
+        .main-maket-image {
+          max-width: 300px;
+        }
+      }
+      
+      /* Критический CSS для предотвращения CLS */
+      .main-maket-section {
+        min-height: 600px;
+        display: flex;
+        align-items: center;
+      }
+      
+      .main-maket-left {
+        min-height: 380px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
       .home { background: #fff; min-height: 100vh; }
       .main-maket-section { background: #f8f9fa; padding: 24px 0; width: 100vw; min-width: 100vw; margin-left: 50%; transform: translateX(-50%); }
       .main-maket-container { display: flex; justify-content: center; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 16px; }

@@ -7,6 +7,8 @@
   margin: 0;
   position: relative;
   min-height: 600px;
+  /* Предотвращаем CLS */
+  contain: layout style paint;
 }
 
 .about-company-section::before {
@@ -23,6 +25,9 @@
   background-repeat: no-repeat;
   opacity: 0.3;
   pointer-events: none;
+  /* Предотвращаем CLS */
+  contain: layout style paint;
+  will-change: transform;
 }
 
 .about-company-container {
