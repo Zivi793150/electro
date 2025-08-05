@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const DeliveryInfo = ({ city, onDeliverySelect, compact = false }) => {
+const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDelivery = null }) => {
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,60 +87,20 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false }) => {
   if (compact) {
     return (
       <div style={{ marginBottom: 12 }}>
-        {deliveryInfo.isAlmaty && deliveryInfo.hasPickupPoints ? (
-          <div style={{
-            background: '#d4edda',
-            border: '1px solid #c3e6cb',
-            borderRadius: 6,
-            padding: 12,
-            marginBottom: 8
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 6, 
-              marginBottom: 4,
-              color: '#155724',
-              fontWeight: 600,
-              fontSize: '0.9rem'
-            }}>
-              🎉 Бесплатная доставка!
-            </div>
-            <div style={{ color: '#155724', fontSize: '0.8rem' }}>
-              В Алматы доступен самовывоз из наших пунктов выдачи
-            </div>
-          </div>
-        ) : (
-          <div style={{
-            background: '#fff3cd',
-            border: '1px solid #ffeaa7',
-            borderRadius: 6,
-            padding: 12,
-            marginBottom: 8
-          }}>
-            <div style={{ 
-              color: '#856404', 
-              fontSize: '0.8rem',
-              marginBottom: 6
-            }}>
-              💡 Доставка в другие города осуществляется платно
-            </div>
-          </div>
-        )}
-
         <div style={{ display: 'grid', gap: 8 }}>
           {deliveryInfo.deliveryOptions.slice(0, 3).map((option, index) => (
             <div
               key={index}
               onClick={() => handleDeliverySelect(option)}
               style={{
-                border: '1px solid #e0e0e0',
+                border: selectedDelivery && selectedDelivery.type === option.type ? '2px solid #ffc107' : '1px solid #e0e0e0',
                 borderRadius: 6,
                 padding: 10,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                background: '#fff',
-                fontSize: '0.85rem'
+                background: selectedDelivery && selectedDelivery.type === option.type ? '#fffbf0' : '#fff',
+                fontSize: '0.85rem',
+                boxShadow: selectedDelivery && selectedDelivery.type === option.type ? '0 2px 8px rgba(255, 193, 7, 0.3)' : 'none'
               }}
               onMouseOver={(e) => {
                 e.target.style.borderColor = '#ffc107';
@@ -157,7 +117,21 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false }) => {
                 alignItems: 'center',
                 marginBottom: 2
               }}>
-                <div style={{ fontWeight: 600, color: '#333' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 6,
+                  fontWeight: 600, 
+                  color: '#333' 
+                }}>
+                  <span style={{ fontSize: '1rem' }}>
+                    {option.type === 'pickup' ? '🏬' : 
+                     option.type === 'indriver' ? '🚗' :
+                     option.type === 'yandex' ? '📦' :
+                     option.type === 'kazpost' ? '📮' :
+                     option.type === 'cdek' ? '🚚' :
+                     option.type === 'air' ? '✈️' : '🚚'}
+                  </span>
                   {option.name}
                 </div>
                 <div style={{ 
@@ -168,8 +142,13 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false }) => {
                   {option.cost === 0 ? 'Бесплатно' : `${option.cost} ₸`}
                 </div>
               </div>
-              <div style={{ color: '#666', fontSize: '0.75rem' }}>
-                {option.description}
+              <div style={{ color: '#666', fontSize: '0.75rem', marginLeft: '1.5rem' }}>
+                {option.type === 'pickup' ? `Самовывоз из ${deliveryInfo.pickupPointsCount || 'наших'} пунктов` :
+                 option.type === 'indriver' ? 'Курьерская доставка в течение дня' :
+                 option.type === 'yandex' ? 'Быстрая курьерская доставка' :
+                 option.type === 'kazpost' ? 'Почтовая доставка 3-5 дней' :
+                 option.type === 'cdek' ? 'Экспресс доставка 1-2 дня' :
+                 option.type === 'air' ? 'Авиа доставка 1-3 дня' : option.description}
               </div>
             </div>
           ))}

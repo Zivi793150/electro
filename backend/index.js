@@ -400,6 +400,7 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
       city,
       isAlmaty,
       hasPickupPoints: pickupPoints.length > 0,
+      pickupPointsCount: pickupPoints.length,
       deliveryOptions: []
     };
     

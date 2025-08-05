@@ -43,6 +43,8 @@ const Product = () => {
   });
   
   const [selectedDelivery, setSelectedDelivery] = useState(null);
+  const [deliveryInfo, setDeliveryInfo] = useState(null);
+  const [isCityChanging, setIsCityChanging] = useState(false);
   
 
   
@@ -284,10 +286,30 @@ const Product = () => {
   
   const handleCityChange = (e) => {
     const newCity = e.target.value;
+    setIsCityChanging(true);
     setSelectedCity(newCity);
     localStorage.setItem('selectedCity', newCity);
     // Сбрасываем выбранную доставку при смене города
     setSelectedDelivery(null);
+    // Загружаем информацию о доставке для нового города
+    fetchDeliveryInfo(newCity);
+    
+    // Убираем анимацию через 500мс
+    setTimeout(() => {
+      setIsCityChanging(false);
+    }, 500);
+  };
+
+  const fetchDeliveryInfo = async (cityName) => {
+    try {
+      const response = await fetch(`https://electro-a8bl.onrender.com/api/pickup-points/delivery/${encodeURIComponent(cityName)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setDeliveryInfo(data);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки информации о доставке:', error);
+    }
   };
   
 
@@ -349,6 +371,21 @@ const Product = () => {
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
+                    {selectedDelivery && selectedDelivery.cost > 0 && (
+                      <div style={{
+                        fontSize: '0.8rem',
+                        color: '#666',
+                        marginTop: 4,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4
+                      }}>
+                        <span>+ доставка {selectedDelivery.cost} ₸</span>
+                        <span style={{color: '#ffc107', fontWeight: 600}}>
+                          = {(Number(product.price) + selectedDelivery.cost).toLocaleString('ru-RU')} ₸
+                        </span>
+                      </div>
+                    )}
                     {product.article && (
                       <div style={{
                         fontSize: '0.85rem', 
@@ -375,7 +412,19 @@ const Product = () => {
                   </div>
                 </div>
                 <div className="product-divider"></div>
-                <div style={{marginTop: 14, background: '#f5f7fa', borderRadius: 10, padding: '10px 12px 8px 12px', fontSize: '0.98rem', color: '#222', boxShadow: 'none', maxWidth: 320}}>
+                <div style={{
+                  marginTop: 14, 
+                  background: '#f5f7fa', 
+                  borderRadius: 10, 
+                  padding: '10px 12px 8px 12px', 
+                  fontSize: '0.98rem', 
+                  color: '#222', 
+                  boxShadow: 'none', 
+                  maxWidth: 320,
+                  transition: 'all 0.3s ease',
+                  transform: isCityChanging ? 'scale(0.98)' : 'scale(1)',
+                  opacity: isCityChanging ? 0.8 : 1
+                }}>
                   <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
                     <span>Ваш город:</span>
                     {detectingCity ? (
@@ -398,11 +447,19 @@ const Product = () => {
                     city={selectedCity} 
                     onDeliverySelect={setSelectedDelivery}
                     compact={true}
+                    selectedDelivery={selectedDelivery}
                   />
                   
                   <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
                     <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
-                    <span>{siteSettings.deliveryInfo.deliveryNote}</span>
+                    <span>
+                      {selectedCity === 'Алматы' 
+                        ? 'Срок доставки рассчитывается менеджером после оформления заказа'
+                        : selectedDelivery 
+                          ? `Доставка в ${selectedCity} через ${selectedDelivery.name.toLowerCase()}. ${selectedDelivery.type === 'pickup' ? 'Самовывоз из наших пунктов' : selectedDelivery.type === 'indriver' ? 'В течение дня' : selectedDelivery.type === 'yandex' ? '1-2 дня' : selectedDelivery.type === 'kazpost' ? '3-5 дней' : selectedDelivery.type === 'cdek' ? '1-2 дня' : selectedDelivery.type === 'air' ? '1-3 дня' : '1-3 дня'}.`
+                          : `Доставка в ${selectedCity} осуществляется через курьерские службы. Срок доставки 1-3 дня.`
+                      }
+                    </span>
                   </div>
                 </div>
               </>
