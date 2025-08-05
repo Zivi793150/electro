@@ -8,6 +8,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Middleware для кеширования статических ресурсов
+app.use((req, res, next) => {
+  // Кеширование изображений на 1 год
+  if (req.path.match(/\.(jpg|jpeg|png|gif|webp|avif|svg)$/i)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  // Кеширование шрифтов на 1 год
+  else if (req.path.match(/\.(woff|woff2|ttf|otf|eot)$/i)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  // Кеширование CSS и JS на 1 месяц
+  else if (req.path.match(/\.(css|js)$/i)) {
+    res.setHeader('Cache-Control', 'public, max-age=2592000');
+  }
+  // Кеширование HTML на 1 час
+  else if (req.path.match(/\.html?$/i)) {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+  }
+  next();
+});
+
 const mongoUri = process.env.MONGO_URI || 'mongodb+srv://electro:electro123@cluster0.mongodb.net/Tanker_products?retryWrites=true&w=majority';
 const PORT = process.env.PORT || 5000;
 
@@ -73,6 +94,38 @@ app.get('/api/products/:id', async (req, res) => {
   } catch (err) {
     console.error('Ошибка получения продукта:', err);
     res.status(500).json({ error: 'Ошибка при получении товара' });
+  }
+});
+
+// Импортируем middleware для загрузки
+const { upload, convertToWebP, createImageSizes } = require('./upload');
+
+// API endpoint для загрузки изображений
+app.post('/api/upload', upload, convertToWebP, createImageSizes, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Файл не загружен' });
+    }
+
+    const response = {
+      original: {
+        filename: req.file.filename,
+        path: req.file.path.replace('public', ''),
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      },
+      webp: req.file.webpPath ? {
+        path: req.file.webpUrl,
+        filename: path.basename(req.file.webpPath)
+      } : null,
+      variants: req.file.variants || {},
+      message: 'Изображение успешно загружено и оптимизировано'
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error('Ошибка загрузки:', error);
+    res.status(500).json({ error: 'Ошибка при загрузке файла' });
   }
 });
 

@@ -4,12 +4,39 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/ChatGPT Image 26 июл. 2025 г., 10_35_59.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#FF6B00" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Электроинструменты Tanker - официальная продукция с гарантией. Продажа и доставка по Казахстану."
     />
+    <meta name="keywords" content="электроинструменты, болгарки, дрели, шуруповерты, Tanker, Казахстан" />
+    <meta name="author" content="Tanker Tools" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph мета-теги -->
+    <meta property="og:title" content="Электроинструменты Tanker" />
+    <meta property="og:description" content="Официальная продукция с гарантией. Продажа и доставка по Казахстану." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://eltok.kz" />
+    <meta property="og:image" content="/images/hero/hero-main.jpg" />
+    
+    <!-- Twitter Card мета-теги -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Электроинструменты Tanker" />
+    <meta name="twitter:description" content="Официальная продукция с гарантией. Продажа и доставка по Казахстану." />
+    <meta name="twitter:image" content="/images/hero/hero-main.jpg" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Preconnect для внешних ресурсов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://electro-a8bl.onrender.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://electro-a8bl.onrender.com">
+    
+    <!-- Preload критических ресурсов -->
+    <link rel="preload" href="/images/hero/hero-main.jpg" as="image" type="image/jpeg">
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -65,8 +92,52 @@
       .header, .top-bar {
         font-family: 'Hemico', Arial, sans-serif !important;
       }
+      
+      /* Критический CSS для главной страницы */
+      .home { background: #fff; min-height: 100vh; }
+      .main-maket-section { background: #f8f9fa; padding: 24px 0; width: 100vw; min-width: 100vw; margin-left: 50%; transform: translateX(-50%); }
+      .main-maket-container { display: flex; justify-content: center; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+      .main-maket-left { flex: 1 1 50%; display: flex; align-items: flex-end; }
+      .main-maket-image { max-width: 520px; width: 100%; height: auto; object-fit: contain; display: block; }
+      .main-maket-right { flex: 1 1 50%; display: flex; flex-direction: column; align-items: flex-start; }
+      .main-maket-title { font-size: 20px; font-weight: 700; color: #222; margin: 0 0 8px 0; }
+      .main-maket-subtitle { font-size: 16px; color: #1e88e5; margin-bottom: 6px; }
+      .main-maket-text { font-size: 16px; color: #444; margin-bottom: 8px; }
+      .main-maket-advantages { list-style: none; padding: 0; margin: 0 0 15px 0; }
+      .main-maket-adv-item { display: flex; align-items: center; font-size: 16px; color: #222; }
+      .main-maket-arrow { display: flex; align-items: center; margin-right: 4px; color: #FF6B00; }
+      .main-maket-btn { background: #FF6B00; color: #fff; font-size: 16px; border: none; border-radius: 6px; padding: 12px 24px; cursor: pointer; margin: 0 auto; display: block; }
+      
+      /* Медиа-запросы для критического CSS */
+      @media (max-width: 900px) {
+        .main-maket-container { flex-direction: column; align-items: center; }
+        .main-maket-left, .main-maket-right { flex: 1 1 100%; }
+        .main-maket-image { max-width: 100%; }
+      }
+      @media (max-width: 600px) {
+        .main-maket-section { padding: 16px 0; }
+        .main-maket-title { font-size: 18px; }
+        .main-maket-subtitle { font-size: 14px; }
+        .main-maket-text { font-size: 14px; }
+        .main-maket-adv-item { font-size: 14px; }
+      }
     </style>
     <title>Tanker</title>
+    
+    <script>
+      // Регистрация service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

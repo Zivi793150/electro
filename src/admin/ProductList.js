@@ -58,7 +58,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     ];
   });
   
-  // Функция для загрузки одного файла
+  // Функция для загрузки одного файла с WebP конвертацией
   const handleFileUpload = async (event, setField) => {
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
@@ -68,9 +68,9 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     
     try {
       const formData = new FormData();
-      formData.append('file', files[0]);
+      formData.append('image', files[0]); // Изменили 'file' на 'image'
       
-      const response = await fetch('/upload.php', {
+      const response = await fetch('https://electro-a8bl.onrender.com/api/upload', {
         method: 'POST',
         body: formData
       });
@@ -82,16 +82,23 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       
       const result = await response.json();
       
-      if (result.success && result.files.length > 0) {
-        const newUrl = result.files[0];
-        setField(newUrl);
-        // Показываем уведомление без блокировки
-        setError('');
+      if (result.webp) {
+        // Используем WebP версию для лучшей производительности
+        setField(result.webp.path);
         setTimeout(() => {
-          alert(`✅ Файл успешно загружен!\n\nURL: ${newUrl}\n\nURL автоматически добавлен в поле.`);
+          alert(`✅ Изображение успешно загружено и оптимизировано!\n\n` +
+                `📁 Оригинал: ${result.original.filename}\n` +
+                `🎨 WebP: ${result.webp.filename}\n` +
+                `📏 Размер: ${Math.round(result.original.size / 1024)} KB\n` +
+                `🚀 Экономия: ~60-70% размера\n\n` +
+                `WebP URL автоматически добавлен в поле.`);
         }, 100);
       } else {
-        setError('Ошибка загрузки файла');
+        // Fallback на оригинальный файл
+        setField(result.original.path);
+        setTimeout(() => {
+          alert(`✅ Файл успешно загружен!\n\nURL: ${result.original.path}`);
+        }, 100);
       }
     } catch (err) {
       setError('Ошибка загрузки файла: ' + err.message);

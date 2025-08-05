@@ -339,7 +339,14 @@ const Product = () => {
             <div className="product-gallery">
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
-                  <img src={product.image || allImages[activeImage]} alt={product.name} loading="lazy" />
+                  <img 
+                    src={product.image || allImages[activeImage]} 
+                    alt={product.name} 
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                    style={{width: '100%', height: 'auto', maxWidth: '400px'}}
+                  />
                 </div>
                 {allImages.length > 1 && (
                   <>
@@ -348,7 +355,16 @@ const Product = () => {
                     </div>
                     <div className="product-thumbs">
                       {allImages.map((img, idx) => (
-                        <img key={idx} src={img} alt={product.name + idx} className={activeImage === idx ? "active" : ""} onClick={() => setActiveImage(idx)} loading="lazy" />
+                        <img 
+                          key={idx} 
+                          src={img} 
+                          alt={product.name + idx} 
+                          className={activeImage === idx ? "active" : ""} 
+                          onClick={() => setActiveImage(idx)} 
+                          loading="lazy"
+                          width="80"
+                          height="80"
+                        />
                       ))}
                     </div>
                   </>

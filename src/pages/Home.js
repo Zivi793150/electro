@@ -19,53 +19,7 @@ const Home = () => {
       });
   }, []);
 
-  // Принудительное применение стилей для карточек мини-каталога
-  useEffect(() => {
-    const forceStyles = () => {
-      const grid = document.querySelector('.home-products-grid');
-      const cards = document.querySelectorAll('.home-products-grid .product-card');
 
-      if (grid) {
-        grid.style.display = 'grid';
-        grid.style.gap = '0';
-        grid.style.margin = '0';
-        grid.style.padding = '0';
-        grid.style.borderCollapse = 'collapse';
-        grid.style.borderSpacing = '0';
-      }
-
-      cards.forEach(card => {
-        card.style.margin = '-1px';
-        card.style.border = '1px solid #e3e6ea';
-        card.style.borderRadius = '0';
-        card.style.padding = '0';
-        card.style.background = '#fff';
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.style.height = '100%';
-        card.style.position = 'relative';
-        card.style.overflow = 'hidden';
-        card.style.boxSizing = 'border-box';
-      });
-    };
-
-    forceStyles();
-    setTimeout(forceStyles, 50);
-    setTimeout(forceStyles, 100);
-    setTimeout(forceStyles, 200);
-    setTimeout(forceStyles, 500);
-    setTimeout(forceStyles, 1000);
-
-    const handleResize = () => {
-      setTimeout(forceStyles, 100);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [miniProducts]);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -86,7 +40,18 @@ const Home = () => {
       <section className="main-maket-section">
         <div className="main-maket-container">
           <div className="main-maket-left">
-            <img src="/images/hero/hero-main.jpg" alt="Электроинструменты для профессионалов" className="main-maket-image" loading="lazy" />
+            <picture>
+              <source srcSet="/images/hero/hero-main.webp" type="image/webp" />
+              <img 
+                src="/images/hero/hero-main.jpg" 
+                alt="Электроинструменты для профессионалов" 
+                className="main-maket-image" 
+                fetchPriority="high"
+                width="520"
+                height="520"
+                style={{width: '100%', height: 'auto', maxWidth: '520px'}}
+              />
+            </picture>
           </div>
           <div className="main-maket-right">
             <h1 className="main-maket-title">Электроинструменты Tanker</h1>
@@ -124,7 +89,20 @@ const Home = () => {
                   style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
                 >
                   <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" />
+                    <picture style={{width: '100%', height: '100%'}}>
+                      <source 
+                        srcSet={product.image ? product.image.replace(/\.(jpg|jpeg|png)$/i, '.webp') : '/images/products/placeholder.webp'} 
+                        type="image/webp"
+                      />
+                      <img 
+                        src={product.image || '/images/products/placeholder.png'} 
+                        alt={product.name} 
+                        style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
+                        loading="lazy"
+                        width="260"
+                        height="170"
+                      />
+                    </picture>
                   </div>
                   <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
                   <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
