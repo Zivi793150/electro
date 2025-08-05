@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
+import DeliveryInfo from '../components/DeliveryInfo';
 import '../styles/Product.css';
 
 const categories = [
@@ -41,17 +42,9 @@ const Product = () => {
     return savedCity || 'Алматы';
   });
   
-  const [selectedPickup, setSelectedPickup] = useState(() => {
-    const savedPickup = localStorage.getItem('selectedPickup');
-    return savedPickup || 'ул. Толе би 216Б';
-  });
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
   
-  const [pickupPoints, setPickupPoints] = useState([
-    'ул. Толе би 216Б',
-    'ул. Аймусина 1в',
-    'ул. Достык 123',
-    'ул. Абая 45'
-  ]);
+
   
   const [detectingCity, setDetectingCity] = useState(false);
   
@@ -227,11 +220,6 @@ const Product = () => {
   // Инициализируем выбранный город из localStorage и автоматически определяем город
   useEffect(() => {
     const savedCity = localStorage.getItem('selectedCity');
-    const savedPickup = localStorage.getItem('selectedPickup');
-    
-    if (savedPickup) {
-      setSelectedPickup(savedPickup);
-    }
     
     // Если есть сохраненный город, используем его
     if (savedCity) {
@@ -240,20 +228,6 @@ const Product = () => {
       // Если нет сохраненного города, пытаемся определить автоматически
       detectUserCity();
     }
-  }, []);
-  
-  // Загружаем пункты самовывоза из базы данных
-  useEffect(() => {
-    fetch('https://electro-a8bl.onrender.com/api/pickup-points')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setPickupPoints(data.map(point => point.address));
-        }
-      })
-      .catch(error => {
-        console.log('Ошибка загрузки пунктов самовывоза, используются значения по умолчанию:', error);
-      });
   }, []);
 
   if (loading) {
@@ -312,13 +286,11 @@ const Product = () => {
     const newCity = e.target.value;
     setSelectedCity(newCity);
     localStorage.setItem('selectedCity', newCity);
+    // Сбрасываем выбранную доставку при смене города
+    setSelectedDelivery(null);
   };
   
-  const handlePickupChange = (e) => {
-    const newPickup = e.target.value;
-    setSelectedPickup(newPickup);
-    localStorage.setItem('selectedPickup', newPickup);
-  };
+
 
   const shortDesc = product['Short description'] || 'краткое описание';
 
@@ -420,30 +392,14 @@ const Product = () => {
                       </select>
                     )}
                   </div>
-                  <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
-                    <span style={{fontSize:17, marginTop:2}}>🚚</span>
-                    <div>
-                      <div style={{fontWeight:500, color:'#222'}}>{siteSettings.deliveryInfo.freeDelivery}</div>
-                      <div style={{color:'#1e88e5', fontWeight:600, fontSize:13}}>{siteSettings.deliveryInfo.freeDeliveryNote}</div>
-                    </div>
-                  </div>
-                  <div style={{display:'flex', alignItems:'flex-start', gap:8, marginBottom:6}}>
-                    <span style={{fontSize:17, marginTop:2}}>🏬</span>
-                    <div style={{flex: 1}}>
-                      <div style={{fontWeight:500, color:'#222', marginBottom: 4}}>Самовывоз из магазина:</div>
-                      <select 
-                        value={selectedPickup} 
-                        onChange={handlePickupChange}
-                        className="city-select"
-                        style={{width: '100%', marginBottom: 4}}
-                      >
-                        {pickupPoints.map(point => (
-                          <option key={point} value={point}>{point}</option>
-                        ))}
-                      </select>
-                      <div style={{color:'#222', fontSize:13}}>{siteSettings.deliveryInfo.pickupInfo}</div>
-                    </div>
-                  </div>
+                  
+                  {/* Заменяем статичный блок на динамический компонент */}
+                  <DeliveryInfo 
+                    city={selectedCity} 
+                    onDeliverySelect={setSelectedDelivery}
+                    compact={true}
+                  />
+                  
                   <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
                     <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
                     <span>{siteSettings.deliveryInfo.deliveryNote}</span>
