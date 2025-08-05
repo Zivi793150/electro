@@ -1,18 +1,42 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const PickupPoints = ({ onLogout }) => {
   const [pickupPoints, setPickupPoints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
   const [editingPoint, setEditingPoint] = useState(null);
-  const [newPoint, setNewPoint] = useState({
-    address: '',
-    description: '',
-    workingHours: 'Пн-Пт: 9:00-18:00'
-  });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const API_URL = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:5000/api/pickup-points' 
-    : 'https://electro-a8bl.onrender.com/api/pickup-points';
+  const navigate = useNavigate();
+
+  const API_URL = 'https://electro-a8bl.onrender.com/api/pickup-points';
+
+  // Начальное состояние формы
+  const initialFormState = {
+    name: '',
+    address: '',
+    city: '',
+    description: '',
+    workingHours: 'Пн-Пт: 9:00-18:00',
+    phone: '',
+    deliveryType: 'pickup',
+    deliveryCost: 0,
+    isActive: true
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
+
+  // Типы доставки
+  const deliveryTypes = [
+    { value: 'pickup', label: 'Самовывоз', cost: 0 },
+    { value: 'indriver', label: 'InDriver', cost: 2000 },
+    { value: 'yandex', label: 'Яндекс.Доставка', cost: 2500 },
+    { value: 'kazpost', label: 'Казпочта', cost: 1500 },
+    { value: 'cdek', label: 'СДЭК', cost: 3000 },
+    { value: 'air', label: 'Авиа доставка', cost: 5000 }
+  ];
 
   useEffect(() => {
     fetchPickupPoints();
@@ -21,100 +45,113 @@ const PickupPoints = ({ onLogout }) => {
   const fetchPickupPoints = async () => {
     try {
       setLoading(true);
+      setError('');
+      
       console.log('Загружаем пункты самовывоза с:', API_URL);
       const response = await fetch(API_URL);
-      console.log('Статус загрузки:', response.status);
+      console.log('Статус ответа:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Загруженные данные:', data);
-        setPickupPoints(data);
+        console.log('Полученные данные:', data);
+        setPickupPoints(Array.isArray(data) ? data : []);
       } else {
-        console.error('Ошибка загрузки:', response.status, response.statusText);
-        setPickupPoints([]);
+        console.error('HTTP ошибка:', response.status, response.statusText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       console.error('Ошибка загрузки пунктов самовывоза:', error);
+      if (error.message.includes('Failed to fetch')) {
+        setError('Сервер недоступен. Проверьте подключение к интернету.');
+      } else if (error.message.includes('Unexpected token')) {
+        setError('Сервер вернул неверный формат данных. Возможно, сервер не запущен.');
+      } else {
+        setError(`Ошибка загрузки: ${error.message}`);
+      }
       setPickupPoints([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddPoint = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newPoint.address.trim()) {
-      alert('Введите адрес пункта самовывоза');
+    setError('');
+    setSuccess('');
+
+    // Валидация
+    if (!formData.name.trim() || !formData.address.trim() || !formData.city.trim()) {
+      setError('Заполните все обязательные поля');
       return;
     }
 
     try {
-      console.log('Отправляем данные:', newPoint);
-      const response = await fetch(API_URL, {
-        method: 'POST',
+      const url = editingPoint ? `${API_URL}/${editingPoint._id}` : API_URL;
+      const method = editingPoint ? 'PUT' : 'POST';
+
+      console.log('Отправляем запрос:', method, url);
+      console.log('Данные:', formData);
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newPoint),
+        body: JSON.stringify(formData),
       });
 
       console.log('Статус ответа:', response.status);
-      console.log('Заголовки ответа:', response.headers);
 
       if (response.ok) {
         const result = await response.json();
         console.log('Успешный ответ:', result);
-        setNewPoint({ address: '', description: '', workingHours: 'Пн-Пт: 9:00-18:00' });
+        setSuccess(editingPoint ? 'Пункт самовывоза обновлен' : 'Пункт самовывоза добавлен');
+        setFormData(initialFormState);
+        setEditingPoint(null);
+        setShowForm(false);
         fetchPickupPoints();
-        alert('Пункт самовывоза добавлен');
+        
+        // Скрыть сообщение через 3 секунды
+        setTimeout(() => setSuccess(''), 3000);
       } else {
-        let errorMessage = 'Неизвестная ошибка';
+        let errorMessage = 'Ошибка сервера';
         try {
           const errorData = await response.json();
           errorMessage = errorData.error || errorData.message || `HTTP ${response.status}`;
         } catch (parseError) {
           errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         }
-        console.error('Ошибка сервера:', errorMessage);
-        alert(`Ошибка: ${errorMessage}`);
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error('Ошибка сети:', error);
-      alert(`Ошибка сети: ${error.message}`);
-    }
-  };
-
-  const handleUpdatePoint = async (e) => {
-    e.preventDefault();
-    if (!editingPoint.address.trim()) {
-      alert('Введите адрес пункта самовывоза');
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/${editingPoint._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(editingPoint),
-      });
-
-      if (response.ok) {
-        setEditingPoint(null);
-        fetchPickupPoints();
-        alert('Пункт самовывоза обновлен');
+      console.error('Ошибка:', error);
+      if (error.message.includes('Failed to fetch')) {
+        setError('Сервер недоступен. Проверьте подключение к интернету.');
+      } else if (error.message.includes('Unexpected token')) {
+        setError('Сервер вернул неверный формат данных. Возможно, сервер не запущен.');
       } else {
-        const error = await response.json();
-        alert(`Ошибка: ${error.error}`);
+        setError(error.message);
       }
-    } catch (error) {
-      console.error('Ошибка обновления пункта самовывоза:', error);
-      alert('Ошибка при обновлении пункта самовывоза');
     }
   };
 
-  const handleDeletePoint = async (id) => {
+  const handleEdit = (point) => {
+    setEditingPoint(point);
+    setFormData({
+      name: point.name || '',
+      address: point.address || '',
+      city: point.city || '',
+      description: point.description || '',
+      workingHours: point.workingHours || 'Пн-Пт: 9:00-18:00',
+      phone: point.phone || '',
+      deliveryType: point.deliveryType || 'pickup',
+      deliveryCost: point.deliveryCost || 0,
+      isActive: point.isActive !== false
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
     if (!window.confirm('Вы уверены, что хотите удалить этот пункт самовывоза?')) {
       return;
     }
@@ -125,376 +162,633 @@ const PickupPoints = ({ onLogout }) => {
       });
 
       if (response.ok) {
+        setSuccess('Пункт самовывоза удален');
         fetchPickupPoints();
-        alert('Пункт самовывоза удален');
+        setTimeout(() => setSuccess(''), 3000);
       } else {
-        const error = await response.json();
-        alert(`Ошибка: ${error.error}`);
+        throw new Error('Ошибка удаления');
       }
     } catch (error) {
-      console.error('Ошибка удаления пункта самовывоза:', error);
-      alert('Ошибка при удалении пункта самовывоза');
+      setError('Ошибка при удалении');
     }
   };
 
-  const startEditing = (point) => {
-    setEditingPoint({ ...point });
+  const handleCancel = () => {
+    setFormData(initialFormState);
+    setEditingPoint(null);
+    setShowForm(false);
+    setError('');
   };
 
-  const cancelEditing = () => {
-    setEditingPoint(null);
+  const handleDeliveryTypeChange = (type) => {
+    const selectedType = deliveryTypes.find(t => t.value === type);
+    setFormData({
+      ...formData,
+      deliveryType: type,
+      deliveryCost: selectedType ? selectedType.cost : 0
+    });
+  };
+
+  const getDeliveryTypeLabel = (type) => {
+    const found = deliveryTypes.find(t => t.value === type);
+    return found ? found.label : type;
+  };
+
+  const getStatusBadge = (isActive) => {
+    return (
+      <span style={{
+        padding: '4px 8px',
+        borderRadius: '12px',
+        fontSize: '12px',
+        fontWeight: '500',
+        backgroundColor: isActive ? '#d4edda' : '#f8d7da',
+        color: isActive ? '#155724' : '#721c24'
+      }}>
+        {isActive ? 'Активен' : 'Неактивен'}
+      </span>
+    );
   };
 
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Загрузка...</div>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '50vh',
+        fontSize: '18px',
+        color: '#666'
+      }}>
+        Загрузка...
+      </div>
+    );
   }
 
   return (
-    <div className="admin-container" style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h1 className="admin-header" style={{ margin: 0, color: '#333' }}>Управление пунктами самовывоза</h1>
-        <div>
-          <button
-            onClick={() => window.location.href = '/admin/products'}
-            style={{
-              background: '#6c757d',
-              color: 'white',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              marginRight: '10px'
-            }}
-          >
-            📦 Товары
-          </button>
-          <button
-            onClick={() => window.location.href = '/admin/settings'}
-            style={{
-              background: '#1e88e5',
-              color: 'white',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              marginRight: '10px'
-            }}
-          >
-            ⚙️ Настройки
-          </button>
-          <button
-            onClick={onLogout}
-            style={{
-              background: '#dc3545',
-              color: 'white',
-              border: 'none',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            Выйти
-          </button>
+    <div style={{ 
+      minHeight: '100vh', 
+      background: '#f5f7fa', 
+      padding: '32px 0' 
+    }}>
+      <div style={{ 
+        maxWidth: 1200, 
+        margin: '0 auto', 
+        background: '#fff', 
+        borderRadius: 12, 
+        border: '1px solid #e0e0e0', 
+        padding: 24 
+      }}>
+        
+        {/* Заголовок и навигация */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: 24 
+        }}>
+          <h1 style={{ 
+            fontWeight: 700, 
+            fontSize: 28, 
+            color: '#1a2236', 
+            margin: 0 
+          }}>
+            🏬 Управление пунктами самовывоза
+          </h1>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button
+              onClick={() => navigate('/admin/products')}
+              style={{
+                background: '#6c757d',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              📦 Товары
+            </button>
+            <button
+              onClick={() => navigate('/admin/settings')}
+              style={{
+                background: '#1e88e5',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              ⚙️ Настройки
+            </button>
+            <button
+              onClick={onLogout}
+              style={{
+                background: '#dc3545',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              Выйти
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Форма добавления нового пункта */}
-      <div className="admin-form" style={{ background: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '30px', position: 'relative' }}>
-        <button 
-          type="button" 
-          onClick={() => setNewPoint({ address: '', description: '', workingHours: 'Пн-Пт: 9:00-18:00' })}
-          style={{
-            position: 'absolute',
-            top: 15,
-            right: 15,
-            background: 'none',
-            border: 'none',
-            fontSize: 20,
-            color: '#666',
-            cursor: 'pointer',
-            width: 30,
-            height: 30,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f0f0f0';
-            e.target.style.color = '#333';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'none';
-            e.target.style.color = '#666';
-          }}
-        >
-          ✕
-        </button>
-        <h2 className="admin-header" style={{ marginTop: 0, color: '#333', paddingRight: 40 }}>Добавить новый пункт самовывоза</h2>
-        <form onSubmit={handleAddPoint} style={{ display: 'grid', gap: '15px', maxWidth: '600px' }}>
-          <div>
-            <label className="admin-label" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Адрес: *
-            </label>
-            <input
-              className="admin-input"
-              type="text"
-              value={newPoint.address}
-              onChange={(e) => setNewPoint({ ...newPoint, address: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '14px'
-              }}
-              placeholder="ул. Толе би 216Б"
-              required
-            />
-          </div>
-          <div>
-            <label className="admin-label" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Описание:
-            </label>
-            <textarea
-              className="admin-input"
-              value={newPoint.description}
-              onChange={(e) => setNewPoint({ ...newPoint, description: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '14px',
-                minHeight: '80px',
-                resize: 'vertical'
-              }}
-              placeholder="Дополнительная информация о пункте самовывоза"
-            />
-          </div>
-          <div>
-            <label className="admin-label" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Часы работы:
-            </label>
-            <input
-              className="admin-input"
-              type="text"
-              value={newPoint.workingHours}
-              onChange={(e) => setNewPoint({ ...newPoint, workingHours: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '14px'
-              }}
-              placeholder="Пн-Пт: 9:00-18:00"
-            />
-          </div>
-          <button
-            className="admin-button"
-            type="submit"
-            style={{
-              background: '#28a745',
-              color: 'white',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: 'bold'
-            }}
-          >
-            Добавить пункт самовывоза
-          </button>
-        </form>
-      </div>
 
-      {/* Список существующих пунктов */}
-      <div>
-        <h2 className="admin-header" style={{ color: '#333', marginBottom: '20px' }}>Существующие пункты самовывоза</h2>
-        {pickupPoints.length === 0 ? (
-          <p style={{ color: '#666', fontStyle: 'italic' }}>Пункты самовывоза не найдены</p>
-        ) : (
-          <div style={{ display: 'grid', gap: '15px' }}>
-            {pickupPoints.map((point) => (
-              <div
-                key={point._id}
-                style={{
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  background: 'white'
-                }}
-              >
-                {editingPoint && editingPoint._id === point._id ? (
-                  // Форма редактирования
-                  <form onSubmit={handleUpdatePoint} style={{ display: 'grid', gap: '15px', position: 'relative' }}>
-                    <button 
-                      type="button" 
-                      onClick={cancelEditing}
-                      style={{
-                        position: 'absolute',
-                        top: -10,
-                        right: -10,
-                        background: '#dc3545',
-                        border: 'none',
-                        fontSize: 18,
-                        color: '#fff',
-                        cursor: 'pointer',
-                        width: 30,
-                        height: 30,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '50%',
-                        zIndex: 10
-                      }}
-                    >
-                      ✕
-                    </button>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                        Адрес: *
-                      </label>
-                      <input
-                        type="text"
-                        value={editingPoint.address}
-                        onChange={(e) => setEditingPoint({ ...editingPoint, address: e.target.value })}
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          fontSize: '14px'
-                        }}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                        Описание:
-                      </label>
-                      <textarea
-                        value={editingPoint.description}
-                        onChange={(e) => setEditingPoint({ ...editingPoint, description: e.target.value })}
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          fontSize: '14px',
-                          minHeight: '80px',
-                          resize: 'vertical'
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                        Часы работы:
-                      </label>
-                      <input
-                        type="text"
-                        value={editingPoint.workingHours}
-                        onChange={(e) => setEditingPoint({ ...editingPoint, workingHours: e.target.value })}
-                        style={{
-                          width: '100%',
-                          padding: '10px',
-                          border: '1px solid #ddd',
-                          borderRadius: '4px',
-                          fontSize: '14px'
-                        }}
-                      />
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                      <button
-                        type="submit"
-                        style={{
-                          background: '#007bff',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 16px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '14px'
-                        }}
-                      >
-                        Сохранить
-                      </button>
-                      <button
-                        type="button"
-                        onClick={cancelEditing}
-                        style={{
-                          background: '#6c757d',
-                          color: 'white',
-                          border: 'none',
-                          padding: '8px 16px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '14px'
-                        }}
-                      >
-                        Отмена
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  // Отображение информации
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '15px' }}>
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{point.address}</h3>
-                        {point.description && (
-                          <p style={{ margin: '0 0 10px 0', color: '#666' }}>{point.description}</p>
-                        )}
-                        <p style={{ margin: 0, color: '#888', fontSize: '14px' }}>
-                          <strong>Часы работы:</strong> {point.workingHours}
-                        </p>
-                      </div>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        <button
-                          onClick={() => startEditing(point)}
-                          style={{
-                            background: '#ffc107',
-                            color: '#212529',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px'
-                          }}
-                        >
-                          Редактировать
-                        </button>
-                        <button
-                          onClick={() => handleDeletePoint(point._id)}
-                          style={{
-                            background: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            padding: '6px 12px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '12px'
-                          }}
-                        >
-                          Удалить
-                        </button>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#999' }}>
-                      Создан: {new Date(point.createdAt).toLocaleDateString('ru-RU')}
-                      {point.updatedAt && (
-                        <span> | Обновлен: {new Date(point.updatedAt).toLocaleDateString('ru-RU')}</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
+
+        {/* Уведомления */}
+        {error && (
+          <div style={{
+            background: '#f8d7da',
+            border: '1px solid #f5c6cb',
+            color: '#721c24',
+            padding: '12px 16px',
+            borderRadius: 8,
+            marginBottom: 20
+          }}>
+            ❌ {error}
           </div>
         )}
+
+        {success && (
+          <div style={{
+            background: '#d4edda',
+            border: '1px solid #c3e6cb',
+            color: '#155724',
+            padding: '12px 16px',
+            borderRadius: 8,
+            marginBottom: 20
+          }}>
+            ✅ {success}
+          </div>
+        )}
+
+        {/* Кнопки управления */}
+        <div style={{ marginBottom: 24, display: 'flex', gap: 12 }}>
+          <button
+            onClick={() => {
+              setShowForm(true);
+              setEditingPoint(null);
+              setFormData(initialFormState);
+            }}
+            style={{
+              background: '#28a745',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontSize: 16
+            }}
+          >
+            ➕ Добавить пункт самовывоза
+          </button>
+          
+          <button
+            onClick={async () => {
+              setError('');
+              setSuccess('Тестируем подключение к серверу...');
+              
+              try {
+                // Сначала проверим основной API
+                const productsResponse = await fetch('https://electro-a8bl.onrender.com/api/products');
+                console.log('API продуктов статус:', productsResponse.status);
+                
+                // Затем проверим API пунктов самовывоза
+                const pickupResponse = await fetch('https://electro-a8bl.onrender.com/api/pickup-points');
+                console.log('API пунктов самовывоза статус:', pickupResponse.status);
+                
+                if (pickupResponse.ok) {
+                  setSuccess('✅ Сервер доступен! API пунктов самовывоза работает.');
+                  fetchPickupPoints();
+                } else {
+                  setError(`❌ API пунктов самовывоза недоступен. Статус: ${pickupResponse.status}`);
+                }
+              } catch (error) {
+                console.error('Ошибка тестирования:', error);
+                setError(`❌ Ошибка подключения: ${error.message}`);
+              }
+            }}
+            style={{
+              background: '#17a2b8',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontSize: 16
+            }}
+          >
+            🔄 Тест API
+          </button>
+        </div>
+
+        {/* Форма добавления/редактирования */}
+        {showForm && (
+          <div style={{
+            background: '#f8f9fa',
+            border: '1px solid #e9ecef',
+            borderRadius: 12,
+            padding: 24,
+            marginBottom: 24,
+            position: 'relative'
+          }}>
+            <button
+              onClick={handleCancel}
+              style={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                background: 'none',
+                border: 'none',
+                fontSize: 20,
+                color: '#666',
+                cursor: 'pointer',
+                width: 32,
+                height: 32,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = '#f0f0f0';
+                e.target.style.color = '#333';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'none';
+                e.target.style.color = '#666';
+              }}
+            >
+              ✕
+            </button>
+
+            <h2 style={{ 
+              margin: '0 0 20px 0', 
+              fontSize: 20, 
+              fontWeight: 600, 
+              color: '#333',
+              paddingRight: 40
+            }}>
+              {editingPoint ? 'Редактировать пункт самовывоза' : 'Добавить новый пункт самовывоза'}
+            </h2>
+
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 16 }}>
+              
+              {/* Основная информация */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                    Название пункта *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Например: Главный офис"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      fontSize: 14
+                    }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                    Город *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder="Например: Алматы"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      fontSize: 14
+                    }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                  Адрес *
+                </label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Полный адрес пункта самовывоза"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: 6,
+                    fontSize: 14
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                    Телефон
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+7 (777) 123-45-67"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      fontSize: 14
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                    Часы работы
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.workingHours}
+                    onChange={(e) => setFormData({ ...formData, workingHours: e.target.value })}
+                    placeholder="Пн-Пт: 9:00-18:00"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      fontSize: 14
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                  Описание
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Дополнительная информация о пункте самовывоза"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: 6,
+                    fontSize: 14,
+                    minHeight: 80,
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+
+              {/* Тип доставки */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                    Тип доставки
+                  </label>
+                  <select
+                    value={formData.deliveryType}
+                    onChange={(e) => handleDeliveryTypeChange(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      fontSize: 14,
+                      background: '#fff'
+                    }}
+                  >
+                    {deliveryTypes.map(type => (
+                      <option key={type.value} value={type.value}>
+                        {type.label} {type.cost > 0 ? `(${type.cost} ₸)` : '(Бесплатно)'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, color: '#333' }}>
+                    Стоимость доставки (₸)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.deliveryCost}
+                    onChange={(e) => setFormData({ ...formData, deliveryCost: Number(e.target.value) })}
+                    min="0"
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      border: '1px solid #ddd',
+                      borderRadius: 6,
+                      fontSize: 14
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    style={{ width: 16, height: 16 }}
+                  />
+                  <span style={{ fontWeight: 500, color: '#333' }}>Активный пункт</span>
+                </label>
+              </div>
+
+              {/* Кнопки формы */}
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  style={{
+                    background: '#6c757d',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '10px 20px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    fontSize: 14
+                  }}
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    background: '#28a745',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '10px 20px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    fontSize: 14
+                  }}
+                >
+                  {editingPoint ? 'Сохранить изменения' : 'Добавить пункт'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Список пунктов самовывоза */}
+        <div>
+          <h2 style={{ 
+            fontSize: 20, 
+            fontWeight: 600, 
+            color: '#333', 
+            marginBottom: 16 
+          }}>
+            Существующие пункты самовывоза ({pickupPoints.length})
+          </h2>
+
+          {pickupPoints.length === 0 ? (
+            <div style={{
+              textAlign: 'center',
+              padding: '40px 20px',
+              color: '#666',
+              background: '#f8f9fa',
+              borderRadius: 8,
+              border: '1px dashed #dee2e6'
+            }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🏬</div>
+              <div style={{ fontSize: 16, marginBottom: 8 }}>Пункты самовывоза не найдены</div>
+              <div style={{ fontSize: 14, color: '#999' }}>
+                Добавьте первый пункт самовывоза, нажав кнопку выше
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: 16 }}>
+              {pickupPoints.map((point) => (
+                <div
+                  key={point._id}
+                  style={{
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 12,
+                    padding: 20,
+                    background: point.isActive ? '#fff' : '#f8f9fa',
+                    opacity: point.isActive ? 1 : 0.7
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#333' }}>
+                          {point.name}
+                        </h3>
+                        {getStatusBadge(point.isActive)}
+                      </div>
+                      
+                      <div style={{ marginBottom: 8 }}>
+                        <strong style={{ color: '#666' }}>📍 Адрес:</strong> {point.address}
+                      </div>
+                      
+                      <div style={{ marginBottom: 8 }}>
+                        <strong style={{ color: '#666' }}>🏙️ Город:</strong> {point.city}
+                      </div>
+                      
+                      {point.phone && (
+                        <div style={{ marginBottom: 8 }}>
+                          <strong style={{ color: '#666' }}>📞 Телефон:</strong> {point.phone}
+                        </div>
+                      )}
+                      
+                      <div style={{ marginBottom: 8 }}>
+                        <strong style={{ color: '#666' }}>🕒 Часы работы:</strong> {point.workingHours}
+                      </div>
+                      
+                      <div style={{ marginBottom: 8 }}>
+                        <strong style={{ color: '#666' }}>🚚 Тип доставки:</strong> {getDeliveryTypeLabel(point.deliveryType)}
+                        {point.deliveryCost > 0 ? ` (${point.deliveryCost} ₸)` : ' (Бесплатно)'}
+                      </div>
+                      
+                      {point.description && (
+                        <div style={{ marginBottom: 8 }}>
+                          <strong style={{ color: '#666' }}>📝 Описание:</strong> {point.description}
+                        </div>
+                      )}
+                      
+                      <div style={{ fontSize: 12, color: '#999' }}>
+                        Создан: {new Date(point.createdAt).toLocaleDateString('ru-RU')}
+                        {point.updatedAt && (
+                          <span> | Обновлен: {new Date(point.updatedAt).toLocaleDateString('ru-RU')}</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <button
+                        onClick={() => handleEdit(point)}
+                        style={{
+                          background: '#ffc107',
+                          color: '#212529',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 16px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          fontSize: 13
+                        }}
+                      >
+                        ✏️ Редактировать
+                      </button>
+                      <button
+                        onClick={() => handleDelete(point._id)}
+                        style={{
+                          background: '#dc3545',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 16px',
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          fontSize: 13
+                        }}
+                      >
+                        🗑️ Удалить
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import DeliveryInfo from '../components/DeliveryInfo';
 import '../styles/Product.css';
 import '../styles/Checkout.css';
 import { useLocation } from 'react-router-dom';
@@ -10,6 +11,8 @@ const Checkout = () => {
   const product = location.state?.product;
   const [payment, setPayment] = useState('card');
   const [delivery, setDelivery] = useState('courier');
+  const [selectedCity, setSelectedCity] = useState('Алматы');
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [form, setForm] = useState({ name: '', phone: '', address: '', additionalInfo: '' });
 
   const handleChange = (e) => {
@@ -22,6 +25,8 @@ const Checkout = () => {
   };
 
   const total = product ? Number(product.price) : 0;
+  const deliveryCost = selectedDelivery ? selectedDelivery.cost : 0;
+  const finalTotal = total + deliveryCost;
 
   return (
     <div className="product-page">
@@ -59,12 +64,36 @@ const Checkout = () => {
               </div>
             </div>
             <div style={{ marginBottom: 22, borderBottom: '1px solid #e0e0e0', paddingBottom: 18 }}>
-              <label style={{ fontWeight: 500, color: '#222', display: 'block', marginBottom: 8, fontSize: 17 }}>Доставка</label>
-              <div className="delivery-methods">
-                <label style={{fontSize: 16}}><input type="radio" name="delivery" value="courier" checked={delivery==='courier'} onChange={()=>setDelivery('courier')} /> Курьером</label>
-                <label style={{fontSize: 16}}><input type="radio" name="delivery" value="pickup" checked={delivery==='pickup'} onChange={()=>setDelivery('pickup')} /> Самовывоз</label>
-              </div>
+              <label style={{ fontWeight: 500, color: '#222', display: 'block', marginBottom: 8, fontSize: 17 }}>Город доставки</label>
+              <select 
+                value={selectedCity} 
+                onChange={(e) => setSelectedCity(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: 6,
+                  fontSize: 16,
+                  background: '#fff'
+                }}
+              >
+                <option value="Алматы">Алматы</option>
+                <option value="Астана">Астана</option>
+                <option value="Шымкент">Шымкент</option>
+                <option value="Актобе">Актобе</option>
+                <option value="Караганда">Караганда</option>
+                <option value="Тараз">Тараз</option>
+                <option value="Павлодар">Павлодар</option>
+                <option value="Семей">Семей</option>
+                <option value="Усть-Каменогорск">Усть-Каменогорск</option>
+                <option value="Уральск">Уральск</option>
+              </select>
             </div>
+            
+            <DeliveryInfo 
+              city={selectedCity} 
+              onDeliverySelect={setSelectedDelivery}
+            />
             <div className="form-group">
               <label>Ваше имя</label>
               <input type="text" name="name" value={form.name} onChange={handleChange} required />
@@ -73,7 +102,7 @@ const Checkout = () => {
               <label>Телефон</label>
               <input type="tel" name="phone" value={form.phone} onChange={handleChange} required placeholder="+7 (___) ___-__-__" />
             </div>
-            {delivery === 'courier' && (
+            {selectedDelivery && selectedDelivery.type !== 'pickup' && (
               <div className="form-group">
                 <label>Адрес доставки</label>
                 <input type="text" name="address" value={form.address} onChange={handleChange} required />
@@ -89,8 +118,20 @@ const Checkout = () => {
               />
             </div>
             <div className="total-section">
-              <span style={{fontWeight: 600, fontSize: 18, color: '#222'}}>Итого к оплате:</span>
-              <span style={{color: '#FFB300', fontWeight: 700, fontSize: 22}}>{total.toLocaleString('ru-RU')} ₸</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{fontWeight: 500, fontSize: 16, color: '#666'}}>Стоимость товара:</span>
+                <span style={{fontWeight: 600, fontSize: 16, color: '#333'}}>{total.toLocaleString('ru-RU')} ₸</span>
+              </div>
+              {deliveryCost > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span style={{fontWeight: 500, fontSize: 16, color: '#666'}}>Доставка:</span>
+                  <span style={{fontWeight: 600, fontSize: 16, color: '#333'}}>{deliveryCost.toLocaleString('ru-RU')} ₸</span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e0e0e0', paddingTop: 12 }}>
+                <span style={{fontWeight: 600, fontSize: 18, color: '#222'}}>Итого к оплате:</span>
+                <span style={{color: '#FFB300', fontWeight: 700, fontSize: 22}}>{finalTotal.toLocaleString('ru-RU')} ₸</span>
+              </div>
             </div>
             <button type="submit" className="submit-button">Оформить заказ</button>
             </form>

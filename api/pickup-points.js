@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { MongoClient, ObjectId } = require('mongodb');
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://electro:electro123@cluster0.mongodb.net/electro?retryWrites=true&w=majority";
+const uri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Tanker_tools';
 
 // Получить все пункты самовывоза
 router.get('/', async (req, res) => {
@@ -10,10 +10,10 @@ router.get('/', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('electro');
+    const database = client.db('Tanker_tools');
     const collection = database.collection('pickup_points');
     
-    const pickupPoints = await collection.find({}).toArray();
+    const pickupPoints = await collection.find({}).sort({ createdAt: -1 }).toArray();
     
     await client.close();
     
@@ -24,26 +24,66 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Получить пункты самовывоза по городу
+router.get('/city/:city', async (req, res) => {
+  try {
+    const { city } = req.params;
+    const client = new MongoClient(uri);
+    await client.connect();
+    
+    const database = client.db('Tanker_tools');
+    const collection = database.collection('pickup_points');
+    
+    const pickupPoints = await collection.find({ 
+      city: { $regex: new RegExp(city, 'i') } 
+    }).sort({ createdAt: -1 }).toArray();
+    
+    await client.close();
+    
+    res.json(pickupPoints);
+  } catch (error) {
+    console.error('Ошибка при получении пунктов самовывоза по городу:', error);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 // Добавить новый пункт самовывоза
 router.post('/', async (req, res) => {
   try {
-    const { address, description, workingHours } = req.body;
+    const { 
+      name, 
+      address, 
+      city, 
+      description, 
+      workingHours, 
+      phone, 
+      deliveryType, 
+      deliveryCost,
+      isActive = true 
+    } = req.body;
     
-    if (!address) {
-      return res.status(400).json({ error: 'Адрес обязателен' });
+    if (!name || !address || !city) {
+      return res.status(400).json({ error: 'Название, адрес и город обязательны' });
     }
     
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('electro');
+    const database = client.db('Tanker_tools');
     const collection = database.collection('pickup_points');
     
     const newPickupPoint = {
+      name,
       address,
+      city,
       description: description || '',
       workingHours: workingHours || 'Пн-Пт: 9:00-18:00',
-      createdAt: new Date()
+      phone: phone || '',
+      deliveryType: deliveryType || 'pickup', // pickup, indriver, yandex, kazpost, cdek, air
+      deliveryCost: deliveryType === 'pickup' ? 0 : (deliveryCost || 0),
+      isActive: isActive !== false,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     
     const result = await collection.insertOne(newPickupPoint);
@@ -52,7 +92,8 @@ router.post('/', async (req, res) => {
     
     res.status(201).json({ 
       message: 'Пункт самовывоза добавлен',
-      id: result.insertedId 
+      id: result.insertedId,
+      pickupPoint: newPickupPoint
     });
   } catch (error) {
     console.error('Ошибка при добавлении пункта самовывоза:', error);
@@ -64,28 +105,44 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { address, description, workingHours } = req.body;
+    const { 
+      name, 
+      address, 
+      city, 
+      description, 
+      workingHours, 
+      phone, 
+      deliveryType, 
+      deliveryCost,
+      isActive 
+    } = req.body;
     
-    if (!address) {
-      return res.status(400).json({ error: 'Адрес обязателен' });
+    if (!name || !address || !city) {
+      return res.status(400).json({ error: 'Название, адрес и город обязательны' });
     }
     
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('electro');
+    const database = client.db('Tanker_tools');
     const collection = database.collection('pickup_points');
+    
+    const updateData = {
+      name,
+      address,
+      city,
+      description: description || '',
+      workingHours: workingHours || 'Пн-Пт: 9:00-18:00',
+      phone: phone || '',
+      deliveryType: deliveryType || 'pickup',
+      deliveryCost: deliveryType === 'pickup' ? 0 : (deliveryCost || 0),
+      isActive: isActive !== false,
+      updatedAt: new Date()
+    };
     
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { 
-        $set: { 
-          address, 
-          description: description || '',
-          workingHours: workingHours || 'Пн-Пт: 9:00-18:00',
-          updatedAt: new Date()
-        } 
-      }
+      { $set: updateData }
     );
     
     await client.close();
@@ -94,7 +151,10 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Пункт самовывоза не найден' });
     }
     
-    res.json({ message: 'Пункт самовывоза обновлен' });
+    res.json({ 
+      message: 'Пункт самовывоза обновлен',
+      updatedPoint: updateData
+    });
   } catch (error) {
     console.error('Ошибка при обновлении пункта самовывоза:', error);
     res.status(500).json({ error: 'Ошибка сервера' });
@@ -109,7 +169,7 @@ router.delete('/:id', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('electro');
+    const database = client.db('Tanker_tools');
     const collection = database.collection('pickup_points');
     
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
@@ -123,6 +183,84 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'Пункт самовывоза удален' });
   } catch (error) {
     console.error('Ошибка при удалении пункта самовывоза:', error);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+// Получить информацию о доставке для города
+router.get('/delivery/:city', async (req, res) => {
+  try {
+    const { city } = req.params;
+    const client = new MongoClient(uri);
+    await client.connect();
+    
+    const database = client.db('Tanker_tools');
+    const collection = database.collection('pickup_points');
+    
+    // Проверяем, есть ли пункты самовывоза в городе
+    const pickupPoints = await collection.find({ 
+      city: { $regex: new RegExp(city, 'i') },
+      isActive: true 
+    }).toArray();
+    
+    await client.close();
+    
+    // Если это Алматы и есть пункты самовывоза - бесплатная доставка
+    const isAlmaty = city.toLowerCase().includes('алматы') || city.toLowerCase().includes('алмата');
+    
+    const deliveryInfo = {
+      city,
+      isAlmaty,
+      hasPickupPoints: pickupPoints.length > 0,
+      deliveryOptions: []
+    };
+    
+    if (isAlmaty && pickupPoints.length > 0) {
+      deliveryInfo.deliveryOptions.push({
+        type: 'pickup',
+        name: 'Самовывоз',
+        cost: 0,
+        description: 'Бесплатно'
+      });
+    } else {
+      // Для других городов - платные варианты доставки
+      deliveryInfo.deliveryOptions = [
+        {
+          type: 'indriver',
+          name: 'InDriver',
+          cost: 2000,
+          description: 'Курьерская доставка'
+        },
+        {
+          type: 'yandex',
+          name: 'Яндекс.Доставка',
+          cost: 2500,
+          description: 'Курьерская доставка'
+        },
+        {
+          type: 'kazpost',
+          name: 'Казпочта',
+          cost: 1500,
+          description: 'Почтовая доставка'
+        },
+        {
+          type: 'cdek',
+          name: 'СДЭК',
+          cost: 3000,
+          description: 'Экспресс доставка'
+        },
+        {
+          type: 'air',
+          name: 'Авиа доставка',
+          cost: 5000,
+          description: 'Быстрая авиа доставка'
+        }
+      ];
+    }
+    
+    res.json(deliveryInfo);
+  } catch (error) {
+    console.error('Ошибка при получении информации о доставке:', error);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
