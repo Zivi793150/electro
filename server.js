@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB подключение
-const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/Tanker_tools';
+const mongoUri = process.env.MONGO_URI || 'mongodb+srv://electro:electro123@cluster0.mongodb.net/Tanker_products?retryWrites=true&w=majority';
 const PORT = process.env.PORT || 5000;
 
 mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })

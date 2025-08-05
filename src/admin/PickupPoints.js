@@ -364,15 +364,26 @@ const PickupPoints = ({ onLogout }) => {
                 const productsResponse = await fetch('https://electro-a8bl.onrender.com/api/products');
                 console.log('API продуктов статус:', productsResponse.status);
                 
-                // Затем проверим API пунктов самовывоза
-                const pickupResponse = await fetch('https://electro-a8bl.onrender.com/api/pickup-points');
-                console.log('API пунктов самовывоза статус:', pickupResponse.status);
+                // Затем проверим тестовый endpoint API пунктов самовывоза
+                const testResponse = await fetch('https://electro-a8bl.onrender.com/api/pickup-points/test');
+                console.log('Тестовый API статус:', testResponse.status);
                 
-                if (pickupResponse.ok) {
-                  setSuccess('✅ Сервер доступен! API пунктов самовывоза работает.');
+                if (testResponse.ok) {
+                  const testData = await testResponse.json();
+                  console.log('Тестовые данные:', testData);
+                  setSuccess(`✅ Сервер доступен! База данных: ${testData.database}, Коллекции: ${testData.collections.join(', ')}`);
                   fetchPickupPoints();
                 } else {
-                  setError(`❌ API пунктов самовывоза недоступен. Статус: ${pickupResponse.status}`);
+                  // Если тестовый endpoint не работает, проверим основной
+                  const pickupResponse = await fetch('https://electro-a8bl.onrender.com/api/pickup-points');
+                  console.log('API пунктов самовывоза статус:', pickupResponse.status);
+                  
+                  if (pickupResponse.ok) {
+                    setSuccess('✅ Сервер доступен! API пунктов самовывоза работает.');
+                    fetchPickupPoints();
+                  } else {
+                    setError(`❌ API пунктов самовывоза недоступен. Статус: ${pickupResponse.status}`);
+                  }
                 }
               } catch (error) {
                 console.error('Ошибка тестирования:', error);
