@@ -4,6 +4,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showAllOptions, setShowAllOptions] = useState(false);
 
   const API_URL = 'https://electro-a8bl.onrender.com/api/pickup-points';
 
@@ -85,10 +86,13 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
 
   // Компактный вид для страницы товара
   if (compact) {
+    const visibleOptions = showAllOptions ? deliveryInfo.deliveryOptions : deliveryInfo.deliveryOptions.slice(0, 3);
+    const hasMoreOptions = deliveryInfo.deliveryOptions.length > 3;
+
     return (
       <div style={{ marginBottom: 12 }}>
         <div style={{ display: 'grid', gap: 8 }}>
-          {deliveryInfo.deliveryOptions.slice(0, 3).map((option, index) => (
+          {visibleOptions.map((option, index) => (
             <div
               key={index}
               onClick={() => handleDeliverySelect(option)}
@@ -102,13 +106,17 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
                 fontSize: '0.85rem',
                 boxShadow: selectedDelivery && selectedDelivery.type === option.type ? '0 2px 8px rgba(255, 193, 7, 0.3)' : 'none'
               }}
-              onMouseOver={(e) => {
-                e.target.style.borderColor = '#ffc107';
-                e.target.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.2)';
+              onMouseEnter={(e) => {
+                if (!selectedDelivery || selectedDelivery.type !== option.type) {
+                  e.currentTarget.style.borderColor = '#ffc107';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.2)';
+                }
               }}
-              onMouseOut={(e) => {
-                e.target.style.borderColor = '#e0e0e0';
-                e.target.style.boxShadow = 'none';
+              onMouseLeave={(e) => {
+                if (!selectedDelivery || selectedDelivery.type !== option.type) {
+                  e.currentTarget.style.borderColor = '#e0e0e0';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
               }}
             >
               <div style={{ 
@@ -154,15 +162,32 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
           ))}
         </div>
 
-        {deliveryInfo.deliveryOptions.length > 3 && (
-          <div style={{ 
-            textAlign: 'center', 
-            fontSize: '0.8rem', 
-            color: '#666',
-            marginTop: 6
-          }}>
-            + еще {deliveryInfo.deliveryOptions.length - 3} варианта
-          </div>
+        {hasMoreOptions && (
+          <button
+            onClick={() => setShowAllOptions(!showAllOptions)}
+            style={{
+              background: 'transparent',
+              border: '1px solid #e0e0e0',
+              borderRadius: 6,
+              padding: '8px 16px',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              color: '#666',
+              marginTop: 8,
+              width: '100%',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.borderColor = '#ffc107';
+              e.target.style.color = '#ffc107';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.borderColor = '#e0e0e0';
+              e.target.style.color = '#666';
+            }}
+          >
+            {showAllOptions ? 'Скрыть' : `+ еще ${deliveryInfo.deliveryOptions.length - 3} варианта`}
+          </button>
         )}
       </div>
     );

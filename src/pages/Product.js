@@ -371,21 +371,7 @@ const Product = () => {
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
-                    {selectedDelivery && selectedDelivery.cost > 0 && (
-                      <div style={{
-                        fontSize: '0.8rem',
-                        color: '#666',
-                        marginTop: 4,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 4
-                      }}>
-                        <span>+ доставка {selectedDelivery.cost} ₸</span>
-                        <span style={{color: '#ffc107', fontWeight: 600}}>
-                          = {(Number(product.price) + selectedDelivery.cost).toLocaleString('ru-RU')} ₸
-                        </span>
-                      </div>
-                    )}
+
                     {product.article && (
                       <div style={{
                         fontSize: '0.85rem', 
