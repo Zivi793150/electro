@@ -489,7 +489,20 @@ const Product = () => {
                 style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
               >
                 <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" width="200" height="120" />
+                  <picture style={{width: '100%', height: '100%'}}>
+                    <source 
+                      srcSet={product.image ? product.image.replace(/\.(jpg|jpeg|png)$/i, '.webp') : '/images/products/placeholder.webp'} 
+                      type="image/webp"
+                    />
+                    <img 
+                      src={product.image || '/images/products/placeholder.png'} 
+                      alt={product.name} 
+                      style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
+                      loading="lazy"
+                      width="200"
+                      height="120"
+                    />
+                  </picture>
                 </div>
                 <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
                 <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
@@ -513,7 +526,20 @@ const Product = () => {
                 style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
               >
                 <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} loading="lazy" width="200" height="120" />
+                  <picture style={{width: '100%', height: '100%'}}>
+                    <source 
+                      srcSet={product.image ? product.image.replace(/\.(jpg|jpeg|png)$/i, '.webp') : '/images/products/placeholder.webp'} 
+                      type="image/webp"
+                    />
+                    <img 
+                      src={product.image || '/images/products/placeholder.png'} 
+                      alt={product.name} 
+                      style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
+                      loading="lazy"
+                      width="200"
+                      height="120"
+                    />
+                  </picture>
                 </div>
                 <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
                 <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>

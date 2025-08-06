@@ -38,12 +38,24 @@ const upload = multer({
 // Middleware для конвертации в WebP
 const convertToWebP = async (req, res, next) => {
   if (!req.file) {
+    console.log('❌ Нет файла для конвертации');
     return next();
   }
 
   try {
     const originalPath = req.file.path;
     const webpPath = originalPath.replace(/\.[^/.]+$/, '.webp');
+    
+    console.log('🔍 Начинаем конвертацию в WebP:');
+    console.log('   Оригинальный файл:', originalPath);
+    console.log('   WebP файл будет создан:', webpPath);
+    console.log('   Размер оригинального файла:', req.file.size, 'байт');
+    
+    // Проверяем, существует ли оригинальный файл
+    if (!fs.existsSync(originalPath)) {
+      console.error('❌ Оригинальный файл не найден:', originalPath);
+      return next();
+    }
     
     // Конвертируем в WebP с оптимизацией
     await sharp(originalPath)
@@ -53,15 +65,24 @@ const convertToWebP = async (req, res, next) => {
       })
       .toFile(webpPath);
 
+    // Проверяем, что webp файл создался
+    if (fs.existsSync(webpPath)) {
+      const webpStats = fs.statSync(webpPath);
+      console.log(`✅ Изображение конвертировано в WebP: ${originalPath} -> ${webpPath}`);
+      console.log(`   Размер WebP файла: ${webpStats.size} байт`);
+    } else {
+      console.error('❌ WebP файл не был создан:', webpPath);
+    }
+
     // Добавляем информацию о WebP версии в req.file
     req.file.webpPath = webpPath;
     req.file.webpUrl = webpPath.replace('public', '');
     
-    console.log(`✅ Изображение конвертировано в WebP: ${originalPath} -> ${webpPath}`);
-    
     next();
   } catch (error) {
     console.error('❌ Ошибка конвертации в WebP:', error);
+    console.error('   Детали ошибки:', error.message);
+    console.error('   Стек вызовов:', error.stack);
     next(); // Продолжаем даже если конвертация не удалась
   }
 };
