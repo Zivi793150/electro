@@ -26,10 +26,12 @@ function ProductMerge({ onLogout }) {
       setLoading(true);
       const response = await fetch(`${API_URL}/products`);
       const data = await response.json();
-      setProducts(data);
+      // Проверяем, что data является массивом
+      setProducts(Array.isArray(data) ? data : []);
     } catch (err) {
       setError('Ошибка загрузки товаров');
       console.error(err);
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -40,9 +42,11 @@ function ProductMerge({ onLogout }) {
     try {
       const response = await fetch(`${API_URL}/master-products`);
       const data = await response.json();
-      setMasterProducts(data);
+      // Проверяем, что data является массивом
+      setMasterProducts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Ошибка загрузки мастер-товаров:', err);
+      setMasterProducts([]);
     }
   };
 
@@ -64,10 +68,12 @@ function ProductMerge({ onLogout }) {
 
   // Выбор всех товаров
   const handleSelectAll = () => {
+    if (!Array.isArray(products)) return;
+    
     if (selectedProducts.length === products.length) {
       setSelectedProducts([]);
     } else {
-      setSelectedProducts(products.map(p => p._id));
+      setSelectedProducts(products.filter(p => p && p._id).map(p => p._id));
     }
   };
 
@@ -174,7 +180,8 @@ function ProductMerge({ onLogout }) {
 
   // Получение выбранных товаров
   const getSelectedProductObjects = () => {
-    return products.filter(p => selectedProducts.includes(p._id));
+    if (!Array.isArray(products)) return [];
+    return products.filter(p => p && p._id && selectedProducts.includes(p._id));
   };
 
   return (
@@ -273,7 +280,7 @@ function ProductMerge({ onLogout }) {
                 onClick={handleSelectAll}
                 className="btn-secondary"
               >
-                {selectedProducts.length === products.length ? 'Снять выделение' : 'Выбрать все'}
+                                 {Array.isArray(products) && selectedProducts.length === products.length ? 'Снять выделение' : 'Выбрать все'}
               </button>
               <button 
                 onClick={handleMergeClick}
@@ -289,19 +296,19 @@ function ProductMerge({ onLogout }) {
             <div className="loading">Загрузка товаров...</div>
           ) : (
             <div className="products-grid">
-              {products.map(product => (
+              {Array.isArray(products) && products.map(product => (
                 <div 
-                  key={product._id} 
+                  key={product._id || Math.random()} 
                   className={`product-card ${selectedProducts.includes(product._id) ? 'selected' : ''}`}
-                  onClick={() => handleProductSelect(product._id)}
+                  onClick={() => product._id && handleProductSelect(product._id)}
                 >
-                  <div className="product-image">
-                    <img src={product.image || '/images/products/placeholder.png'} alt={product.name} />
-                  </div>
-                  <div className="product-info">
-                    <h3>{product.name}</h3>
-                    <p className="product-price">{product.price} ₸</p>
-                    <p className="product-article">Артикул: {product.article || 'Нет'}</p>
+                                     <div className="product-image">
+                     <img src={product.image || '/images/products/placeholder.png'} alt={product.name || 'Товар'} />
+                   </div>
+                                     <div className="product-info">
+                     <h3>{product.name || 'Без названия'}</h3>
+                     <p className="product-price">{product.price || '0'} ₸</p>
+                     <p className="product-article">Артикул: {product.article || 'Нет'}</p>
                     {product.characteristics && (
                       <div className="product-characteristics">
                         <small>Характеристики:</small>
@@ -314,14 +321,14 @@ function ProductMerge({ onLogout }) {
                       </div>
                     )}
                   </div>
-                  <div className="product-checkbox">
-                    <input 
-                      type="checkbox" 
-                      checked={selectedProducts.includes(product._id)}
-                      onChange={() => handleProductSelect(product._id)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </div>
+                                     <div className="product-checkbox">
+                     <input 
+                       type="checkbox" 
+                       checked={product._id ? selectedProducts.includes(product._id) : false}
+                       onChange={() => product._id && handleProductSelect(product._id)}
+                       onClick={(e) => e.stopPropagation()}
+                     />
+                   </div>
                 </div>
               ))}
             </div>
@@ -406,15 +413,15 @@ function ProductMerge({ onLogout }) {
                 <div className="selected-products-preview">
                   <h4>Выбранные товары ({selectedProducts.length}):</h4>
                   <div className="selected-products-list">
-                    {getSelectedProductObjects().map(product => (
-                      <div key={product._id} className="selected-product-item">
-                        <img src={product.image || '/images/products/placeholder.png'} alt={product.name} />
-                        <div>
-                          <strong>{product.name}</strong>
-                          <span>{product.price} ₸</span>
-                        </div>
-                      </div>
-                    ))}
+                                         {getSelectedProductObjects().map(product => (
+                       <div key={product._id || Math.random()} className="selected-product-item">
+                         <img src={product.image || '/images/products/placeholder.png'} alt={product.name || 'Товар'} />
+                         <div>
+                           <strong>{product.name || 'Без названия'}</strong>
+                           <span>{product.price || '0'} ₸</span>
+                         </div>
+                       </div>
+                     ))}
                   </div>
                 </div>
 
@@ -433,7 +440,7 @@ function ProductMerge({ onLogout }) {
 
         <div className="product-merge-section">
           <h2>Существующие мастер-товары</h2>
-          {masterProducts.length === 0 ? (
+          {!Array.isArray(masterProducts) || masterProducts.length === 0 ? (
             <p>Пока нет объединенных товаров</p>
           ) : (
             <div className="master-products-list">
@@ -442,8 +449,8 @@ function ProductMerge({ onLogout }) {
                   <div className="master-product-info">
                     <h3>{masterProduct.name}</h3>
                     <p>Категория: {masterProduct.category}</p>
-                    <p>Типы вариаций: {masterProduct.variationTypes.join(', ')}</p>
-                    <p>Создан: {new Date(masterProduct.createdAt).toLocaleDateString()}</p>
+                    <p>Типы вариаций: {Array.isArray(masterProduct.variationTypes) ? masterProduct.variationTypes.join(', ') : 'Не указано'}</p>
+                    <p>Создан: {masterProduct.createdAt ? new Date(masterProduct.createdAt).toLocaleDateString() : 'Не указано'}</p>
                   </div>
                   <div className="master-product-actions">
                     <button 

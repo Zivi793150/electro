@@ -544,15 +544,7 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
 // Получить все мастер-товары
 app.get('/api/master-products', async (req, res) => {
   try {
-    const masterProducts = await MasterProduct.find({ isActive: true })
-      .populate({
-        path: 'variations',
-        model: 'ProductVariation',
-        populate: {
-          path: 'productId',
-          model: 'Product'
-        }
-      });
+    const masterProducts = await MasterProduct.find({ isActive: true });
     res.json(masterProducts);
   } catch (err) {
     console.error('Ошибка получения мастер-товаров:', err);
@@ -563,22 +555,24 @@ app.get('/api/master-products', async (req, res) => {
 // Получить один мастер-товар с вариациями
 app.get('/api/master-products/:id', async (req, res) => {
   try {
-    const masterProduct = await MasterProduct.findById(req.params.id)
-      .populate({
-        path: 'variations',
-        model: 'ProductVariation',
-        match: { isActive: true },
-        populate: {
-          path: 'productId',
-          model: 'Product'
-        }
-      });
+    const masterProduct = await MasterProduct.findById(req.params.id);
     
     if (!masterProduct) {
       return res.status(404).json({ error: 'Мастер-товар не найден' });
     }
     
-    res.json(masterProduct);
+    // Получаем вариации отдельно
+    const variations = await ProductVariation.find({ 
+      masterProductId: req.params.id,
+      isActive: true 
+    }).populate('productId');
+    
+    const result = {
+      ...masterProduct.toObject(),
+      variations
+    };
+    
+    res.json(result);
   } catch (err) {
     console.error('Ошибка получения мастер-товара:', err);
     res.status(500).json({ error: 'Ошибка при получении мастер-товара' });
