@@ -2,6 +2,8 @@ const multer = require('multer');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
+const FormData = require('form-data');
 
 // Настройка multer для загрузки файлов
 const storage = multer.diskStorage({
@@ -130,8 +132,55 @@ const createImageSizes = async (req, res, next) => {
   }
 };
 
+// Функция для отправки файла на upload.php
+async function uploadToPlesk(localFilePath, remoteUploadUrl) {
+  const form = new FormData();
+  form.append('file', fs.createReadStream(localFilePath));
+  const response = await axios.post(remoteUploadUrl, form, {
+    headers: form.getHeaders(),
+    maxContentLength: Infinity,
+    maxBodyLength: Infinity,
+    timeout: 20000,
+  });
+  return response.data;
+}
+
+// Middleware для отправки файлов на Plesk после обработки
+const uploadToPleskMiddleware = async (req, res, next) => {
+  if (!req.file) return next();
+  try {
+    // Укажи свой URL upload.php:
+    const PLESK_UPLOAD_URL = 'https://www.eltok.kz/upload.php';
+    // Загружаем оригинал
+    const origResult = await uploadToPlesk(req.file.path, PLESK_UPLOAD_URL);
+    if (origResult.success && origResult.files && origResult.files[0]) {
+      req.file.pleskUrl = origResult.files[0];
+      // Удаляем локальный оригинал
+      fs.unlinkSync(req.file.path);
+    } else {
+      console.error('Ошибка загрузки оригинала на Plesk:', origResult);
+    }
+    // Загружаем webp
+    if (req.file.webpPath && fs.existsSync(req.file.webpPath)) {
+      const webpResult = await uploadToPlesk(req.file.webpPath, PLESK_UPLOAD_URL);
+      if (webpResult.success && webpResult.files && webpResult.files[0]) {
+        req.file.pleskWebpUrl = webpResult.files[0];
+        // Удаляем локальный webp
+        fs.unlinkSync(req.file.webpPath);
+      } else {
+        console.error('Ошибка загрузки webp на Plesk:', webpResult);
+      }
+    }
+    next();
+  } catch (err) {
+    console.error('Ошибка отправки на Plesk:', err);
+    next();
+  }
+};
+
 module.exports = {
   upload: upload.single('image'),
   convertToWebP,
-  createImageSizes
+  createImageSizes,
+  uploadToPleskMiddleware
 }; 

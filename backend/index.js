@@ -99,10 +99,10 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // Импортируем middleware для загрузки
-const { upload, convertToWebP, createImageSizes } = require('./upload');
+const { upload, convertToWebP, createImageSizes, uploadToPleskMiddleware } = require('./upload');
 
 // API endpoint для загрузки изображений
-app.post('/api/upload', upload, convertToWebP, createImageSizes, async (req, res) => {
+app.post('/api/upload', upload, convertToWebP, createImageSizes, uploadToPleskMiddleware, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Файл не загружен' });
@@ -111,13 +111,13 @@ app.post('/api/upload', upload, convertToWebP, createImageSizes, async (req, res
     const response = {
       original: {
         filename: req.file.filename,
-        path: req.file.path.replace('public', ''),
+        path: req.file.pleskUrl || '',
         size: req.file.size,
         mimetype: req.file.mimetype
       },
-      webp: req.file.webpPath ? {
-        path: req.file.webpUrl,
-        filename: path.basename(req.file.webpPath)
+      webp: req.file.pleskWebpUrl ? {
+        path: req.file.pleskWebpUrl,
+        filename: req.file.pleskWebpUrl.split('/').pop()
       } : null,
       variants: req.file.variants || {},
       message: 'Изображение успешно загружено и оптимизировано'
