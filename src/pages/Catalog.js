@@ -71,25 +71,15 @@ const Catalog = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch('https://electro-a8bl.onrender.com/api/products-unified')
+    fetch(API_URL)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
         setLoading(false);
       })
       .catch(err => {
-        console.error('Ошибка загрузки объединенных товаров, пробуем обычные:', err);
-        // Fallback к обычным товарам
-        fetch(API_URL)
-          .then(res => res.json())
-          .then(data => {
-            setProducts(data);
-            setLoading(false);
-          })
-          .catch(err => {
-            setError('Ошибка загрузки товаров');
-            setLoading(false);
-          });
+        setError('Ошибка загрузки товаров');
+        setLoading(false);
       });
   }, []);
 
@@ -294,7 +284,7 @@ const Catalog = () => {
             <div className="catalog-products-grid" style={{gap: 0}}>
               {currentProducts.map(product => (
                 <Link
-                  to={product.isGroup ? `/product-group/${encodeURIComponent(product.baseName)}` : `/product/${product._id}`}
+                  to={`/product/${product._id}`}
                   key={product._id}
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >
@@ -320,14 +310,7 @@ const Catalog = () => {
                     </div>
                     <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
                     <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '80px'}}>
-                      <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '20px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>
-                        {product.name}
-                        {product.isGroup && product.voltages && (
-                          <div style={{fontSize: '0.75rem', color: '#666', marginTop: '2px', fontWeight: 400}}>
-                            {product.voltages.join(', ')} В
-                          </div>
-                        )}
-                      </span>
+                      <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '20px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                       <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
                         <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                       </div>

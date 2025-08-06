@@ -252,7 +252,6 @@ function ProductForm({ onClose, onSuccess, initialData }) {
           <div style={{marginBottom:12}}>
             <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Название товара *</label>
             <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Введите название товара" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
-            <small style={{color:'#6c757d',fontSize:12}}>Для группировки товаров по вольтам используйте формат: "Название 220 Вольт"</small>
           </div>
           
           <div style={{marginBottom:12}}>
@@ -544,9 +543,9 @@ const ProductList = ({ onLogout }) => {
                 🗑️ Удалить выбранные ({selectedProducts.length})
               </button>
             )}
+            <button onClick={() => navigate('/admin/merge-products')} style={{background: '#9c27b0', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🔗 Объединить товары</button>
             <button onClick={() => navigate('/admin/settings')} style={{background: '#1e88e5', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>⚙️ Настройки</button>
             <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
-            <button onClick={() => window.open('/admin/product-groups', '_blank')} style={{background: '#9c27b0', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>⚡ Группы товаров</button>
             <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>
           </div>
         </div>

@@ -45,6 +45,37 @@ app.get('/', (req, res) => {
 const productSchema = new mongoose.Schema({}, { strict: false, collection: 'products' });
 const Product = mongoose.model('Product', productSchema);
 
+// Модель для вариаций товаров
+const productVariationSchema = new mongoose.Schema({
+  masterProductId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  variationType: { type: String, required: true }, // например: 'voltage', 'power', 'size'
+  variationValue: { type: String, required: true }, // например: '950W', '1100W'
+  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  price: { type: String, required: true },
+  article: { type: String },
+  characteristics: { type: mongoose.Schema.Types.Mixed },
+  equipment: { type: mongoose.Schema.Types.Mixed },
+  images: { type: [String], default: [] },
+  isActive: { type: Boolean, default: true }
+}, { collection: 'product_variations' });
+
+const ProductVariation = mongoose.model('ProductVariation', productVariationSchema);
+
+// Модель для мастер-товаров (объединенных товаров)
+const masterProductSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  category: { type: String, required: true },
+  description: { type: String },
+  shortDescription: { type: String },
+  mainImage: { type: String },
+  variationTypes: { type: [String], default: [] }, // типы вариаций: ['voltage', 'power']
+  isActive: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+}, { collection: 'master_products' });
+
+const MasterProduct = mongoose.model('MasterProduct', masterProductSchema);
+
 // Модель информации сайта
 const informationSchema = new mongoose.Schema({
   city: { type: String, default: 'Алматы' },
@@ -508,186 +539,306 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
   }
 });
 
-// API для работы с группами товаров по вольтам
+// ========== API ENDPOINTS ДЛЯ ВАРИАЦИЙ ТОВАРОВ ==========
 
-// Получить все группы товаров
-app.get('/api/product-groups', async (req, res) => {
+// Получить все мастер-товары
+app.get('/api/master-products', async (req, res) => {
   try {
-    const products = await Product.find({});
-    
-    // Группируем товары по названию (без учета вольтов)
-    const groups = {};
-    
-    products.forEach(product => {
-      if (product.name) {
-        // Извлекаем базовое название без вольтов
-        const baseName = product.name.replace(/\s*\d+\s*[Вв]ольт?.*$/i, '').trim();
-        
-        if (!groups[baseName]) {
-          groups[baseName] = {
-            baseName,
-            products: [],
-            voltages: []
-          };
+    const masterProducts = await MasterProduct.find({ isActive: true })
+      .populate({
+        path: 'variations',
+        model: 'ProductVariation',
+        populate: {
+          path: 'productId',
+          model: 'Product'
         }
-        
-        // Извлекаем вольты из названия
-        const voltageMatch = product.name.match(/(\d+)\s*[Вв]ольт?/i);
-        const voltage = voltageMatch ? voltageMatch[1] : null;
-        
-        groups[baseName].products.push({
-          id: product._id,
-          name: product.name,
-          price: product.price,
-          voltage: voltage,
-          image: product.image,
-          imageVariants: product.imageVariants,
-          category: product.category,
-          article: product.article
-        });
-        
-        if (voltage && !groups[baseName].voltages.includes(voltage)) {
-          groups[baseName].voltages.push(voltage);
-        }
-      }
-    });
-    
-    // Фильтруем только группы с несколькими вольтами
-    const multiVoltageGroups = Object.values(groups).filter(group => group.voltages.length > 1);
-    
-    res.json(multiVoltageGroups);
+      });
+    res.json(masterProducts);
   } catch (err) {
-    console.error('Ошибка получения групп товаров:', err);
-    res.status(500).json({ error: 'Ошибка при получении групп товаров' });
+    console.error('Ошибка получения мастер-товаров:', err);
+    res.status(500).json({ error: 'Ошибка при получении мастер-товаров' });
   }
 });
 
-// Получить группу товаров по базовому названию
-app.get('/api/product-groups/:baseName', async (req, res) => {
+// Получить один мастер-товар с вариациями
+app.get('/api/master-products/:id', async (req, res) => {
   try {
-    const { baseName } = req.params;
-    const products = await Product.find({
-      name: { $regex: new RegExp(baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }
-    });
+    const masterProduct = await MasterProduct.findById(req.params.id)
+      .populate({
+        path: 'variations',
+        model: 'ProductVariation',
+        match: { isActive: true },
+        populate: {
+          path: 'productId',
+          model: 'Product'
+        }
+      });
     
-    if (products.length === 0) {
-      return res.status(404).json({ error: 'Группа товаров не найдена' });
+    if (!masterProduct) {
+      return res.status(404).json({ error: 'Мастер-товар не найден' });
     }
     
-    const group = {
-      baseName,
-      products: [],
-      voltages: []
-    };
+    res.json(masterProduct);
+  } catch (err) {
+    console.error('Ошибка получения мастер-товара:', err);
+    res.status(500).json({ error: 'Ошибка при получении мастер-товара' });
+  }
+});
+
+// Создать новый мастер-товар
+app.post('/api/master-products', async (req, res) => {
+  try {
+    const masterProduct = new MasterProduct(req.body);
+    const savedMasterProduct = await masterProduct.save();
+    res.status(201).json(savedMasterProduct);
+  } catch (err) {
+    console.error('Ошибка создания мастер-товара:', err);
+    res.status(500).json({ error: 'Ошибка при создании мастер-товара' });
+  }
+});
+
+// Обновить мастер-товар
+app.put('/api/master-products/:id', async (req, res) => {
+  try {
+    const masterProduct = await MasterProduct.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedAt: Date.now() },
+      { new: true, runValidators: true }
+    );
+    if (!masterProduct) return res.status(404).json({ error: 'Мастер-товар не найден' });
+    res.json(masterProduct);
+  } catch (err) {
+    console.error('Ошибка обновления мастер-товара:', err);
+    res.status(500).json({ error: 'Ошибка при обновлении мастер-товара' });
+  }
+});
+
+// Удалить мастер-товар
+app.delete('/api/master-products/:id', async (req, res) => {
+  try {
+    const masterProduct = await MasterProduct.findByIdAndDelete(req.params.id);
+    if (!masterProduct) return res.status(404).json({ error: 'Мастер-товар не найден' });
     
-    products.forEach(product => {
-      const voltageMatch = product.name.match(/(\d+)\s*[Вв]ольт?/i);
-      const voltage = voltageMatch ? voltageMatch[1] : null;
+    // Удаляем все связанные вариации
+    await ProductVariation.deleteMany({ masterProductId: req.params.id });
+    
+    res.json({ success: true, message: 'Мастер-товар и все вариации удалены' });
+  } catch (err) {
+    console.error('Ошибка удаления мастер-товара:', err);
+    res.status(500).json({ error: 'Ошибка при удалении мастер-товара' });
+  }
+});
+
+// Получить все вариации товара
+app.get('/api/product-variations/:masterProductId', async (req, res) => {
+  try {
+    const variations = await ProductVariation.find({ 
+      masterProductId: req.params.masterProductId,
+      isActive: true 
+    }).populate('productId');
+    res.json(variations);
+  } catch (err) {
+    console.error('Ошибка получения вариаций:', err);
+    res.status(500).json({ error: 'Ошибка при получении вариаций' });
+  }
+});
+
+// Создать вариацию товара
+app.post('/api/product-variations', async (req, res) => {
+  try {
+    const variation = new ProductVariation(req.body);
+    const savedVariation = await variation.save();
+    res.status(201).json(savedVariation);
+  } catch (err) {
+    console.error('Ошибка создания вариации:', err);
+    res.status(500).json({ error: 'Ошибка при создании вариации' });
+  }
+});
+
+// Обновить вариацию товара
+app.put('/api/product-variations/:id', async (req, res) => {
+  try {
+    const variation = await ProductVariation.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!variation) return res.status(404).json({ error: 'Вариация не найдена' });
+    res.json(variation);
+  } catch (err) {
+    console.error('Ошибка обновления вариации:', err);
+    res.status(500).json({ error: 'Ошибка при обновлении вариации' });
+  }
+});
+
+// Удалить вариацию товара
+app.delete('/api/product-variations/:id', async (req, res) => {
+  try {
+    const variation = await ProductVariation.findByIdAndDelete(req.params.id);
+    if (!variation) return res.status(404).json({ error: 'Вариация не найдена' });
+    res.json({ success: true, message: 'Вариация удалена' });
+  } catch (err) {
+    console.error('Ошибка удаления вариации:', err);
+    res.status(500).json({ error: 'Ошибка при удалении вариации' });
+  }
+});
+
+// API для объединения товаров в мастер-товар
+app.post('/api/merge-products', async (req, res) => {
+  try {
+    const { productIds, masterProductData, variationType } = req.body;
+    
+    if (!productIds || !Array.isArray(productIds) || productIds.length < 2) {
+      return res.status(400).json({ error: 'Необходимо выбрать минимум 2 товара для объединения' });
+    }
+    
+    if (!masterProductData || !masterProductData.name) {
+      return res.status(400).json({ error: 'Необходимо указать название мастер-товара' });
+    }
+    
+    if (!variationType) {
+      return res.status(400).json({ error: 'Необходимо указать тип вариации' });
+    }
+    
+    // Получаем все товары для объединения
+    const products = await Product.find({ _id: { $in: productIds } });
+    
+    if (products.length !== productIds.length) {
+      return res.status(400).json({ error: 'Некоторые товары не найдены' });
+    }
+    
+    // Создаем мастер-товар
+    const masterProduct = new MasterProduct({
+      ...masterProductData,
+      variationTypes: [variationType]
+    });
+    
+    const savedMasterProduct = await masterProduct.save();
+    
+    // Создаем вариации для каждого товара
+    const variations = [];
+    for (const product of products) {
+      // Извлекаем значение вариации из характеристик или названия
+      let variationValue = '';
       
-      group.products.push({
-        id: product._id,
-        name: product.name,
+      // Пытаемся найти значение в характеристиках
+      if (product.characteristics) {
+        try {
+          const characteristics = typeof product.characteristics === 'string' 
+            ? JSON.parse(product.characteristics) 
+            : product.characteristics;
+          
+          if (Array.isArray(characteristics)) {
+            const powerChar = characteristics.find(char => 
+              char.parameter && char.parameter.toLowerCase().includes('мощность') ||
+              char.parameter && char.parameter.toLowerCase().includes('power')
+            );
+            if (powerChar) {
+              variationValue = powerChar.value;
+            }
+          }
+        } catch (e) {
+          // Если не удалось распарсить JSON, ищем в строке
+          const powerMatch = product.characteristics.match(/(\d+)\s*[ВтW]/i);
+          if (powerMatch) {
+            variationValue = powerMatch[0];
+          }
+        }
+      }
+      
+      // Если не нашли в характеристиках, ищем в названии
+      if (!variationValue) {
+        const powerMatch = product.name.match(/(\d+)\s*[ВтW]/i);
+        if (powerMatch) {
+          variationValue = powerMatch[0];
+        }
+      }
+      
+      // Если все еще не нашли, используем артикул или ID
+      if (!variationValue) {
+        variationValue = product.article || product._id.toString().slice(-6);
+      }
+      
+      const variation = new ProductVariation({
+        masterProductId: savedMasterProduct._id,
+        variationType,
+        variationValue,
+        productId: product._id,
         price: product.price,
-        voltage: voltage,
-        image: product.image,
-        imageVariants: product.imageVariants,
-        category: product.category,
         article: product.article,
         characteristics: product.characteristics,
         equipment: product.equipment,
-        description: product.description
+        images: product.images || []
       });
       
-      if (voltage && !group.voltages.includes(voltage)) {
-        group.voltages.push(voltage);
-      }
+      const savedVariation = await variation.save();
+      variations.push(savedVariation);
+    }
+    
+    res.status(201).json({
+      masterProduct: savedMasterProduct,
+      variations,
+      message: `Успешно объединено ${products.length} товаров в мастер-товар`
     });
     
-    // Сортируем по вольтам
-    group.voltages.sort((a, b) => parseInt(a) - parseInt(b));
-    group.products.sort((a, b) => {
-      const voltageA = a.voltage ? parseInt(a.voltage) : 0;
-      const voltageB = b.voltage ? parseInt(b.voltage) : 0;
-      return voltageA - voltageB;
-    });
-    
-    res.json(group);
   } catch (err) {
-    console.error('Ошибка получения группы товаров:', err);
-    res.status(500).json({ error: 'Ошибка при получении группы товаров' });
+    console.error('Ошибка объединения товаров:', err);
+    res.status(500).json({ error: 'Ошибка при объединении товаров' });
   }
 });
 
-// Получить объединенные товары для каталога
-app.get('/api/products-unified', async (req, res) => {
+// API для получения товара с вариациями (для фронтенда)
+app.get('/api/products/:id/with-variations', async (req, res) => {
   try {
-    const products = await Product.find({});
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Товар не найден' });
+    }
     
-    // Группируем товары
-    const groups = {};
-    const unifiedProducts = [];
+    // Ищем, является ли этот товар частью мастер-товара
+    const variation = await ProductVariation.findOne({ 
+      productId: req.params.id,
+      isActive: true 
+    }).populate('masterProductId');
     
-    products.forEach(product => {
-      if (product.name) {
-        const baseName = product.name.replace(/\s*\d+\s*[Вв]ольт?.*$/i, '').trim();
-        const voltageMatch = product.name.match(/(\d+)\s*[Вв]ольт?/i);
-        const voltage = voltageMatch ? voltageMatch[1] : null;
+    if (variation) {
+      // Получаем все вариации этого мастер-товара
+      const allVariations = await ProductVariation.find({ 
+        masterProductId: variation.masterProductId._id,
+        isActive: true 
+      }).populate('productId');
+      
+      res.json({
+        isVariation: true,
+        masterProduct: variation.masterProductId,
+        variations: allVariations,
+        currentVariation: variation
+      });
+    } else {
+      // Проверяем, является ли это мастер-товаром
+      const masterProduct = await MasterProduct.findById(req.params.id);
+      if (masterProduct) {
+        const variations = await ProductVariation.find({ 
+          masterProductId: req.params.id,
+          isActive: true 
+        }).populate('productId');
         
-        if (!groups[baseName]) {
-          groups[baseName] = [];
-        }
-        
-        groups[baseName].push({
-          id: product._id,
-          name: product.name,
-          price: product.price,
-          voltage: voltage,
-          image: product.image,
-          imageVariants: product.imageVariants,
-          category: product.category,
-          article: product.article
-        });
-      }
-    });
-    
-    // Создаем объединенные товары
-    Object.entries(groups).forEach(([baseName, groupProducts]) => {
-      if (groupProducts.length > 1 && groupProducts.some(p => p.voltage)) {
-        // Группа с несколькими вольтами - создаем объединенный товар
-        const voltages = groupProducts.map(p => p.voltage).filter(v => v).sort((a, b) => parseInt(a) - parseInt(b));
-        const minPrice = Math.min(...groupProducts.map(p => Number(p.price) || 0));
-        const maxPrice = Math.max(...groupProducts.map(p => Number(p.price) || 0));
-        
-        unifiedProducts.push({
-          id: `group_${baseName}`,
-          name: baseName,
-          baseName: baseName,
-          price: minPrice === maxPrice ? minPrice : `${minPrice} - ${maxPrice}`,
-          voltage: voltages.join(', '),
-          voltages: voltages,
-          image: groupProducts[0].image,
-          imageVariants: groupProducts[0].imageVariants,
-          category: groupProducts[0].category,
-          article: groupProducts[0].article,
-          isGroup: true,
-          productCount: groupProducts.length,
-          minPrice,
-          maxPrice
+        res.json({
+          isMasterProduct: true,
+          masterProduct,
+          variations
         });
       } else {
-        // Одиночный товар - добавляем как есть
-        unifiedProducts.push({
-          ...groupProducts[0],
-          isGroup: false,
-          productCount: 1
+        // Обычный товар без вариаций
+        res.json({
+          isVariation: false,
+          product
         });
       }
-    });
-    
-    res.json(unifiedProducts);
+    }
   } catch (err) {
-    console.error('Ошибка получения объединенных товаров:', err);
-    res.status(500).json({ error: 'Ошибка при получении товаров' });
+    console.error('Ошибка получения товара с вариациями:', err);
+    res.status(500).json({ error: 'Ошибка при получении товара с вариациями' });
   }
 });
 

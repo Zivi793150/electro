@@ -9,7 +9,7 @@ const AdminLogin = lazy(() => import('./Login'));
 const AdminProductList = lazy(() => import('./ProductList'));
 const SiteSettings = lazy(() => import('./SiteSettings'));
 const PickupPoints = lazy(() => import('./PickupPoints'));
-const ProductGroups = lazy(() => import('./ProductGroups'));
+const ProductMerge = lazy(() => import('./ProductMerge'));
 
 const AdminApp = () => {
   const navigate = useNavigate();
@@ -43,9 +43,9 @@ const AdminApp = () => {
       <Routes>
         <Route path="/login" element={<AdminLogin onLogin={handleLogin} />} />
         <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/merge-products" element={isAuth ? <ProductMerge onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={isAuth ? <SiteSettings onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/pickup-points" element={isAuth ? <PickupPoints onLogout={handleLogout} /> : <Navigate to="/login" />} />
-        <Route path="/product-groups" element={isAuth ? <ProductGroups onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/" element={isAuth ? <Navigate to="/products" /> : <Navigate to="/login" />} />
         <Route path="*" element={isAuth ? <Navigate to="/products" /> : <Navigate to="/login" />} />
       </Routes>

@@ -46,6 +46,11 @@ const Product = () => {
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [isCityChanging, setIsCityChanging] = useState(false);
   
+  // Состояния для вариаций товара
+  const [productWithVariations, setProductWithVariations] = useState(null);
+  const [selectedVariation, setSelectedVariation] = useState(null);
+  const [variationType, setVariationType] = useState('');
+  
 
   
   const [detectingCity, setDetectingCity] = useState(false);
@@ -143,25 +148,31 @@ const Product = () => {
   // Объединяем все изображения из разных полей
   const getAllImages = () => {
     const images = [];
+    const currentProduct = getCurrentProduct();
     
     // Добавляем основное изображение из поля image (если есть)
-    if (product?.image) {
-      images.push(product.image);
+    if (currentProduct?.image) {
+      images.push(currentProduct.image);
     }
     
     // Добавляем изображения из поля images
-    if (Array.isArray(product?.images)) {
-      images.push(...product.images);
+    if (Array.isArray(currentProduct?.images)) {
+      images.push(...currentProduct.images);
     }
     
     // Добавляем изображения из поля images2
-    if (Array.isArray(product?.images2)) {
-      images.push(...product.images2);
+    if (Array.isArray(currentProduct?.images2)) {
+      images.push(...currentProduct.images2);
     }
     
     // Добавляем изображения из поля images3
-    if (Array.isArray(product?.images3)) {
-      images.push(...product.images3);
+    if (Array.isArray(currentProduct?.images3)) {
+      images.push(...currentProduct.images3);
+    }
+    
+    // Если есть вариация с изображениями, добавляем их
+    if (selectedVariation?.images && Array.isArray(selectedVariation.images)) {
+      images.push(...selectedVariation.images);
     }
     
     // Если нет изображений, добавляем placeholder
@@ -180,14 +191,41 @@ const Product = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`${API_URL}/${id}`)
+    
+    // Сначала проверяем, есть ли у товара вариации
+    fetch(`${API_URL}/${id}/with-variations`)
       .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          // Если ошибка, загружаем обычный товар
+          return fetch(`${API_URL}/${id}`);
+        }
+        return Promise.resolve(data);
+      })
       .then(data => {
         if (data.error) {
           setError(data.error);
           setProduct(null);
+          setProductWithVariations(null);
+        } else if (data.isVariation || data.isMasterProduct) {
+          // Товар с вариациями
+          setProductWithVariations(data);
+          if (data.isVariation) {
+            setProduct(data.currentVariation.productId);
+            setSelectedVariation(data.currentVariation);
+            setVariationType(data.currentVariation.variationType);
+          } else {
+            setProduct(data.masterProduct);
+            setVariationType(data.masterProduct.variationTypes[0] || 'power');
+            // Выбираем первую вариацию по умолчанию
+            if (data.variations && data.variations.length > 0) {
+              setSelectedVariation(data.variations[0]);
+            }
+          }
         } else {
-          setProduct(data);
+          // Обычный товар без вариаций
+          setProduct(data.product);
+          setProductWithVariations(null);
         }
         setLoading(false);
       })
@@ -251,11 +289,11 @@ const Product = () => {
   }
 
   // Найти категорию для хлебных крошек
-  const categoryObj = categories.find(cat => cat.id === product.category);
+  const categoryObj = categories.find(cat => cat.id === getCurrentProduct().category);
   const categoryName = categoryObj ? categoryObj.name : '';
 
   // Преимущества — если есть в product, иначе дефолтные
-  const productAdvantages = product.advantages || [
+  const productAdvantages = getCurrentProduct().advantages || [
     'Высокий крутящий момент и мощность',
     'Долговечный литий-ионный аккумулятор',
     'Компактный и лёгкий корпус для работы одной рукой'
@@ -264,12 +302,41 @@ const Product = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = (formData) => {
-    console.log('Заявка на товар:', { ...formData, product: product.name });
+    console.log('Заявка на товар:', { ...formData, product: getCurrentProduct().name });
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
 
   const handleBuy = () => {
-    navigate('/checkout', { state: { product } });
+    // Если есть выбранная вариация, используем её данные
+    const productToBuy = selectedVariation ? selectedVariation.productId : product;
+    navigate('/checkout', { state: { product: productToBuy } });
+  };
+
+  // Обработчик выбора вариации
+  const handleVariationSelect = (variation) => {
+    setSelectedVariation(variation);
+    setProduct(variation.productId);
+  };
+
+  // Получение доступных вариаций
+  const getAvailableVariations = () => {
+    if (!productWithVariations) return [];
+    
+    if (productWithVariations.isVariation) {
+      return productWithVariations.variations || [];
+    } else if (productWithVariations.isMasterProduct) {
+      return productWithVariations.variations || [];
+    }
+    
+    return [];
+  };
+
+  // Получение текущего товара для отображения
+  const getCurrentProduct = () => {
+    if (selectedVariation) {
+      return selectedVariation.productId;
+    }
+    return product;
   };
 
   // Модалка фото
@@ -314,7 +381,7 @@ const Product = () => {
   
 
 
-  const shortDesc = product['Short description'] || 'краткое описание';
+  const shortDesc = getCurrentProduct()['Short description'] || 'краткое описание';
 
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
@@ -339,11 +406,11 @@ const Product = () => {
             {categoryName && (
               <>
                 <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-                <a href={`/catalog?category=${product.category}`}>{categoryName}</a>
+                <a href={`/catalog?category=${getCurrentProduct().category}`}>{categoryName}</a>
               </>
             )}
             <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-            <span style={{color:'#1a2236', fontWeight:500}}>{product.name}</span>
+            <span style={{color:'#1a2236', fontWeight:500}}>{getCurrentProduct().name}</span>
           </nav>
           <div className="product-flex">
             {/* Фото и миниатюры */}
@@ -351,8 +418,8 @@ const Product = () => {
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img 
-                    src={product.image || allImages[activeImage]} 
-                    alt={product.name} 
+                    src={getCurrentProduct().image || allImages[activeImage]} 
+                    alt={getCurrentProduct().name} 
                     loading="lazy"
                     width="400"
                     height="400"
@@ -369,7 +436,7 @@ const Product = () => {
                         <img 
                           key={idx} 
                           src={img} 
-                          alt={product.name + idx} 
+                          alt={getCurrentProduct().name + idx} 
                           className={activeImage === idx ? "active" : ""} 
                           onClick={() => setActiveImage(idx)} 
                           loading="lazy"
@@ -385,21 +452,57 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
+                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
+                
+                {/* Селектор вариаций */}
+                {productWithVariations && getAvailableVariations().length > 0 && (
+                  <div className="product-variations" style={{marginBottom: 15}}>
+                    <div style={{fontSize: '0.9rem', color: '#666', marginBottom: 8, fontWeight: 500}}>
+                      {variationType === 'power' && 'Мощность:'}
+                      {variationType === 'voltage' && 'Напряжение:'}
+                      {variationType === 'size' && 'Размер:'}
+                      {variationType === 'color' && 'Цвет:'}
+                      {variationType === 'custom' && 'Вариант:'}
+                    </div>
+                    <div className="variations-list" style={{display: 'flex', gap: 8, flexWrap: 'wrap'}}>
+                      {getAvailableVariations().map((variation) => (
+                        <button
+                          key={variation._id}
+                          onClick={() => handleVariationSelect(variation)}
+                          className={`variation-option ${selectedVariation && selectedVariation._id === variation._id ? 'selected' : ''}`}
+                          style={{
+                            padding: '8px 16px',
+                            border: selectedVariation && selectedVariation._id === variation._id ? '2px solid #1976d2' : '1px solid #ddd',
+                            borderRadius: '6px',
+                            background: selectedVariation && selectedVariation._id === variation._id ? '#e3f2fd' : '#fff',
+                            color: selectedVariation && selectedVariation._id === variation._id ? '#1976d2' : '#333',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: selectedVariation && selectedVariation._id === variation._id ? '600' : '400',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {variation.variationValue}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
-                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{product.subtitle}</div>
+                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{getCurrentProduct().subtitle}</div>
                 <div className="product-divider"></div>
                 <div className="product-buy-row">
                   <div className="product-price-block">
                     <div className="product-price-label-value">
                       <div className="product-price-label">Цена</div>
                       <div className="product-price-value">
-                        {Number(product.price).toLocaleString('ru-RU')}
+                        {Number(selectedVariation ? selectedVariation.price : product.price).toLocaleString('ru-RU')}
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
 
-                    {product.article && (
+                    {(selectedVariation ? selectedVariation.article : product.article) && (
                       <div style={{
                         fontSize: '0.85rem', 
                         color: '#666', 
@@ -413,7 +516,7 @@ const Product = () => {
                         alignItems: 'flex-start'
                       }}>
                         <span style={{fontWeight: 500, color: '#495057'}}>Артикул</span>
-                        <span style={{marginTop: 2}}>{product.article}</span>
+                        <span style={{marginTop: 2}}>{selectedVariation ? selectedVariation.article : product.article}</span>
                       </div>
                     )}
                   </div>
@@ -480,7 +583,7 @@ const Product = () => {
           </div>
           {/* Вкладки снизу */}
           <div className="product-tabs-wrap">
-            <Tabs product={product} />
+                            <Tabs product={getCurrentProduct()} selectedVariation={selectedVariation} />
                 </div>
             </div>
       </main>
@@ -574,7 +677,7 @@ const Product = () => {
     {showImageModal && (
       <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-          <img src={allImages[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
+          <img src={allImages[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
           {allImages.length > 1 && (
             <>
               <button 
@@ -638,7 +741,7 @@ const Product = () => {
   );
 };
 
-function Tabs({product}) {
+function Tabs({product, selectedVariation}) {
   const [tab,setTab]=React.useState('desc');
   
   // Функция для парсинга характеристик из строки
@@ -670,8 +773,13 @@ function Tabs({product}) {
     }
   };
   
-  const characteristics = parseCharacteristics(product.characteristics);
-  const equipment = parseEquipment(product.equipment);
+  // Если есть выбранная вариация, используем её характеристики и комплектацию
+  const characteristics = parseCharacteristics(
+    selectedVariation && selectedVariation.characteristics ? selectedVariation.characteristics : product.characteristics
+  );
+  const equipment = parseEquipment(
+    selectedVariation && selectedVariation.equipment ? selectedVariation.equipment : product.equipment
+  );
   return (
     <div className="product-tabs">
       <div className="product-tabs-header">
