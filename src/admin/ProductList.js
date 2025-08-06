@@ -85,12 +85,26 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       if (result.webp) {
         // Используем WebP версию для лучшей производительности
         setField(result.webp.path);
+        
+        // Сохраняем варианты изображений для оптимизации
+        const imageVariants = {
+          original: result.original.path,
+          webp: result.webp.path,
+          thumb: result.variants?.thumb?.url || result.webp.path,
+          medium: result.variants?.medium?.url || result.webp.path,
+          large: result.variants?.large?.url || result.webp.path
+        };
+        
+        // Сохраняем варианты в localStorage для использования при сохранении продукта
+        localStorage.setItem('lastUploadedImageVariants', JSON.stringify(imageVariants));
+        
         setTimeout(() => {
           alert(`✅ Изображение успешно загружено и оптимизировано!\n\n` +
                 `📁 Оригинал: ${result.original.filename}\n` +
                 `🎨 WebP: ${result.webp.filename}\n` +
                 `📏 Размер: ${Math.round(result.original.size / 1024)} KB\n` +
-                `🚀 Экономия: ~60-70% размера\n\n` +
+                `🚀 Экономия: ~60-70% размера\n` +
+                `📱 Варианты: thumb, medium, large\n\n` +
                 `WebP URL автоматически добавлен в поле.`);
         }, 100);
       } else {
@@ -151,6 +165,10 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     // Собираем все фото в массив
     const allPhotos = [photo1, photo2, photo3].filter(photo => photo.trim() !== '');
     
+    // Получаем варианты изображений из localStorage
+    const imageVariants = localStorage.getItem('lastUploadedImageVariants');
+    const parsedVariants = imageVariants ? JSON.parse(imageVariants) : null;
+    
     try {
       let payload = { 
         name, 
@@ -166,6 +184,13 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         equipment, 
         article 
       };
+      
+      // Добавляем варианты изображений, если они есть
+      if (parsedVariants) {
+        payload.imageVariants = parsedVariants;
+        // Очищаем localStorage после использования
+        localStorage.removeItem('lastUploadedImageVariants');
+      }
       
       const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
         method: isEdit ? 'PUT' : 'POST',

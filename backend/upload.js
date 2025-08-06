@@ -151,6 +151,7 @@ const uploadToPleskMiddleware = async (req, res, next) => {
   try {
     // Укажи свой URL upload.php:
     const PLESK_UPLOAD_URL = 'https://www.eltok.kz/upload.php';
+    
     // Загружаем оригинал
     const origResult = await uploadToPlesk(req.file.path, PLESK_UPLOAD_URL);
     if (origResult.success && origResult.files && origResult.files[0]) {
@@ -160,6 +161,7 @@ const uploadToPleskMiddleware = async (req, res, next) => {
     } else {
       console.error('Ошибка загрузки оригинала на Plesk:', origResult);
     }
+    
     // Загружаем webp
     if (req.file.webpPath && fs.existsSync(req.file.webpPath)) {
       const webpResult = await uploadToPlesk(req.file.webpPath, PLESK_UPLOAD_URL);
@@ -171,6 +173,28 @@ const uploadToPleskMiddleware = async (req, res, next) => {
         console.error('Ошибка загрузки webp на Plesk:', webpResult);
       }
     }
+    
+    // Загружаем варианты (thumb, medium, large)
+    if (req.file.variants) {
+      req.file.pleskVariants = {};
+      for (const [sizeName, variant] of Object.entries(req.file.variants)) {
+        if (fs.existsSync(variant.path)) {
+          const variantResult = await uploadToPlesk(variant.path, PLESK_UPLOAD_URL);
+          if (variantResult.success && variantResult.files && variantResult.files[0]) {
+            req.file.pleskVariants[sizeName] = {
+              url: variantResult.files[0],
+              width: variant.width,
+              height: variant.height
+            };
+            // Удаляем локальный вариант
+            fs.unlinkSync(variant.path);
+          } else {
+            console.error(`Ошибка загрузки варианта ${sizeName} на Plesk:`, variantResult);
+          }
+        }
+      }
+    }
+    
     next();
   } catch (err) {
     console.error('Ошибка отправки на Plesk:', err);

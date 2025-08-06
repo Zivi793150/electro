@@ -119,7 +119,7 @@ app.post('/api/upload', upload, convertToWebP, createImageSizes, uploadToPleskMi
         path: req.file.pleskWebpUrl,
         filename: req.file.pleskWebpUrl.split('/').pop()
       } : null,
-      variants: req.file.variants || {},
+      variants: req.file.pleskVariants || {},
       message: 'Изображение успешно загружено и оптимизировано'
     };
 

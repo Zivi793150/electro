@@ -9,6 +9,17 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
 
+  // Функция для получения оптимального размера изображения
+  const getOptimalImage = (product, preferredSize = 'medium') => {
+    if (product.imageVariants && product.imageVariants[preferredSize]) {
+      return product.imageVariants[preferredSize];
+    }
+    if (product.imageVariants && product.imageVariants.webp) {
+      return product.imageVariants.webp;
+    }
+    return product.image || '/images/products/placeholder.png';
+  };
+
   const API_URL = 'https://electro-a8bl.onrender.com/api/products';
 
   useEffect(() => {
@@ -94,11 +105,11 @@ const Home = () => {
                   <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <picture style={{width: '100%', height: '100%'}}>
                       <source 
-                        srcSet={product.image ? product.image.replace(/\.(jpg|jpeg|png)$/i, '.webp') : '/images/products/placeholder.webp'} 
+                        srcSet={getOptimalImage(product, 'medium')} 
                         type="image/webp"
                       />
                       <img 
-                        src={product.image || '/images/products/placeholder.png'} 
+                        src={getOptimalImage(product)} 
                         alt={product.name} 
                         style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
                         loading="lazy"

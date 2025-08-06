@@ -172,6 +172,7 @@ body, html {
   overflow: hidden !important;
 }
 .product-image { 
+  aspect-ratio: 13 / 8;
   height: 160px !important; 
   background: #fff !important; 
   display: flex !important; 
