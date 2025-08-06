@@ -508,6 +508,189 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
   }
 });
 
+// API для работы с группами товаров по вольтам
+
+// Получить все группы товаров
+app.get('/api/product-groups', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    
+    // Группируем товары по названию (без учета вольтов)
+    const groups = {};
+    
+    products.forEach(product => {
+      if (product.name) {
+        // Извлекаем базовое название без вольтов
+        const baseName = product.name.replace(/\s*\d+\s*[Вв]ольт?.*$/i, '').trim();
+        
+        if (!groups[baseName]) {
+          groups[baseName] = {
+            baseName,
+            products: [],
+            voltages: []
+          };
+        }
+        
+        // Извлекаем вольты из названия
+        const voltageMatch = product.name.match(/(\d+)\s*[Вв]ольт?/i);
+        const voltage = voltageMatch ? voltageMatch[1] : null;
+        
+        groups[baseName].products.push({
+          id: product._id,
+          name: product.name,
+          price: product.price,
+          voltage: voltage,
+          image: product.image,
+          imageVariants: product.imageVariants,
+          category: product.category,
+          article: product.article
+        });
+        
+        if (voltage && !groups[baseName].voltages.includes(voltage)) {
+          groups[baseName].voltages.push(voltage);
+        }
+      }
+    });
+    
+    // Фильтруем только группы с несколькими вольтами
+    const multiVoltageGroups = Object.values(groups).filter(group => group.voltages.length > 1);
+    
+    res.json(multiVoltageGroups);
+  } catch (err) {
+    console.error('Ошибка получения групп товаров:', err);
+    res.status(500).json({ error: 'Ошибка при получении групп товаров' });
+  }
+});
+
+// Получить группу товаров по базовому названию
+app.get('/api/product-groups/:baseName', async (req, res) => {
+  try {
+    const { baseName } = req.params;
+    const products = await Product.find({
+      name: { $regex: new RegExp(baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }
+    });
+    
+    if (products.length === 0) {
+      return res.status(404).json({ error: 'Группа товаров не найдена' });
+    }
+    
+    const group = {
+      baseName,
+      products: [],
+      voltages: []
+    };
+    
+    products.forEach(product => {
+      const voltageMatch = product.name.match(/(\d+)\s*[Вв]ольт?/i);
+      const voltage = voltageMatch ? voltageMatch[1] : null;
+      
+      group.products.push({
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        voltage: voltage,
+        image: product.image,
+        imageVariants: product.imageVariants,
+        category: product.category,
+        article: product.article,
+        characteristics: product.characteristics,
+        equipment: product.equipment,
+        description: product.description
+      });
+      
+      if (voltage && !group.voltages.includes(voltage)) {
+        group.voltages.push(voltage);
+      }
+    });
+    
+    // Сортируем по вольтам
+    group.voltages.sort((a, b) => parseInt(a) - parseInt(b));
+    group.products.sort((a, b) => {
+      const voltageA = a.voltage ? parseInt(a.voltage) : 0;
+      const voltageB = b.voltage ? parseInt(b.voltage) : 0;
+      return voltageA - voltageB;
+    });
+    
+    res.json(group);
+  } catch (err) {
+    console.error('Ошибка получения группы товаров:', err);
+    res.status(500).json({ error: 'Ошибка при получении группы товаров' });
+  }
+});
+
+// Получить объединенные товары для каталога
+app.get('/api/products-unified', async (req, res) => {
+  try {
+    const products = await Product.find({});
+    
+    // Группируем товары
+    const groups = {};
+    const unifiedProducts = [];
+    
+    products.forEach(product => {
+      if (product.name) {
+        const baseName = product.name.replace(/\s*\d+\s*[Вв]ольт?.*$/i, '').trim();
+        const voltageMatch = product.name.match(/(\d+)\s*[Вв]ольт?/i);
+        const voltage = voltageMatch ? voltageMatch[1] : null;
+        
+        if (!groups[baseName]) {
+          groups[baseName] = [];
+        }
+        
+        groups[baseName].push({
+          id: product._id,
+          name: product.name,
+          price: product.price,
+          voltage: voltage,
+          image: product.image,
+          imageVariants: product.imageVariants,
+          category: product.category,
+          article: product.article
+        });
+      }
+    });
+    
+    // Создаем объединенные товары
+    Object.entries(groups).forEach(([baseName, groupProducts]) => {
+      if (groupProducts.length > 1 && groupProducts.some(p => p.voltage)) {
+        // Группа с несколькими вольтами - создаем объединенный товар
+        const voltages = groupProducts.map(p => p.voltage).filter(v => v).sort((a, b) => parseInt(a) - parseInt(b));
+        const minPrice = Math.min(...groupProducts.map(p => Number(p.price) || 0));
+        const maxPrice = Math.max(...groupProducts.map(p => Number(p.price) || 0));
+        
+        unifiedProducts.push({
+          id: `group_${baseName}`,
+          name: baseName,
+          baseName: baseName,
+          price: minPrice === maxPrice ? minPrice : `${minPrice} - ${maxPrice}`,
+          voltage: voltages.join(', '),
+          voltages: voltages,
+          image: groupProducts[0].image,
+          imageVariants: groupProducts[0].imageVariants,
+          category: groupProducts[0].category,
+          article: groupProducts[0].article,
+          isGroup: true,
+          productCount: groupProducts.length,
+          minPrice,
+          maxPrice
+        });
+      } else {
+        // Одиночный товар - добавляем как есть
+        unifiedProducts.push({
+          ...groupProducts[0],
+          isGroup: false,
+          productCount: 1
+        });
+      }
+    });
+    
+    res.json(unifiedProducts);
+  } catch (err) {
+    console.error('Ошибка получения объединенных товаров:', err);
+    res.status(500).json({ error: 'Ошибка при получении товаров' });
+  }
+});
+
 mongoose.connection.once('open', () => {
   console.log('MongoDB подключена успешно');
 });

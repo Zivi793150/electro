@@ -10,6 +10,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Catalog = lazy(() => import('./pages/Catalog'));
 const Category = lazy(() => import('./pages/Category'));
 const Product = lazy(() => import('./pages/Product'));
+const ProductGroup = lazy(() => import('./pages/ProductGroup'));
 const About = lazy(() => import('./pages/About'));
 const Contacts = lazy(() => import('./pages/Contacts'));
 const Policy = lazy(() => import('./pages/Policy'));
@@ -40,6 +41,7 @@ function App() {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/category" element={<Category />} />
           <Route path="/product/:id" element={<Product />} />
+          <Route path="/product-group/:baseName" element={<ProductGroup />} />
           <Route path="/about" element={<About />} />
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/policy" element={<Policy />} />
