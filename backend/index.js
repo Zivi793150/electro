@@ -6,7 +6,20 @@ require('dotenv').config();
 const path = require('path');
 
 const app = express();
-app.use(cors());
+
+// Настройка CORS для разрешения запросов с вашего домена
+app.use(cors({
+  origin: [
+    'https://www.eltok.kz',
+    'https://eltok.kz',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 app.use(express.json());
 
 // Middleware для кеширования статических ресурсов
