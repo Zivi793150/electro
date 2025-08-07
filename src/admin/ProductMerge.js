@@ -113,20 +113,20 @@ function ProductMerge({ onLogout }) {
       setLoading(true);
       setError('');
       
+      const requestData = {
+        productIds: selectedProducts,
+        masterProductData: mergeFormData,
+        variationType: useCustomOptions ? null : mergeFormData.variationType,
+        variationOptions: useCustomOptions ? getVariationOptionsForAPI() : null
+      };
+      
+      console.log('Отправляем данные на сервер:', requestData);
+      
       const response = await fetch(`${API_URL}/merge-products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        const requestData = {
-          productIds: selectedProducts,
-          masterProductData: mergeFormData,
-          variationType: useCustomOptions ? null : mergeFormData.variationType,
-          variationOptions: useCustomOptions ? getVariationOptionsForAPI() : null
-        };
-        
-        console.log('Отправляем данные на сервер:', requestData);
-        
         body: JSON.stringify(requestData)
       });
       

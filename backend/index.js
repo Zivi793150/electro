@@ -895,6 +895,26 @@ app.get('/api/products/:id/with-variations', async (req, res) => {
   try {
     console.log('Запрос товара с вариациями для ID:', req.params.id);
     
+    // Сначала проверяем, является ли это мастер-товаром
+    const masterProduct = await MasterProduct.findById(req.params.id);
+    if (masterProduct) {
+      console.log('Найден мастер-товар:', masterProduct.name);
+      const variations = await ProductVariation.find({ 
+        masterProductId: req.params.id,
+        isActive: true 
+      }).populate('productId');
+      
+      console.log('Найдено вариаций для мастер-товара:', variations.length);
+      
+      res.json({
+        isMasterProduct: true,
+        masterProduct,
+        variations
+      });
+      return;
+    }
+    
+    // Если не мастер-товар, ищем обычный товар
     const product = await Product.findById(req.params.id);
     if (!product) {
       console.log('Товар не найден в базе данных');
@@ -908,6 +928,7 @@ app.get('/api/products/:id/with-variations', async (req, res) => {
     }).populate('masterProductId');
     
     if (variation) {
+      console.log('Найдена вариация товара');
       // Получаем все вариации этого мастер-товара
       const allVariations = await ProductVariation.find({ 
         masterProductId: variation.masterProductId._id,
@@ -921,26 +942,12 @@ app.get('/api/products/:id/with-variations', async (req, res) => {
         currentVariation: variation
       });
     } else {
-      // Проверяем, является ли это мастер-товаром
-      const masterProduct = await MasterProduct.findById(req.params.id);
-      if (masterProduct) {
-        const variations = await ProductVariation.find({ 
-          masterProductId: req.params.id,
-          isActive: true 
-        }).populate('productId');
-        
-        res.json({
-          isMasterProduct: true,
-          masterProduct,
-          variations
-        });
-      } else {
-        // Обычный товар без вариаций
-        res.json({
-          isVariation: false,
-          product
-        });
-      }
+      console.log('Обычный товар без вариаций');
+      // Обычный товар без вариаций
+      res.json({
+        isVariation: false,
+        product
+      });
     }
   } catch (err) {
     console.error('Ошибка получения товара с вариациями:', err);
