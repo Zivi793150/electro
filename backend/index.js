@@ -45,39 +45,28 @@ app.get('/', (req, res) => {
 const productSchema = new mongoose.Schema({}, { strict: false, collection: 'products' });
 const Product = mongoose.model('Product', productSchema);
 
-// Модель для вариаций товаров
-const productVariationSchema = new mongoose.Schema({
-  masterProductId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  // Старый способ (оставляем для обратной совместимости)
-  variationType: { type: String }, // например: 'voltage', 'power', 'size'
-  variationValue: { type: String }, // например: '950W', '1100W'
-  // Новый способ: произвольные параметры вариации
-  variationOptions: { type: mongoose.Schema.Types.Mixed, default: {} }, // например: { voltage: '220', regulator: 'Да' }
-  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  price: { type: String, required: true },
-  article: { type: String },
-  characteristics: { type: mongoose.Schema.Types.Mixed },
-  equipment: { type: mongoose.Schema.Types.Mixed },
-  images: { type: [String], default: [] },
-  isActive: { type: Boolean, default: true }
-}, { collection: 'product_variations' });
-
-const ProductVariation = mongoose.model('ProductVariation', productVariationSchema);
-
-// Модель для мастер-товаров (объединенных товаров)
-const masterProductSchema = new mongoose.Schema({
+// Модель группы вариаций товаров
+const productGroupSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  category: { type: String, required: true },
-  description: { type: String },
-  shortDescription: { type: String },
-  mainImage: { type: String },
-  variationTypes: { type: [String], default: [] }, // типы вариаций: ['voltage', 'power']
-  isActive: { type: Boolean, default: true },
+  description: String,
+  baseProductId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  variants: [{
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+    parameters: { type: Map, of: String }, // Динамические параметры (вольты, с регулятором и т.д.)
+    price: String,
+    isActive: { type: Boolean, default: true }
+  }],
+  parameters: [{ // Настраиваемые параметры для группы
+    name: { type: String, required: true }, // например "Вольты", "С регулятором"
+    type: { type: String, enum: ['select', 'radio', 'checkbox'], default: 'select' },
+    values: [String], // возможные значения
+    required: { type: Boolean, default: false }
+  }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
-}, { collection: 'master_products' });
+}, { collection: 'product_groups' });
 
-const MasterProduct = mongoose.model('MasterProduct', masterProductSchema);
+const ProductGroup = mongoose.model('ProductGroup', productGroupSchema);
 
 // Модель информации сайта
 const informationSchema = new mongoose.Schema({
@@ -112,54 +101,8 @@ const Information = mongoose.model('Information', informationSchema);
 app.get('/api/products', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
-    
-    // Получаем все обычные товары
     const products = await Product.find().limit(limit);
-    
-    // Получаем все мастер-товары
-    const masterProducts = await MasterProduct.find({ isActive: true });
-    
-    // Получаем ID всех товаров, которые являются вариациями
-    const variationProductIds = await ProductVariation.distinct('productId');
-    
-    // Фильтруем обычные товары, исключая те, которые являются вариациями
-    const filteredProducts = products.filter(product => 
-      !variationProductIds.some(variationId => variationId.toString() === product._id.toString())
-    );
-    
-    // Преобразуем мастер-товары в формат, совместимый с обычными товарами
-    const masterProductsFormatted = masterProducts.map(master => ({
-      _id: master._id,
-      name: master.name,
-      category: master.category,
-      description: master.description,
-      'Short description': master.shortDescription,
-      image: master.mainImage,
-      price: 'От 0', // Будет обновлено ниже
-      article: 'MP-' + master._id.toString().slice(-6),
-      isMasterProduct: true,
-      masterProductId: master._id
-    }));
-    
-    // Получаем минимальные цены для мастер-товаров
-    for (let master of masterProductsFormatted) {
-      const variations = await ProductVariation.find({ 
-        masterProductId: master.masterProductId,
-        isActive: true 
-      });
-      if (variations.length > 0) {
-        const minPrice = Math.min(...variations.map(v => parseFloat(v.price) || 0));
-        master.price = `От ${minPrice.toLocaleString()}`;
-      }
-    }
-    
-    // Объединяем обычные товары и мастер-товары
-    const allProducts = [...filteredProducts, ...masterProductsFormatted];
-    
-    // Применяем лимит к общему списку
-    const limitedProducts = limit > 0 ? allProducts.slice(0, limit) : allProducts;
-    
-    res.json(limitedProducts);
+    res.json(products);
   } catch (err) {
     console.error('Ошибка получения продуктов:', err);
     res.status(500).json({ error: 'Ошибка при получении продуктов' });
@@ -169,40 +112,6 @@ app.get('/api/products', async (req, res) => {
 // API endpoint для получения одного продукта по id
 app.get('/api/products/:id', async (req, res) => {
   try {
-    // Сначала проверяем, является ли это мастер-товаром
-    const masterProduct = await MasterProduct.findById(req.params.id);
-    if (masterProduct) {
-      // Получаем вариации для мастер-товара
-      const variations = await ProductVariation.find({ 
-        masterProductId: req.params.id,
-        isActive: true 
-      }).populate('productId');
-      
-      // Формируем ответ в формате обычного товара
-      const productData = {
-        _id: masterProduct._id,
-        name: masterProduct.name,
-        category: masterProduct.category,
-        description: masterProduct.description,
-        'Short description': masterProduct.shortDescription,
-        image: masterProduct.mainImage,
-        price: 'От 0',
-        article: 'MP-' + masterProduct._id.toString().slice(-6),
-        isMasterProduct: true,
-        masterProductId: masterProduct._id,
-        variations: variations
-      };
-      
-      // Устанавливаем минимальную цену
-      if (variations.length > 0) {
-        const minPrice = Math.min(...variations.map(v => parseFloat(v.price) || 0));
-        productData.price = `От ${minPrice.toLocaleString()}`;
-      }
-      
-      return res.json(productData);
-    }
-    
-    // Если не мастер-товар, ищем обычный товар
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
     res.json(product);
@@ -622,336 +531,93 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
   }
 });
 
-// ========== API ENDPOINTS ДЛЯ ВАРИАЦИЙ ТОВАРОВ ==========
+// API для групп вариаций товаров
 
-// Получить все мастер-товары
-app.get('/api/master-products', async (req, res) => {
+// Получить все группы вариаций
+app.get('/api/product-groups', async (req, res) => {
   try {
-    console.log('Запрос всех мастер-товаров');
-    const masterProducts = await MasterProduct.find({ isActive: true });
-    console.log('Найдено мастер-товаров:', masterProducts.length);
-    res.json(masterProducts);
+    const groups = await ProductGroup.find().populate('baseProductId').populate('variants.productId');
+    res.json(groups);
   } catch (err) {
-    console.error('Ошибка получения мастер-товаров:', err);
-    res.status(500).json({ error: 'Ошибка при получении мастер-товаров' });
+    console.error('Ошибка получения групп вариаций:', err);
+    res.status(500).json({ error: 'Ошибка при получении групп вариаций' });
   }
 });
 
-// Получить один мастер-товар с вариациями
-app.get('/api/master-products/:id', async (req, res) => {
+// Получить группу вариаций по ID
+app.get('/api/product-groups/:id', async (req, res) => {
   try {
-    const masterProduct = await MasterProduct.findById(req.params.id);
+    const group = await ProductGroup.findById(req.params.id)
+      .populate('baseProductId')
+      .populate('variants.productId');
     
-    if (!masterProduct) {
-      return res.status(404).json({ error: 'Мастер-товар не найден' });
-    }
-    
-    // Получаем вариации отдельно
-    const variations = await ProductVariation.find({ 
-      masterProductId: req.params.id,
-      isActive: true 
-    }).populate('productId');
-    
-    const result = {
-      ...masterProduct.toObject(),
-      variations
-    };
-    
-    res.json(result);
+    if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    res.json(group);
   } catch (err) {
-    console.error('Ошибка получения мастер-товара:', err);
-    res.status(500).json({ error: 'Ошибка при получении мастер-товара' });
+    console.error('Ошибка получения группы вариаций:', err);
+    res.status(500).json({ error: 'Ошибка при получении группы вариаций' });
   }
 });
 
-// Создать новый мастер-товар
-app.post('/api/master-products', async (req, res) => {
+// Создать новую группу вариаций
+app.post('/api/product-groups', async (req, res) => {
   try {
-    const masterProduct = new MasterProduct(req.body);
-    const savedMasterProduct = await masterProduct.save();
-    res.status(201).json(savedMasterProduct);
+    const group = new ProductGroup(req.body);
+    const savedGroup = await group.save();
+    const populatedGroup = await ProductGroup.findById(savedGroup._id)
+      .populate('baseProductId')
+      .populate('variants.productId');
+    res.status(201).json(populatedGroup);
   } catch (err) {
-    console.error('Ошибка создания мастер-товара:', err);
-    res.status(500).json({ error: 'Ошибка при создании мастер-товара' });
+    console.error('Ошибка создания группы вариаций:', err);
+    res.status(500).json({ error: 'Ошибка при создании группы вариаций' });
   }
 });
 
-// Обновить мастер-товар
-app.put('/api/master-products/:id', async (req, res) => {
+// Обновить группу вариаций
+app.put('/api/product-groups/:id', async (req, res) => {
   try {
-    const masterProduct = await MasterProduct.findByIdAndUpdate(
+    const group = await ProductGroup.findByIdAndUpdate(
       req.params.id,
       { ...req.body, updatedAt: Date.now() },
       { new: true, runValidators: true }
-    );
-    if (!masterProduct) return res.status(404).json({ error: 'Мастер-товар не найден' });
-    res.json(masterProduct);
+    ).populate('baseProductId').populate('variants.productId');
+    
+    if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    res.json(group);
   } catch (err) {
-    console.error('Ошибка обновления мастер-товара:', err);
-    res.status(500).json({ error: 'Ошибка при обновлении мастер-товара' });
+    console.error('Ошибка обновления группы вариаций:', err);
+    res.status(500).json({ error: 'Ошибка при обновлении группы вариаций' });
   }
 });
 
-// Удалить мастер-товар
-app.delete('/api/master-products/:id', async (req, res) => {
+// Удалить группу вариаций
+app.delete('/api/product-groups/:id', async (req, res) => {
   try {
-    const masterProduct = await MasterProduct.findByIdAndDelete(req.params.id);
-    if (!masterProduct) return res.status(404).json({ error: 'Мастер-товар не найден' });
-    
-    // Удаляем все связанные вариации
-    await ProductVariation.deleteMany({ masterProductId: req.params.id });
-    
-    res.json({ success: true, message: 'Мастер-товар и все вариации удалены' });
+    const group = await ProductGroup.findByIdAndDelete(req.params.id);
+    if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    res.json({ success: true, message: 'Группа вариаций удалена' });
   } catch (err) {
-    console.error('Ошибка удаления мастер-товара:', err);
-    res.status(500).json({ error: 'Ошибка при удалении мастер-товара' });
+    console.error('Ошибка удаления группы вариаций:', err);
+    res.status(500).json({ error: 'Ошибка при удалении группы вариаций' });
   }
 });
 
-// Получить все вариации товара
-app.get('/api/product-variations/:masterProductId', async (req, res) => {
+// Получить группу вариаций по ID продукта
+app.get('/api/product-groups/by-product/:productId', async (req, res) => {
   try {
-    const variations = await ProductVariation.find({ 
-      masterProductId: req.params.masterProductId,
-      isActive: true 
-    }).populate('productId');
-    res.json(variations);
+    const group = await ProductGroup.findOne({
+      $or: [
+        { baseProductId: req.params.productId },
+        { 'variants.productId': req.params.productId }
+      ]
+    }).populate('baseProductId').populate('variants.productId');
+    
+    if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    res.json(group);
   } catch (err) {
-    console.error('Ошибка получения вариаций:', err);
-    res.status(500).json({ error: 'Ошибка при получении вариаций' });
-  }
-});
-
-// Создать вариацию товара
-app.post('/api/product-variations', async (req, res) => {
-  try {
-    const variation = new ProductVariation(req.body);
-    const savedVariation = await variation.save();
-    res.status(201).json(savedVariation);
-  } catch (err) {
-    console.error('Ошибка создания вариации:', err);
-    res.status(500).json({ error: 'Ошибка при создании вариации' });
-  }
-});
-
-// Обновить вариацию товара
-app.put('/api/product-variations/:id', async (req, res) => {
-  try {
-    const variation = await ProductVariation.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!variation) return res.status(404).json({ error: 'Вариация не найдена' });
-    res.json(variation);
-  } catch (err) {
-    console.error('Ошибка обновления вариации:', err);
-    res.status(500).json({ error: 'Ошибка при обновлении вариации' });
-  }
-});
-
-// Удалить вариацию товара
-app.delete('/api/product-variations/:id', async (req, res) => {
-  try {
-    const variation = await ProductVariation.findByIdAndDelete(req.params.id);
-    if (!variation) return res.status(404).json({ error: 'Вариация не найдена' });
-    res.json({ success: true, message: 'Вариация удалена' });
-  } catch (err) {
-    console.error('Ошибка удаления вариации:', err);
-    res.status(500).json({ error: 'Ошибка при удалении вариации' });
-  }
-});
-
-// API для объединения товаров в мастер-товар
-app.post('/api/merge-products', async (req, res) => {
-  try {
-    const { productIds, masterProductData, variationType, variationOptions } = req.body;
-    console.log('Начало объединения товаров:', { productIds, masterProductData, variationType, variationOptions });
-    
-    if (!productIds || !Array.isArray(productIds) || productIds.length < 2) {
-      return res.status(400).json({ error: 'Необходимо выбрать минимум 2 товара для объединения' });
-    }
-    
-    if (!masterProductData || !masterProductData.name) {
-      return res.status(400).json({ error: 'Необходимо указать название мастер-товара' });
-    }
-    
-    // Поддержка как старого способа (variationType), так и нового (variationOptions)
-    if (!variationType && (!variationOptions || Object.keys(variationOptions).length === 0)) {
-      return res.status(400).json({ error: 'Необходимо указать параметры вариации' });
-    }
-    
-    // Получаем все товары для объединения
-    console.log('Поиск товаров с ID:', productIds);
-    const products = await Product.find({ _id: { $in: productIds } });
-    console.log('Найдено товаров:', products.length);
-    
-    if (products.length !== productIds.length) {
-      console.log('Ошибка: не все товары найдены. Ожидалось:', productIds.length, 'Найдено:', products.length);
-      return res.status(400).json({ error: 'Некоторые товары не найдены' });
-    }
-    
-    // Создаем мастер-товар
-    const masterProduct = new MasterProduct({
-      ...masterProductData,
-      variationTypes: variationOptions ? Object.keys(variationOptions) : [variationType]
-    });
-    
-    const savedMasterProduct = await masterProduct.save();
-    
-    // Создаем вариации для каждого товара
-    console.log('Начинаем создание вариаций для', products.length, 'товаров');
-    const variations = [];
-    for (const product of products) {
-      console.log('Создание вариации для товара:', product.name);
-      let variationData = {
-        masterProductId: savedMasterProduct._id,
-        productId: product._id,
-        price: product.price,
-        article: product.article,
-        characteristics: product.characteristics,
-        equipment: product.equipment,
-        images: product.images || []
-      };
-
-      if (variationOptions) {
-        // Новый способ: произвольные параметры
-        variationData.variationOptions = {};
-        
-        // Для каждого параметра из variationOptions создаем значение
-        for (const [paramName, paramValues] of Object.entries(variationOptions)) {
-          if (Array.isArray(paramValues) && paramValues.length > 0) {
-            // Берем значение по индексу товара (циклически)
-            const valueIndex = variations.length % paramValues.length;
-            variationData.variationOptions[paramName] = paramValues[valueIndex];
-          }
-        }
-      } else {
-        // Старый способ: автоматическое извлечение значения
-        let variationValue = '';
-        
-        // Пытаемся найти значение в характеристиках
-        if (product.characteristics) {
-          try {
-            const characteristics = typeof product.characteristics === 'string' 
-              ? JSON.parse(product.characteristics) 
-              : product.characteristics;
-            
-            if (Array.isArray(characteristics)) {
-              const powerChar = characteristics.find(char => 
-                char.parameter && char.parameter.toLowerCase().includes('мощность') ||
-                char.parameter && char.parameter.toLowerCase().includes('power')
-              );
-              if (powerChar) {
-                variationValue = powerChar.value;
-              }
-            }
-          } catch (e) {
-            // Если не удалось распарсить JSON, ищем в строке
-            const powerMatch = product.characteristics.match(/(\d+)\s*[ВтW]/i);
-            if (powerMatch) {
-              variationValue = powerMatch[0];
-            }
-          }
-        }
-        
-        // Если не нашли в характеристиках, ищем в названии
-        if (!variationValue) {
-          const powerMatch = product.name.match(/(\d+)\s*[ВтW]/i);
-          if (powerMatch) {
-            variationValue = powerMatch[0];
-          }
-        }
-        
-        // Если все еще не нашли, используем артикул или ID
-        if (!variationValue) {
-          variationValue = product.article || product._id.toString().slice(-6);
-        }
-        
-        variationData.variationType = variationType;
-        variationData.variationValue = variationValue;
-      }
-      
-      const variation = new ProductVariation(variationData);
-      const savedVariation = await variation.save();
-      variations.push(savedVariation);
-    }
-    
-    console.log('Объединение завершено успешно. Создано вариаций:', variations.length);
-    res.status(201).json({
-      masterProduct: savedMasterProduct,
-      variations,
-      message: `Успешно объединено ${products.length} товаров в мастер-товар`
-    });
-    
-  } catch (err) {
-    console.error('Ошибка объединения товаров:', err);
-    res.status(500).json({ error: 'Ошибка при объединении товаров' });
-  }
-});
-
-// API для получения товара с вариациями (для фронтенда)
-app.get('/api/products/:id/with-variations', async (req, res) => {
-  try {
-    console.log('Запрос товара с вариациями для ID:', req.params.id);
-    
-    // Сначала проверяем, является ли это мастер-товаром
-    const masterProduct = await MasterProduct.findById(req.params.id);
-    if (masterProduct) {
-      console.log('Найден мастер-товар:', masterProduct.name);
-      const variations = await ProductVariation.find({ 
-        masterProductId: req.params.id,
-        isActive: true 
-      }).populate('productId');
-      
-      console.log('Найдено вариаций для мастер-товара:', variations.length);
-      
-      res.json({
-        isMasterProduct: true,
-        masterProduct,
-        variations
-      });
-      return;
-    }
-    
-    // Если не мастер-товар, ищем обычный товар
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      console.log('Товар не найден в базе данных');
-      return res.status(404).json({ error: 'Товар не найден' });
-    }
-    
-    // Ищем, является ли этот товар частью мастер-товара
-    const variation = await ProductVariation.findOne({ 
-      productId: req.params.id,
-      isActive: true 
-    }).populate('masterProductId');
-    
-    if (variation) {
-      console.log('Найдена вариация товара');
-      // Получаем все вариации этого мастер-товара
-      const allVariations = await ProductVariation.find({ 
-        masterProductId: variation.masterProductId._id,
-        isActive: true 
-      }).populate('productId');
-      
-      res.json({
-        isVariation: true,
-        masterProduct: variation.masterProductId,
-        variations: allVariations,
-        currentVariation: variation
-      });
-    } else {
-      console.log('Обычный товар без вариаций');
-      // Обычный товар без вариаций
-      res.json({
-        isVariation: false,
-        product
-      });
-    }
-  } catch (err) {
-    console.error('Ошибка получения товара с вариациями:', err);
-    res.status(500).json({ error: 'Ошибка при получении товара с вариациями' });
+    console.error('Ошибка получения группы вариаций по продукту:', err);
+    res.status(500).json({ error: 'Ошибка при получении группы вариаций' });
   }
 });
 

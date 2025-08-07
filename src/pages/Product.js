@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import DeliveryInfo from '../components/DeliveryInfo';
 import '../styles/Product.css';
+import '../styles/ProductVariations.css';
 
 const categories = [
   { id: 'grinders', name: 'Болгарки' },
@@ -46,10 +47,9 @@ const Product = () => {
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [isCityChanging, setIsCityChanging] = useState(false);
   
-  // Состояния для вариаций товара
-  const [productWithVariations, setProductWithVariations] = useState(null);
-  const [selectedVariation, setSelectedVariation] = useState(null);
-  const [variationType, setVariationType] = useState('');
+  // Состояние для вариаций товара
+  const [productGroup, setProductGroup] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedParameters, setSelectedParameters] = useState({});
   
 
@@ -149,31 +149,25 @@ const Product = () => {
   // Объединяем все изображения из разных полей
   const getAllImages = () => {
     const images = [];
-    const currentProduct = getCurrentProduct();
     
     // Добавляем основное изображение из поля image (если есть)
-    if (currentProduct?.image) {
-      images.push(currentProduct.image);
+    if (product?.image) {
+      images.push(product.image);
     }
     
     // Добавляем изображения из поля images
-    if (Array.isArray(currentProduct?.images)) {
-      images.push(...currentProduct.images);
+    if (Array.isArray(product?.images)) {
+      images.push(...product.images);
     }
     
     // Добавляем изображения из поля images2
-    if (Array.isArray(currentProduct?.images2)) {
-      images.push(...currentProduct.images2);
+    if (Array.isArray(product?.images2)) {
+      images.push(...product.images2);
     }
     
     // Добавляем изображения из поля images3
-    if (Array.isArray(currentProduct?.images3)) {
-      images.push(...currentProduct.images3);
-    }
-    
-    // Если есть вариация с изображениями, добавляем их
-    if (selectedVariation?.images && Array.isArray(selectedVariation.images)) {
-      images.push(...selectedVariation.images);
+    if (Array.isArray(product?.images3)) {
+      images.push(...product.images3);
     }
     
     // Если нет изображений, добавляем placeholder
@@ -184,6 +178,7 @@ const Product = () => {
     return images;
   };
   
+  const allImages = getAllImages();
   const navigate = useNavigate();
 
   const API_URL = 'https://electro-a8bl.onrender.com/api/products';
@@ -192,60 +187,49 @@ const Product = () => {
     setLoading(true);
     setError(null);
     
-    // Сначала проверяем, есть ли у товара вариации
-    fetch(`${API_URL}/${id}/with-variations`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          // Если ошибка, загружаем обычный товар
-          return fetch(`${API_URL}/${id}`);
-        }
-        return Promise.resolve(data);
-      })
-      .then(data => {
-        if (data.error) {
-          setError(data.error);
+    const fetchProductAndGroup = async () => {
+      try {
+        // Загружаем товар
+        const productRes = await fetch(`${API_URL}/${id}`);
+        const productData = await productRes.json();
+        
+        if (productData.error) {
+          setError(productData.error);
           setProduct(null);
-          setProductWithVariations(null);
-        } else if (data.isVariation || data.isMasterProduct) {
-          // Товар с вариациями
-          setProductWithVariations(data);
-          if (data.isVariation) {
-            setProduct(data.currentVariation.productId);
-            setSelectedVariation(data.currentVariation);
-            setVariationType(data.currentVariation.variationType);
+          setLoading(false);
+          return;
+        }
+        
+        setProduct(productData);
+        
+        // Загружаем группу вариаций для этого товара
+        try {
+          const groupRes = await fetch(`https://electro-a8bl.onrender.com/api/product-groups/by-product/${id}`);
+          if (groupRes.ok) {
+            const groupData = await groupRes.json();
+            setProductGroup(groupData);
             
-            // Инициализируем выбранные параметры для вариации
-            if (data.currentVariation.variationOptions) {
-              setSelectedParameters(data.currentVariation.variationOptions);
-            }
-          } else {
-            setProduct(data.masterProduct);
-            setVariationType(data.masterProduct.variationTypes[0] || 'power');
-            // Выбираем первую вариацию по умолчанию
-            if (data.variations && data.variations.length > 0) {
-              const firstVariation = data.variations[0];
-              setSelectedVariation(firstVariation);
-              
-              // Инициализируем выбранные параметры
-              if (firstVariation.variationOptions) {
-                setSelectedParameters(firstVariation.variationOptions);
-              } else if (firstVariation.variationType && firstVariation.variationValue) {
-                setSelectedParameters({ [firstVariation.variationType]: firstVariation.variationValue });
-              }
+            // Если это базовый товар группы, устанавливаем его как выбранную вариацию
+            if (groupData.baseProductId?._id === id) {
+              setSelectedVariant({
+                productId: groupData.baseProductId,
+                parameters: {},
+                price: productData.price
+              });
             }
           }
-        } else {
-          // Обычный товар без вариаций
-          setProduct(data.product);
-          setProductWithVariations(null);
+        } catch (groupError) {
+          console.log('Группа вариаций не найдена для товара:', groupError);
         }
+        
         setLoading(false);
-      })
-      .catch(() => {
+      } catch (error) {
         setError('Ошибка загрузки товара');
         setLoading(false);
-      });
+      }
+    };
+    
+    fetchProductAndGroup();
   }, [id]);
 
   useEffect(() => {
@@ -302,11 +286,11 @@ const Product = () => {
   }
 
   // Найти категорию для хлебных крошек
-  const categoryObj = categories.find(cat => cat.id === getCurrentProduct().category);
+  const categoryObj = categories.find(cat => cat.id === product.category);
   const categoryName = categoryObj ? categoryObj.name : '';
 
   // Преимущества — если есть в product, иначе дефолтные
-  const productAdvantages = getCurrentProduct().advantages || [
+  const productAdvantages = product.advantages || [
     'Высокий крутящий момент и мощность',
     'Долговечный литий-ионный аккумулятор',
     'Компактный и лёгкий корпус для работы одной рукой'
@@ -315,111 +299,61 @@ const Product = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = (formData) => {
-    console.log('Заявка на товар:', { ...formData, product: getCurrentProduct().name });
+    console.log('Заявка на товар:', { ...formData, product: product.name });
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
 
   const handleBuy = () => {
-    // Если есть выбранная вариация, используем её данные
-    const productToBuy = selectedVariation ? selectedVariation.productId : product;
-    navigate('/checkout', { state: { product: productToBuy } });
-  };
-
-  // Обработчик выбора вариации
-  const handleVariationSelect = (variation) => {
-    setSelectedVariation(variation);
-    setProduct(variation.productId);
-  };
-
-  // Обработчик выбора параметра
-  const handleParameterSelect = (parameter, value) => {
-    const newSelectedParams = { ...selectedParameters, [parameter]: value };
-    setSelectedParameters(newSelectedParams);
+    const currentProduct = getCurrentProduct();
+    const currentPrice = getCurrentPrice();
     
-    // Находим вариацию по выбранным параметрам
-    const variation = getVariationByParameters(newSelectedParams);
-    if (variation) {
-      setSelectedVariation(variation);
-      setProduct(variation.productId);
-    }
-  };
-
-  // Получение доступных вариаций
-  const getAvailableVariations = () => {
-    if (!productWithVariations) return [];
-    
-    if (productWithVariations.isVariation) {
-      return productWithVariations.variations || [];
-    } else if (productWithVariations.isMasterProduct) {
-      return productWithVariations.variations || [];
-    }
-    
-    return [];
-  };
-
-  // Получение уникальных параметров вариаций
-  const getVariationParameters = () => {
-    const variations = getAvailableVariations();
-    if (variations.length === 0) return [];
-
-    // Проверяем, есть ли вариации с произвольными параметрами
-    const hasCustomOptions = variations.some(v => v.variationOptions && Object.keys(v.variationOptions).length > 0);
-    
-    if (hasCustomOptions) {
-      // Получаем все уникальные параметры из variationOptions
-      const allParams = new Set();
-      variations.forEach(v => {
-        if (v.variationOptions) {
-          Object.keys(v.variationOptions).forEach(param => allParams.add(param));
-        }
-      });
-      return Array.from(allParams);
-    } else {
-      // Старый способ - один параметр
-      return [variationType];
-    }
-  };
-
-  // Получение уникальных значений для параметра
-  const getParameterValues = (parameter) => {
-    const variations = getAvailableVariations();
-    const values = new Set();
-    
-    variations.forEach(v => {
-      if (v.variationOptions && v.variationOptions[parameter]) {
-        values.add(v.variationOptions[parameter]);
-      } else if (parameter === variationType && v.variationValue) {
-        values.add(v.variationValue);
-      }
+    navigate('/checkout', { 
+      state: { 
+        product: currentProduct,
+        selectedVariant,
+        selectedParameters,
+        originalPrice: product.price,
+        currentPrice
+      } 
     });
-    
-    return Array.from(values);
   };
 
-  // Получение вариации по выбранным параметрам
-  const getVariationByParameters = (selectedParams) => {
-    const variations = getAvailableVariations();
+  // Функции для работы с вариациями
+  const handleParameterChange = (paramName, value) => {
+    const newParameters = { ...selectedParameters, [paramName]: value };
+    setSelectedParameters(newParameters);
     
-    return variations.find(v => {
-      if (v.variationOptions && Object.keys(v.variationOptions).length > 0) {
-        // Новый способ - проверяем все выбранные параметры
-        return Object.keys(selectedParams).every(param => 
-          v.variationOptions[param] === selectedParams[param]
+    // Находим подходящую вариацию
+    if (productGroup) {
+      const matchingVariant = productGroup.variants.find(variant => {
+        if (!variant.isActive) return false;
+        
+        // Проверяем, что все выбранные параметры совпадают
+        return Object.entries(newParameters).every(([key, val]) => 
+          variant.parameters[key] === val
         );
-      } else {
-        // Старый способ - проверяем только variationType
-        const paramValue = selectedParams[variationType];
-        return v.variationType === variationType && v.variationValue === paramValue;
+      });
+      
+      if (matchingVariant) {
+        setSelectedVariant(matchingVariant);
       }
-    });
+    }
   };
 
-  // Получение текущего товара для отображения
+  // Получаем текущий товар для отображения (с учетом выбранной вариации)
   const getCurrentProduct = () => {
-    if (selectedVariation) {
-      return selectedVariation.productId;
+    if (selectedVariant && selectedVariant.productId) {
+      return selectedVariant.productId;
     }
     return product;
+  };
+
+  // Получаем текущую цену
+  const getCurrentPrice = () => {
+    if (selectedVariant && selectedVariant.price) {
+      return selectedVariant.price;
+    }
+    return product?.price;
   };
 
   // Модалка фото
@@ -427,11 +361,11 @@ const Product = () => {
   const handleCloseImageModal = () => setShowImageModal(false);
   const handlePrevImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev - 1 + getAllImages().length) % getAllImages().length);
+    setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
   const handleNextImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev + 1) % getAllImages().length);
+    setActiveImage((prev) => (prev + 1) % allImages.length);
   };
   
   const handleCityChange = (e) => {
@@ -464,7 +398,7 @@ const Product = () => {
   
 
 
-  const shortDesc = getCurrentProduct()['Short description'] || 'краткое описание';
+  const shortDesc = product['Short description'] || 'краткое описание';
 
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
@@ -489,11 +423,11 @@ const Product = () => {
             {categoryName && (
               <>
                 <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-                <a href={`/catalog?category=${getCurrentProduct().category}`}>{categoryName}</a>
+                <a href={`/catalog?category=${product.category}`}>{categoryName}</a>
               </>
             )}
             <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-            <span style={{color:'#1a2236', fontWeight:500}}>{getCurrentProduct().name}</span>
+            <span style={{color:'#1a2236', fontWeight:500}}>{product.name}</span>
           </nav>
           <div className="product-flex">
             {/* Фото и миниатюры */}
@@ -501,25 +435,25 @@ const Product = () => {
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img 
-                    src={getCurrentProduct().image || getAllImages()[activeImage]} 
-                    alt={getCurrentProduct().name} 
+                    src={product.image || allImages[activeImage]} 
+                    alt={product.name} 
                     loading="lazy"
                     width="400"
                     height="400"
                     style={{width: '100%', height: 'auto', maxWidth: '400px'}}
                   />
                 </div>
-                {getAllImages().length > 1 && (
+                {allImages.length > 1 && (
                   <>
                     <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 20, marginBottom: 8, border:'none'}}>
                       Чтобы увеличить, нажмите на картинку
                     </div>
                     <div className="product-thumbs">
-                      {getAllImages().map((img, idx) => (
+                      {allImages.map((img, idx) => (
                         <img 
                           key={idx} 
                           src={img} 
-                          alt={getCurrentProduct().name + idx} 
+                          alt={product.name + idx} 
                           className={activeImage === idx ? "active" : ""} 
                           onClick={() => setActiveImage(idx)} 
                           loading="lazy"
@@ -535,57 +469,124 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
-                
-                {/* Селектор вариаций */}
-                {productWithVariations && getAvailableVariations().length > 0 && (
-                  <div className="product-variations" style={{marginBottom: 15}}>
-                    {getVariationParameters().map((parameter) => (
-                      <div key={parameter} style={{marginBottom: 15}}>
-                        <div style={{fontSize: '0.9rem', color: '#666', marginBottom: 8, fontWeight: 500}}>
-                          {parameter}:
-                        </div>
-                        <div className="variations-list" style={{display: 'flex', gap: 8, flexWrap: 'wrap'}}>
-                          {getParameterValues(parameter).map((value) => (
-                            <button
-                              key={value}
-                              onClick={() => handleParameterSelect(parameter, value)}
-                              className={`variation-option ${selectedParameters[parameter] === value ? 'selected' : ''}`}
-                              style={{
-                                padding: '8px 16px',
-                                border: selectedParameters[parameter] === value ? '2px solid #1976d2' : '1px solid #ddd',
-                                borderRadius: '6px',
-                                background: selectedParameters[parameter] === value ? '#e3f2fd' : '#fff',
-                                color: selectedParameters[parameter] === value ? '#1976d2' : '#333',
+                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
+                <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
+                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{product.subtitle}</div>
+                <div className="product-divider"></div>
+                {/* Компонент выбора вариаций */}
+                {productGroup && productGroup.parameters.length > 0 && (
+                  <div className="product-variations" style={{
+                    marginBottom: '20px',
+                    padding: '15px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: '#f9f9f9'
+                  }}>
+                    <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', fontWeight: '600' }}>
+                      Выберите параметры
+                    </h3>
+                    {productGroup.parameters.map((param, index) => (
+                      <div key={index} style={{ marginBottom: '15px' }}>
+                        <label style={{ 
+                          display: 'block', 
+                          marginBottom: '8px', 
+                          fontWeight: '500',
+                          color: '#333'
+                        }}>
+                          {param.name}
+                          {param.required && <span style={{ color: '#e74c3c' }}> *</span>}
+                        </label>
+                        
+                        {param.type === 'select' && (
+                          <select
+                            value={selectedParameters[param.name] || ''}
+                            onChange={(e) => handleParameterChange(param.name, e.target.value)}
+                            required={param.required}
+                            style={{
+                              width: '100%',
+                              padding: '8px 12px',
+                              border: '1px solid #ddd',
+                              borderRadius: '4px',
+                              fontSize: '14px'
+                            }}
+                          >
+                            <option value="">Выберите {param.name.toLowerCase()}</option>
+                            {param.values.map((value, valueIndex) => (
+                              <option key={valueIndex} value={value}>
+                                {value}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        
+                        {param.type === 'radio' && (
+                          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                            {param.values.map((value, valueIndex) => (
+                              <label key={valueIndex} style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
                                 cursor: 'pointer',
-                                fontSize: '14px',
-                                fontWeight: selectedParameters[parameter] === value ? '600' : '400',
-                                transition: 'all 0.2s ease'
-                              }}
-                            >
-                              {value}
-                            </button>
-                          ))}
-                        </div>
+                                fontSize: '14px'
+                              }}>
+                                <input
+                                  type="radio"
+                                  name={param.name}
+                                  value={value}
+                                  checked={selectedParameters[param.name] === value}
+                                  onChange={(e) => handleParameterChange(param.name, e.target.value)}
+                                  required={param.required}
+                                  style={{ marginRight: '6px' }}
+                                />
+                                {value}
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {param.type === 'checkbox' && (
+                          <label style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            cursor: 'pointer',
+                            fontSize: '14px'
+                          }}>
+                            <input
+                              type="checkbox"
+                              checked={selectedParameters[param.name] === 'true'}
+                              onChange={(e) => handleParameterChange(param.name, e.target.checked ? 'true' : 'false')}
+                              style={{ marginRight: '6px' }}
+                            />
+                            {param.name}
+                          </label>
+                        )}
                       </div>
                     ))}
+                    
+                    {selectedVariant && (
+                      <div style={{
+                        marginTop: '15px',
+                        padding: '10px',
+                        backgroundColor: '#e8f5e8',
+                        border: '1px solid #4caf50',
+                        borderRadius: '4px'
+                      }}>
+                        <strong>Выбрана вариация:</strong> {selectedVariant.productId?.name}
+                      </div>
+                    )}
                   </div>
                 )}
-                
-                <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
-                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{getCurrentProduct().subtitle}</div>
-                <div className="product-divider"></div>
+
                 <div className="product-buy-row">
                   <div className="product-price-block">
                     <div className="product-price-label-value">
                       <div className="product-price-label">Цена</div>
                       <div className="product-price-value">
-                        {Number(selectedVariation ? selectedVariation.price : product.price).toLocaleString('ru-RU')}
+                        {Number(getCurrentPrice()).toLocaleString('ru-RU')}
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
 
-                    {(selectedVariation ? selectedVariation.article : product.article) && (
+                    {product.article && (
                       <div style={{
                         fontSize: '0.85rem', 
                         color: '#666', 
@@ -599,7 +600,7 @@ const Product = () => {
                         alignItems: 'flex-start'
                       }}>
                         <span style={{fontWeight: 500, color: '#495057'}}>Артикул</span>
-                        <span style={{marginTop: 2}}>{selectedVariation ? selectedVariation.article : product.article}</span>
+                        <span style={{marginTop: 2}}>{product.article}</span>
                       </div>
                     )}
                   </div>
@@ -666,7 +667,7 @@ const Product = () => {
           </div>
           {/* Вкладки снизу */}
           <div className="product-tabs-wrap">
-                            <Tabs product={getCurrentProduct()} selectedVariation={selectedVariation} />
+            <Tabs product={product} />
                 </div>
             </div>
       </main>
@@ -760,8 +761,8 @@ const Product = () => {
     {showImageModal && (
       <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-                          <img src={getAllImages()[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
-                {getAllImages().length > 1 && (
+          <img src={allImages[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
+          {allImages.length > 1 && (
             <>
               <button 
                 onClick={handlePrevImage} 
@@ -812,7 +813,7 @@ const Product = () => {
                 ›
               </button>
               <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
-                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {getAllImages().length}</span>
+                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {allImages.length}</span>
               </div>
             </>
           )}
@@ -824,7 +825,7 @@ const Product = () => {
   );
 };
 
-function Tabs({product, selectedVariation}) {
+function Tabs({product}) {
   const [tab,setTab]=React.useState('desc');
   
   // Функция для парсинга характеристик из строки
@@ -856,13 +857,8 @@ function Tabs({product, selectedVariation}) {
     }
   };
   
-  // Если есть выбранная вариация, используем её характеристики и комплектацию
-  const characteristics = parseCharacteristics(
-    selectedVariation && selectedVariation.characteristics ? selectedVariation.characteristics : product.characteristics
-  );
-  const equipment = parseEquipment(
-    selectedVariation && selectedVariation.equipment ? selectedVariation.equipment : product.equipment
-  );
+  const characteristics = parseCharacteristics(product.characteristics);
+  const equipment = parseEquipment(product.equipment);
   return (
     <div className="product-tabs">
       <div className="product-tabs-header">
