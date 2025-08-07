@@ -112,8 +112,54 @@ const Information = mongoose.model('Information', informationSchema);
 app.get('/api/products', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
+    
+    // Получаем все обычные товары
     const products = await Product.find().limit(limit);
-    res.json(products);
+    
+    // Получаем все мастер-товары
+    const masterProducts = await MasterProduct.find({ isActive: true });
+    
+    // Получаем ID всех товаров, которые являются вариациями
+    const variationProductIds = await ProductVariation.distinct('productId');
+    
+    // Фильтруем обычные товары, исключая те, которые являются вариациями
+    const filteredProducts = products.filter(product => 
+      !variationProductIds.some(variationId => variationId.toString() === product._id.toString())
+    );
+    
+    // Преобразуем мастер-товары в формат, совместимый с обычными товарами
+    const masterProductsFormatted = masterProducts.map(master => ({
+      _id: master._id,
+      name: master.name,
+      category: master.category,
+      description: master.description,
+      'Short description': master.shortDescription,
+      image: master.mainImage,
+      price: 'От 0', // Будет обновлено ниже
+      article: 'MP-' + master._id.toString().slice(-6),
+      isMasterProduct: true,
+      masterProductId: master._id
+    }));
+    
+    // Получаем минимальные цены для мастер-товаров
+    for (let master of masterProductsFormatted) {
+      const variations = await ProductVariation.find({ 
+        masterProductId: master.masterProductId,
+        isActive: true 
+      });
+      if (variations.length > 0) {
+        const minPrice = Math.min(...variations.map(v => parseFloat(v.price) || 0));
+        master.price = `От ${minPrice.toLocaleString()}`;
+      }
+    }
+    
+    // Объединяем обычные товары и мастер-товары
+    const allProducts = [...filteredProducts, ...masterProductsFormatted];
+    
+    // Применяем лимит к общему списку
+    const limitedProducts = limit > 0 ? allProducts.slice(0, limit) : allProducts;
+    
+    res.json(limitedProducts);
   } catch (err) {
     console.error('Ошибка получения продуктов:', err);
     res.status(500).json({ error: 'Ошибка при получении продуктов' });
@@ -123,6 +169,40 @@ app.get('/api/products', async (req, res) => {
 // API endpoint для получения одного продукта по id
 app.get('/api/products/:id', async (req, res) => {
   try {
+    // Сначала проверяем, является ли это мастер-товаром
+    const masterProduct = await MasterProduct.findById(req.params.id);
+    if (masterProduct) {
+      // Получаем вариации для мастер-товара
+      const variations = await ProductVariation.find({ 
+        masterProductId: req.params.id,
+        isActive: true 
+      }).populate('productId');
+      
+      // Формируем ответ в формате обычного товара
+      const productData = {
+        _id: masterProduct._id,
+        name: masterProduct.name,
+        category: masterProduct.category,
+        description: masterProduct.description,
+        'Short description': masterProduct.shortDescription,
+        image: masterProduct.mainImage,
+        price: 'От 0',
+        article: 'MP-' + masterProduct._id.toString().slice(-6),
+        isMasterProduct: true,
+        masterProductId: masterProduct._id,
+        variations: variations
+      };
+      
+      // Устанавливаем минимальную цену
+      if (variations.length > 0) {
+        const minPrice = Math.min(...variations.map(v => parseFloat(v.price) || 0));
+        productData.price = `От ${minPrice.toLocaleString()}`;
+      }
+      
+      return res.json(productData);
+    }
+    
+    // Если не мастер-товар, ищем обычный товар
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
     res.json(product);
@@ -547,7 +627,9 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
 // Получить все мастер-товары
 app.get('/api/master-products', async (req, res) => {
   try {
+    console.log('Запрос всех мастер-товаров');
     const masterProducts = await MasterProduct.find({ isActive: true });
+    console.log('Найдено мастер-товаров:', masterProducts.length);
     res.json(masterProducts);
   } catch (err) {
     console.error('Ошибка получения мастер-товаров:', err);
@@ -683,6 +765,7 @@ app.delete('/api/product-variations/:id', async (req, res) => {
 // API для объединения товаров в мастер-товар
 app.post('/api/merge-products', async (req, res) => {
   try {
+    console.log('Начало объединения товаров:', { productIds, masterProductData, variationType, variationOptions });
     const { productIds, masterProductData, variationType, variationOptions } = req.body;
     
     if (!productIds || !Array.isArray(productIds) || productIds.length < 2) {
@@ -804,8 +887,11 @@ app.post('/api/merge-products', async (req, res) => {
 // API для получения товара с вариациями (для фронтенда)
 app.get('/api/products/:id/with-variations', async (req, res) => {
   try {
+    console.log('Запрос товара с вариациями для ID:', req.params.id);
+    
     const product = await Product.findById(req.params.id);
     if (!product) {
+      console.log('Товар не найден в базе данных');
       return res.status(404).json({ error: 'Товар не найден' });
     }
     
