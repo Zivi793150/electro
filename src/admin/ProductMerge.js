@@ -118,12 +118,16 @@ function ProductMerge({ onLogout }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
+        const requestData = {
           productIds: selectedProducts,
           masterProductData: mergeFormData,
           variationType: useCustomOptions ? null : mergeFormData.variationType,
           variationOptions: useCustomOptions ? getVariationOptionsForAPI() : null
-        })
+        };
+        
+        console.log('Отправляем данные на сервер:', requestData);
+        
+        body: JSON.stringify(requestData)
       });
       
       const data = await response.json();

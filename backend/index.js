@@ -765,8 +765,8 @@ app.delete('/api/product-variations/:id', async (req, res) => {
 // API для объединения товаров в мастер-товар
 app.post('/api/merge-products', async (req, res) => {
   try {
-    console.log('Начало объединения товаров:', { productIds, masterProductData, variationType, variationOptions });
     const { productIds, masterProductData, variationType, variationOptions } = req.body;
+    console.log('Начало объединения товаров:', { productIds, masterProductData, variationType, variationOptions });
     
     if (!productIds || !Array.isArray(productIds) || productIds.length < 2) {
       return res.status(400).json({ error: 'Необходимо выбрать минимум 2 товара для объединения' });
@@ -782,9 +782,12 @@ app.post('/api/merge-products', async (req, res) => {
     }
     
     // Получаем все товары для объединения
+    console.log('Поиск товаров с ID:', productIds);
     const products = await Product.find({ _id: { $in: productIds } });
+    console.log('Найдено товаров:', products.length);
     
     if (products.length !== productIds.length) {
+      console.log('Ошибка: не все товары найдены. Ожидалось:', productIds.length, 'Найдено:', products.length);
       return res.status(400).json({ error: 'Некоторые товары не найдены' });
     }
     
@@ -797,8 +800,10 @@ app.post('/api/merge-products', async (req, res) => {
     const savedMasterProduct = await masterProduct.save();
     
     // Создаем вариации для каждого товара
+    console.log('Начинаем создание вариаций для', products.length, 'товаров');
     const variations = [];
     for (const product of products) {
+      console.log('Создание вариации для товара:', product.name);
       let variationData = {
         masterProductId: savedMasterProduct._id,
         productId: product._id,
@@ -872,6 +877,7 @@ app.post('/api/merge-products', async (req, res) => {
       variations.push(savedVariation);
     }
     
+    console.log('Объединение завершено успешно. Создано вариаций:', variations.length);
     res.status(201).json({
       masterProduct: savedMasterProduct,
       variations,
