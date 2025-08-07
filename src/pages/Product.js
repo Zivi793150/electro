@@ -148,26 +148,27 @@ const Product = () => {
   
   // Объединяем все изображения из разных полей
   const getAllImages = () => {
+    const currentProduct = getCurrentProduct();
     const images = [];
     
     // Добавляем основное изображение из поля image (если есть)
-    if (product?.image) {
-      images.push(product.image);
+    if (currentProduct?.image) {
+      images.push(currentProduct.image);
     }
     
     // Добавляем изображения из поля images
-    if (Array.isArray(product?.images)) {
-      images.push(...product.images);
+    if (Array.isArray(currentProduct?.images)) {
+      images.push(...currentProduct.images);
     }
     
     // Добавляем изображения из поля images2
-    if (Array.isArray(product?.images2)) {
-      images.push(...product.images2);
+    if (Array.isArray(currentProduct?.images2)) {
+      images.push(...currentProduct.images2);
     }
     
     // Добавляем изображения из поля images3
-    if (Array.isArray(product?.images3)) {
-      images.push(...product.images3);
+    if (Array.isArray(currentProduct?.images3)) {
+      images.push(...currentProduct.images3);
     }
     
     // Если нет изображений, добавляем placeholder
@@ -299,7 +300,7 @@ const Product = () => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = (formData) => {
-    console.log('Заявка на товар:', { ...formData, product: product.name });
+    console.log('Заявка на товар:', { ...formData, product: getCurrentProduct().name });
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
 
@@ -350,8 +351,8 @@ const Product = () => {
 
   // Получаем текущую цену
   const getCurrentPrice = () => {
-    if (selectedVariant && selectedVariant.price) {
-      return selectedVariant.price;
+    if (selectedVariant && selectedVariant.productId) {
+      return selectedVariant.productId.price;
     }
     return product?.price;
   };
@@ -398,7 +399,7 @@ const Product = () => {
   
 
 
-  const shortDesc = product['Short description'] || 'краткое описание';
+  const shortDesc = getCurrentProduct()['Short description'] || 'краткое описание';
 
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
@@ -469,9 +470,9 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{product.name}</h1>
+                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
                 <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
-                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{product.subtitle}</div>
+                <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{getCurrentProduct().subtitle}</div>
                 <div className="product-divider"></div>
                 {/* Компонент выбора вариаций */}
                 {productGroup && productGroup.parameters.length > 0 && (
@@ -586,7 +587,7 @@ const Product = () => {
                       </div>
                     </div>
 
-                    {product.article && (
+                    {getCurrentProduct().article && (
                       <div style={{
                         fontSize: '0.85rem', 
                         color: '#666', 
@@ -600,7 +601,7 @@ const Product = () => {
                         alignItems: 'flex-start'
                       }}>
                         <span style={{fontWeight: 500, color: '#495057'}}>Артикул</span>
-                        <span style={{marginTop: 2}}>{product.article}</span>
+                        <span style={{marginTop: 2}}>{getCurrentProduct().article}</span>
                       </div>
                     )}
                   </div>
@@ -667,7 +668,7 @@ const Product = () => {
           </div>
           {/* Вкладки снизу */}
           <div className="product-tabs-wrap">
-            <Tabs product={product} />
+            <Tabs product={getCurrentProduct()} />
                 </div>
             </div>
       </main>
@@ -761,7 +762,7 @@ const Product = () => {
     {showImageModal && (
       <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-          <img src={allImages[activeImage]} alt={product.name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
+          <img src={allImages[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
           {allImages.length > 1 && (
             <>
               <button 

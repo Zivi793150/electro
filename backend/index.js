@@ -66,7 +66,6 @@ const productGroupSchema = new mongoose.Schema({
   variants: [{
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
     parameters: { type: Map, of: String }, // Динамические параметры (вольты, с регулятором и т.д.)
-    price: String,
     isActive: { type: Boolean, default: true }
   }],
   parameters: [{ // Настраиваемые параметры для группы
@@ -114,7 +113,25 @@ const Information = mongoose.model('Information', informationSchema);
 app.get('/api/products', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
-    const products = await Product.find().limit(limit);
+    
+    // Получаем все группы вариаций
+    const productGroups = await ProductGroup.find().populate('variants.productId');
+    
+    // Собираем ID всех товаров, которые являются вариациями
+    const variantProductIds = new Set();
+    productGroups.forEach(group => {
+      group.variants.forEach(variant => {
+        if (variant.productId && variant.isActive) {
+          variantProductIds.add(variant.productId._id.toString());
+        }
+      });
+    });
+    
+    // Получаем все товары, исключая те, которые являются вариациями
+    const products = await Product.find({
+      _id: { $nin: Array.from(variantProductIds) }
+    }).limit(limit);
+    
     res.json(products);
   } catch (err) {
     console.error('Ошибка получения продуктов:', err);

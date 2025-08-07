@@ -173,7 +173,6 @@ function ProductVariations() {
       variants: [...prev.variants, {
         productId: '',
         parameters: new Map(),
-        price: '',
         isActive: true
       }]
     }));
@@ -519,29 +518,21 @@ function ProductVariations() {
                 {formData.variants.map((variant, index) => (
                   <div key={index} className="variant-card">
                     <div className="variant-header">
-                      <div className="variant-inputs">
-                        <select
-                          value={variant.productId}
-                          onChange={(e) => updateVariant(index, 'productId', e.target.value)}
-                          className="form-select"
-                          required
-                        >
-                          <option value="">Выберите товар</option>
-                          {products.map(product => (
-                            <option key={product._id} value={product._id}>
-                              {product.name}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          type="text"
-                          placeholder="Цена"
-                          value={variant.price}
-                          onChange={(e) => updateVariant(index, 'price', e.target.value)}
-                          className="form-input"
-                          required
-                        />
-                      </div>
+                                             <div className="variant-inputs">
+                         <select
+                           value={variant.productId}
+                           onChange={(e) => updateVariant(index, 'productId', e.target.value)}
+                           className="form-select"
+                           required
+                         >
+                           <option value="">Выберите товар</option>
+                           {products.map(product => (
+                             <option key={product._id} value={product._id}>
+                               {product.name} - {product.price} ₸
+                             </option>
+                           ))}
+                         </select>
+                       </div>
                       <div className="variant-options">
                         <label className="checkbox-label">
                           <input
