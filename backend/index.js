@@ -115,21 +115,29 @@ app.get('/api/products', async (req, res) => {
     const limit = parseInt(req.query.limit) || 0;
     
     // Получаем все группы вариаций
-    const productGroups = await ProductGroup.find().populate('variants.productId');
+    const productGroups = await ProductGroup.find();
     
     // Собираем ID всех товаров, которые являются вариациями
     const variantProductIds = new Set();
+    // Собираем ID всех мастер-товаров
+    const masterProductIds = new Set();
     productGroups.forEach(group => {
+      if (group.baseProductId) masterProductIds.add(group.baseProductId.toString());
       group.variants.forEach(variant => {
         if (variant.productId && variant.isActive) {
-          variantProductIds.add(variant.productId._id.toString());
+          variantProductIds.add(variant.productId.toString());
         }
       });
     });
     
-    // Получаем все товары, исключая те, которые являются вариациями
+    // В каталоге должны быть:
+    // 1. Все товары, которые НЕ входят в variants ни одной группы
+    // 2. Все товары, которые являются baseProductId хотя бы одной группы
     const products = await Product.find({
-      _id: { $nin: Array.from(variantProductIds) }
+      $or: [
+        { _id: { $nin: Array.from(variantProductIds) } },
+        { _id: { $in: Array.from(masterProductIds) } }
+      ]
     }).limit(limit);
     
     res.json(products);
