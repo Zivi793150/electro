@@ -184,7 +184,6 @@ const Product = () => {
     return images;
   };
   
-  const allImages = getAllImages();
   const navigate = useNavigate();
 
   const API_URL = 'https://electro-a8bl.onrender.com/api/products';
@@ -428,11 +427,11 @@ const Product = () => {
   const handleCloseImageModal = () => setShowImageModal(false);
   const handlePrevImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
+    setActiveImage((prev) => (prev - 1 + getAllImages().length) % getAllImages().length);
   };
   const handleNextImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev + 1) % allImages.length);
+    setActiveImage((prev) => (prev + 1) % getAllImages().length);
   };
   
   const handleCityChange = (e) => {
@@ -502,7 +501,7 @@ const Product = () => {
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img 
-                    src={getCurrentProduct().image || allImages[activeImage]} 
+                    src={getCurrentProduct().image || getAllImages()[activeImage]} 
                     alt={getCurrentProduct().name} 
                     loading="lazy"
                     width="400"
@@ -510,13 +509,13 @@ const Product = () => {
                     style={{width: '100%', height: 'auto', maxWidth: '400px'}}
                   />
                 </div>
-                {allImages.length > 1 && (
+                {getAllImages().length > 1 && (
                   <>
                     <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 20, marginBottom: 8, border:'none'}}>
                       Чтобы увеличить, нажмите на картинку
                     </div>
                     <div className="product-thumbs">
-                      {allImages.map((img, idx) => (
+                      {getAllImages().map((img, idx) => (
                         <img 
                           key={idx} 
                           src={img} 
@@ -761,8 +760,8 @@ const Product = () => {
     {showImageModal && (
       <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-          <img src={allImages[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
-          {allImages.length > 1 && (
+                          <img src={getAllImages()[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
+                {getAllImages().length > 1 && (
             <>
               <button 
                 onClick={handlePrevImage} 
@@ -813,7 +812,7 @@ const Product = () => {
                 ›
               </button>
               <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
-                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {allImages.length}</span>
+                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {getAllImages().length}</span>
               </div>
             </>
           )}
