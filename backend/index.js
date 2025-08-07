@@ -48,8 +48,11 @@ const Product = mongoose.model('Product', productSchema);
 // Модель для вариаций товаров
 const productVariationSchema = new mongoose.Schema({
   masterProductId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-  variationType: { type: String, required: true }, // например: 'voltage', 'power', 'size'
-  variationValue: { type: String, required: true }, // например: '950W', '1100W'
+  // Старый способ (оставляем для обратной совместимости)
+  variationType: { type: String }, // например: 'voltage', 'power', 'size'
+  variationValue: { type: String }, // например: '950W', '1100W'
+  // Новый способ: произвольные параметры вариации
+  variationOptions: { type: mongoose.Schema.Types.Mixed, default: {} }, // например: { voltage: '220', regulator: 'Да' }
   productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
   price: { type: String, required: true },
   article: { type: String },
@@ -680,7 +683,7 @@ app.delete('/api/product-variations/:id', async (req, res) => {
 // API для объединения товаров в мастер-товар
 app.post('/api/merge-products', async (req, res) => {
   try {
-    const { productIds, masterProductData, variationType } = req.body;
+    const { productIds, masterProductData, variationType, variationOptions } = req.body;
     
     if (!productIds || !Array.isArray(productIds) || productIds.length < 2) {
       return res.status(400).json({ error: 'Необходимо выбрать минимум 2 товара для объединения' });
@@ -690,8 +693,9 @@ app.post('/api/merge-products', async (req, res) => {
       return res.status(400).json({ error: 'Необходимо указать название мастер-товара' });
     }
     
-    if (!variationType) {
-      return res.status(400).json({ error: 'Необходимо указать тип вариации' });
+    // Поддержка как старого способа (variationType), так и нового (variationOptions)
+    if (!variationType && (!variationOptions || Object.keys(variationOptions).length === 0)) {
+      return res.status(400).json({ error: 'Необходимо указать параметры вариации' });
     }
     
     // Получаем все товары для объединения
@@ -704,7 +708,7 @@ app.post('/api/merge-products', async (req, res) => {
     // Создаем мастер-товар
     const masterProduct = new MasterProduct({
       ...masterProductData,
-      variationTypes: [variationType]
+      variationTypes: variationOptions ? Object.keys(variationOptions) : [variationType]
     });
     
     const savedMasterProduct = await masterProduct.save();
@@ -712,59 +716,75 @@ app.post('/api/merge-products', async (req, res) => {
     // Создаем вариации для каждого товара
     const variations = [];
     for (const product of products) {
-      // Извлекаем значение вариации из характеристик или названия
-      let variationValue = '';
-      
-      // Пытаемся найти значение в характеристиках
-      if (product.characteristics) {
-        try {
-          const characteristics = typeof product.characteristics === 'string' 
-            ? JSON.parse(product.characteristics) 
-            : product.characteristics;
-          
-          if (Array.isArray(characteristics)) {
-            const powerChar = characteristics.find(char => 
-              char.parameter && char.parameter.toLowerCase().includes('мощность') ||
-              char.parameter && char.parameter.toLowerCase().includes('power')
-            );
-            if (powerChar) {
-              variationValue = powerChar.value;
-            }
-          }
-        } catch (e) {
-          // Если не удалось распарсить JSON, ищем в строке
-          const powerMatch = product.characteristics.match(/(\d+)\s*[ВтW]/i);
-          if (powerMatch) {
-            variationValue = powerMatch[0];
-          }
-        }
-      }
-      
-      // Если не нашли в характеристиках, ищем в названии
-      if (!variationValue) {
-        const powerMatch = product.name.match(/(\d+)\s*[ВтW]/i);
-        if (powerMatch) {
-          variationValue = powerMatch[0];
-        }
-      }
-      
-      // Если все еще не нашли, используем артикул или ID
-      if (!variationValue) {
-        variationValue = product.article || product._id.toString().slice(-6);
-      }
-      
-      const variation = new ProductVariation({
+      let variationData = {
         masterProductId: savedMasterProduct._id,
-        variationType,
-        variationValue,
         productId: product._id,
         price: product.price,
         article: product.article,
         characteristics: product.characteristics,
         equipment: product.equipment,
         images: product.images || []
-      });
+      };
+
+      if (variationOptions) {
+        // Новый способ: произвольные параметры
+        variationData.variationOptions = {};
+        
+        // Для каждого параметра из variationOptions создаем значение
+        for (const [paramName, paramValues] of Object.entries(variationOptions)) {
+          if (Array.isArray(paramValues) && paramValues.length > 0) {
+            // Берем значение по индексу товара (циклически)
+            const valueIndex = variations.length % paramValues.length;
+            variationData.variationOptions[paramName] = paramValues[valueIndex];
+          }
+        }
+      } else {
+        // Старый способ: автоматическое извлечение значения
+        let variationValue = '';
+        
+        // Пытаемся найти значение в характеристиках
+        if (product.characteristics) {
+          try {
+            const characteristics = typeof product.characteristics === 'string' 
+              ? JSON.parse(product.characteristics) 
+              : product.characteristics;
+            
+            if (Array.isArray(characteristics)) {
+              const powerChar = characteristics.find(char => 
+                char.parameter && char.parameter.toLowerCase().includes('мощность') ||
+                char.parameter && char.parameter.toLowerCase().includes('power')
+              );
+              if (powerChar) {
+                variationValue = powerChar.value;
+              }
+            }
+          } catch (e) {
+            // Если не удалось распарсить JSON, ищем в строке
+            const powerMatch = product.characteristics.match(/(\d+)\s*[ВтW]/i);
+            if (powerMatch) {
+              variationValue = powerMatch[0];
+            }
+          }
+        }
+        
+        // Если не нашли в характеристиках, ищем в названии
+        if (!variationValue) {
+          const powerMatch = product.name.match(/(\d+)\s*[ВтW]/i);
+          if (powerMatch) {
+            variationValue = powerMatch[0];
+          }
+        }
+        
+        // Если все еще не нашли, используем артикул или ID
+        if (!variationValue) {
+          variationValue = product.article || product._id.toString().slice(-6);
+        }
+        
+        variationData.variationType = variationType;
+        variationData.variationValue = variationValue;
+      }
       
+      const variation = new ProductVariation(variationData);
       const savedVariation = await variation.save();
       variations.push(savedVariation);
     }

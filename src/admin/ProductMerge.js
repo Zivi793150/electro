@@ -20,6 +20,10 @@ function ProductMerge({ onLogout }) {
     variationType: 'power'
   });
 
+  // Состояние для произвольных параметров вариаций
+  const [variationOptions, setVariationOptions] = useState([]);
+  const [useCustomOptions, setUseCustomOptions] = useState(false);
+
   // Загрузка всех товаров
   const fetchProducts = async () => {
     try {
@@ -117,7 +121,8 @@ function ProductMerge({ onLogout }) {
         body: JSON.stringify({
           productIds: selectedProducts,
           masterProductData: mergeFormData,
-          variationType: mergeFormData.variationType
+          variationType: useCustomOptions ? null : mergeFormData.variationType,
+          variationOptions: useCustomOptions ? getVariationOptionsForAPI() : null
         })
       });
       
@@ -182,6 +187,65 @@ function ProductMerge({ onLogout }) {
   const getSelectedProductObjects = () => {
     if (!Array.isArray(products)) return [];
     return products.filter(p => p && p._id && selectedProducts.includes(p._id));
+  };
+
+  // Добавление нового параметра вариации
+  const addVariationOption = () => {
+    setVariationOptions(prev => [...prev, {
+      id: Date.now(),
+      name: '',
+      values: ['']
+    }]);
+  };
+
+  // Удаление параметра вариации
+  const removeVariationOption = (optionId) => {
+    setVariationOptions(prev => prev.filter(option => option.id !== optionId));
+  };
+
+  // Обновление названия параметра
+  const updateVariationOptionName = (optionId, name) => {
+    setVariationOptions(prev => prev.map(option => 
+      option.id === optionId ? { ...option, name } : option
+    ));
+  };
+
+  // Добавление значения к параметру
+  const addVariationOptionValue = (optionId) => {
+    setVariationOptions(prev => prev.map(option => 
+      option.id === optionId ? { ...option, values: [...option.values, ''] } : option
+    ));
+  };
+
+  // Удаление значения параметра
+  const removeVariationOptionValue = (optionId, valueIndex) => {
+    setVariationOptions(prev => prev.map(option => 
+      option.id === optionId ? { 
+        ...option, 
+        values: option.values.filter((_, index) => index !== valueIndex) 
+      } : option
+    ));
+  };
+
+  // Обновление значения параметра
+  const updateVariationOptionValue = (optionId, valueIndex, value) => {
+    setVariationOptions(prev => prev.map(option => 
+      option.id === optionId ? { 
+        ...option, 
+        values: option.values.map((v, index) => index === valueIndex ? value : v) 
+      } : option
+    ));
+  };
+
+  // Преобразование variationOptions в формат для API
+  const getVariationOptionsForAPI = () => {
+    const result = {};
+    variationOptions.forEach(option => {
+      if (option.name && option.values.length > 0 && option.values.some(v => v.trim())) {
+        result[option.name] = option.values.filter(v => v.trim());
+      }
+    });
+    return result;
   };
 
   return (
@@ -367,17 +431,160 @@ function ProductMerge({ onLogout }) {
                 </div>
 
                 <div className="form-group">
-                  <label>Тип вариации:</label>
-                  <select
-                    value={mergeFormData.variationType}
-                    onChange={(e) => setMergeFormData(prev => ({ ...prev, variationType: e.target.value }))}
-                  >
-                    <option value="power">Мощность (Вт)</option>
-                    <option value="voltage">Напряжение (В)</option>
-                    <option value="size">Размер</option>
-                    <option value="color">Цвет</option>
-                    <option value="custom">Другое</option>
-                  </select>
+                  <label>Способ задания вариаций:</label>
+                  <div style={{marginBottom: 15}}>
+                    <label style={{display: 'flex', alignItems: 'center', marginBottom: 10}}>
+                      <input
+                        type="radio"
+                        checked={!useCustomOptions}
+                        onChange={() => setUseCustomOptions(false)}
+                        style={{marginRight: 8}}
+                      />
+                      Автоматический (по мощности)
+                    </label>
+                    <label style={{display: 'flex', alignItems: 'center'}}>
+                      <input
+                        type="radio"
+                        checked={useCustomOptions}
+                        onChange={() => setUseCustomOptions(true)}
+                        style={{marginRight: 8}}
+                      />
+                      Произвольные параметры
+                    </label>
+                  </div>
+                  
+                  {!useCustomOptions ? (
+                    <div>
+                      <label>Тип вариации:</label>
+                      <select
+                        value={mergeFormData.variationType}
+                        onChange={(e) => setMergeFormData(prev => ({ ...prev, variationType: e.target.value }))}
+                      >
+                        <option value="power">Мощность (Вт)</option>
+                        <option value="voltage">Напряжение (В)</option>
+                        <option value="size">Размер</option>
+                        <option value="color">Цвет</option>
+                        <option value="custom">Другое</option>
+                      </select>
+                    </div>
+                  ) : (
+                    <div>
+                      <label>Произвольные параметры вариаций:</label>
+                      <div style={{marginTop: 10}}>
+                        {variationOptions.map((option, optionIndex) => (
+                          <div key={option.id} style={{
+                            border: '1px solid #ddd',
+                            borderRadius: '5px',
+                            padding: '15px',
+                            marginBottom: '10px',
+                            backgroundColor: '#f9f9f9'
+                          }}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
+                              <input
+                                type="text"
+                                placeholder="Название параметра (например: Вольты)"
+                                value={option.name}
+                                onChange={(e) => updateVariationOptionName(option.id, e.target.value)}
+                                style={{
+                                  flex: 1,
+                                  padding: '8px',
+                                  border: '1px solid #ccc',
+                                  borderRadius: '4px',
+                                  marginRight: '10px'
+                                }}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => removeVariationOption(option.id)}
+                                style={{
+                                  background: '#dc3545',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  padding: '8px 12px',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                Удалить
+                              </button>
+                            </div>
+                            
+                            <div>
+                              <label style={{fontSize: '14px', color: '#666', marginBottom: '5px', display: 'block'}}>
+                                Значения параметра:
+                              </label>
+                              {option.values.map((value, valueIndex) => (
+                                <div key={valueIndex} style={{display: 'flex', alignItems: 'center', marginBottom: '5px'}}>
+                                  <input
+                                    type="text"
+                                    placeholder="Значение (например: 220)"
+                                    value={value}
+                                    onChange={(e) => updateVariationOptionValue(option.id, valueIndex, e.target.value)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '6px',
+                                      border: '1px solid #ccc',
+                                      borderRadius: '4px',
+                                      marginRight: '5px'
+                                    }}
+                                  />
+                                  {option.values.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeVariationOptionValue(option.id, valueIndex)}
+                                      style={{
+                                        background: '#ffc107',
+                                        color: '#333',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        padding: '6px 8px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                      }}
+                                    >
+                                      ✕
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() => addVariationOptionValue(option.id)}
+                                style={{
+                                  background: '#28a745',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '4px',
+                                  padding: '6px 12px',
+                                  cursor: 'pointer',
+                                  fontSize: '12px',
+                                  marginTop: '5px'
+                                }}
+                              >
+                                + Добавить значение
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        <button
+                          type="button"
+                          onClick={addVariationOption}
+                          style={{
+                            background: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            padding: '10px 15px',
+                            cursor: 'pointer',
+                            width: '100%'
+                          }}
+                        >
+                          + Добавить параметр
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-group">

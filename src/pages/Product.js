@@ -50,6 +50,7 @@ const Product = () => {
   const [productWithVariations, setProductWithVariations] = useState(null);
   const [selectedVariation, setSelectedVariation] = useState(null);
   const [variationType, setVariationType] = useState('');
+  const [selectedParameters, setSelectedParameters] = useState({});
   
 
   
@@ -214,12 +215,25 @@ const Product = () => {
             setProduct(data.currentVariation.productId);
             setSelectedVariation(data.currentVariation);
             setVariationType(data.currentVariation.variationType);
+            
+            // Инициализируем выбранные параметры для вариации
+            if (data.currentVariation.variationOptions) {
+              setSelectedParameters(data.currentVariation.variationOptions);
+            }
           } else {
             setProduct(data.masterProduct);
             setVariationType(data.masterProduct.variationTypes[0] || 'power');
             // Выбираем первую вариацию по умолчанию
             if (data.variations && data.variations.length > 0) {
-              setSelectedVariation(data.variations[0]);
+              const firstVariation = data.variations[0];
+              setSelectedVariation(firstVariation);
+              
+              // Инициализируем выбранные параметры
+              if (firstVariation.variationOptions) {
+                setSelectedParameters(firstVariation.variationOptions);
+              } else if (firstVariation.variationType && firstVariation.variationValue) {
+                setSelectedParameters({ [firstVariation.variationType]: firstVariation.variationValue });
+              }
             }
           }
         } else {
@@ -318,6 +332,19 @@ const Product = () => {
     setProduct(variation.productId);
   };
 
+  // Обработчик выбора параметра
+  const handleParameterSelect = (parameter, value) => {
+    const newSelectedParams = { ...selectedParameters, [parameter]: value };
+    setSelectedParameters(newSelectedParams);
+    
+    // Находим вариацию по выбранным параметрам
+    const variation = getVariationByParameters(newSelectedParams);
+    if (variation) {
+      setSelectedVariation(variation);
+      setProduct(variation.productId);
+    }
+  };
+
   // Получение доступных вариаций
   const getAvailableVariations = () => {
     if (!productWithVariations) return [];
@@ -329,6 +356,63 @@ const Product = () => {
     }
     
     return [];
+  };
+
+  // Получение уникальных параметров вариаций
+  const getVariationParameters = () => {
+    const variations = getAvailableVariations();
+    if (variations.length === 0) return [];
+
+    // Проверяем, есть ли вариации с произвольными параметрами
+    const hasCustomOptions = variations.some(v => v.variationOptions && Object.keys(v.variationOptions).length > 0);
+    
+    if (hasCustomOptions) {
+      // Получаем все уникальные параметры из variationOptions
+      const allParams = new Set();
+      variations.forEach(v => {
+        if (v.variationOptions) {
+          Object.keys(v.variationOptions).forEach(param => allParams.add(param));
+        }
+      });
+      return Array.from(allParams);
+    } else {
+      // Старый способ - один параметр
+      return [variationType];
+    }
+  };
+
+  // Получение уникальных значений для параметра
+  const getParameterValues = (parameter) => {
+    const variations = getAvailableVariations();
+    const values = new Set();
+    
+    variations.forEach(v => {
+      if (v.variationOptions && v.variationOptions[parameter]) {
+        values.add(v.variationOptions[parameter]);
+      } else if (parameter === variationType && v.variationValue) {
+        values.add(v.variationValue);
+      }
+    });
+    
+    return Array.from(values);
+  };
+
+  // Получение вариации по выбранным параметрам
+  const getVariationByParameters = (selectedParams) => {
+    const variations = getAvailableVariations();
+    
+    return variations.find(v => {
+      if (v.variationOptions && Object.keys(v.variationOptions).length > 0) {
+        // Новый способ - проверяем все выбранные параметры
+        return Object.keys(selectedParams).every(param => 
+          v.variationOptions[param] === selectedParams[param]
+        );
+      } else {
+        // Старый способ - проверяем только variationType
+        const paramValue = selectedParams[variationType];
+        return v.variationType === variationType && v.variationValue === paramValue;
+      }
+    });
   };
 
   // Получение текущего товара для отображения
@@ -457,35 +541,35 @@ const Product = () => {
                 {/* Селектор вариаций */}
                 {productWithVariations && getAvailableVariations().length > 0 && (
                   <div className="product-variations" style={{marginBottom: 15}}>
-                    <div style={{fontSize: '0.9rem', color: '#666', marginBottom: 8, fontWeight: 500}}>
-                      {variationType === 'power' && 'Мощность:'}
-                      {variationType === 'voltage' && 'Напряжение:'}
-                      {variationType === 'size' && 'Размер:'}
-                      {variationType === 'color' && 'Цвет:'}
-                      {variationType === 'custom' && 'Вариант:'}
-                    </div>
-                    <div className="variations-list" style={{display: 'flex', gap: 8, flexWrap: 'wrap'}}>
-                      {getAvailableVariations().map((variation) => (
-                        <button
-                          key={variation._id}
-                          onClick={() => handleVariationSelect(variation)}
-                          className={`variation-option ${selectedVariation && selectedVariation._id === variation._id ? 'selected' : ''}`}
-                          style={{
-                            padding: '8px 16px',
-                            border: selectedVariation && selectedVariation._id === variation._id ? '2px solid #1976d2' : '1px solid #ddd',
-                            borderRadius: '6px',
-                            background: selectedVariation && selectedVariation._id === variation._id ? '#e3f2fd' : '#fff',
-                            color: selectedVariation && selectedVariation._id === variation._id ? '#1976d2' : '#333',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            fontWeight: selectedVariation && selectedVariation._id === variation._id ? '600' : '400',
-                            transition: 'all 0.2s ease'
-                          }}
-                        >
-                          {variation.variationValue}
-                        </button>
-                      ))}
-                    </div>
+                    {getVariationParameters().map((parameter) => (
+                      <div key={parameter} style={{marginBottom: 15}}>
+                        <div style={{fontSize: '0.9rem', color: '#666', marginBottom: 8, fontWeight: 500}}>
+                          {parameter}:
+                        </div>
+                        <div className="variations-list" style={{display: 'flex', gap: 8, flexWrap: 'wrap'}}>
+                          {getParameterValues(parameter).map((value) => (
+                            <button
+                              key={value}
+                              onClick={() => handleParameterSelect(parameter, value)}
+                              className={`variation-option ${selectedParameters[parameter] === value ? 'selected' : ''}`}
+                              style={{
+                                padding: '8px 16px',
+                                border: selectedParameters[parameter] === value ? '2px solid #1976d2' : '1px solid #ddd',
+                                borderRadius: '6px',
+                                background: selectedParameters[parameter] === value ? '#e3f2fd' : '#fff',
+                                color: selectedParameters[parameter] === value ? '#1976d2' : '#333',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                fontWeight: selectedParameters[parameter] === value ? '600' : '400',
+                                transition: 'all 0.2s ease'
+                              }}
+                            >
+                              {value}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
                 
