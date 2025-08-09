@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { validateForm, sendToTelegram } from '../utils/telegram';
 import '../styles/Modal.css';
 
-const Modal = ({ isOpen, onClose, onSubmit }) => {
+const Modal = ({ isOpen, onClose, onSubmit, product = null }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -41,7 +41,7 @@ const Modal = ({ isOpen, onClose, onSubmit }) => {
     
     try {
       // Отправка в Telegram
-      const result = await sendToTelegram(formData);
+      const result = await sendToTelegram(formData, product);
       
       if (result.success) {
         onSubmit(formData);

@@ -179,7 +179,6 @@ const Product = () => {
     return images;
   };
   
-  const allImages = getAllImages();
   const navigate = useNavigate();
 
   const API_URL = 'https://electro-a8bl.onrender.com/api/products';
@@ -268,6 +267,11 @@ const Product = () => {
     }
   }, []);
 
+  // Сбрасываем активное изображение при смене товара
+  useEffect(() => {
+    setActiveImage(0);
+  }, [selectedVariant]);
+
   if (loading) {
     return <div style={{padding: 48, textAlign: 'center'}}>Загрузка...</div>;
   }
@@ -326,17 +330,47 @@ const Product = () => {
     
     // Находим подходящую вариацию
     if (productGroup) {
-      const matchingVariant = productGroup.variants.find(variant => {
+      // Удаляем параметр из поиска, если значение пустое или false
+      const filteredParameters = {};
+      Object.entries(newParameters).forEach(([key, val]) => {
+        if (val && val !== 'false') {
+          filteredParameters[key] = val;
+        }
+      });
+      
+      // Если нет выбранных параметров, сбрасываем на базовый товар
+      if (Object.keys(filteredParameters).length === 0) {
+        setSelectedVariant(null);
+        return;
+      }
+      
+      // Ищем вариацию с точным совпадением всех параметров
+      let matchingVariant = productGroup.variants.find(variant => {
         if (!variant.isActive) return false;
         
         // Проверяем, что все выбранные параметры совпадают
-        return Object.entries(newParameters).every(([key, val]) => 
-          variant.parameters[key] === val
-        );
+        return Object.entries(filteredParameters).every(([key, val]) => {
+          return variant.parameters[key] === val;
+        });
       });
+      
+      // Если точного совпадения нет, ищем вариацию с частичным совпадением
+      if (!matchingVariant && Object.keys(filteredParameters).length > 0) {
+        matchingVariant = productGroup.variants.find(variant => {
+          if (!variant.isActive) return false;
+          
+          // Проверяем, что хотя бы один параметр совпадает
+          return Object.entries(filteredParameters).some(([key, val]) => {
+            return variant.parameters[key] === val;
+          });
+        });
+      }
       
       if (matchingVariant) {
         setSelectedVariant(matchingVariant);
+      } else {
+        // Если совпадения нет, сбрасываем на базовый товар
+        setSelectedVariant(null);
       }
     }
   };
@@ -344,6 +378,7 @@ const Product = () => {
   // Получаем текущий товар для отображения (с учетом выбранной вариации)
   const getCurrentProduct = () => {
     if (selectedVariant && selectedVariant.productId) {
+      // Убеждаемся, что у нас есть полная информация о товаре
       return selectedVariant.productId;
     }
     return product;
@@ -357,16 +392,44 @@ const Product = () => {
     return product?.price;
   };
 
+  // Проверяем, есть ли вариации с определенным параметром
+  const hasVariationsWithParameter = (paramName) => {
+    if (!productGroup) return false;
+    return productGroup.variants.some(variant => 
+      variant.isActive && variant.parameters[paramName]
+    );
+  };
+
+  // Получаем доступные значения для параметра
+  const getAvailableValuesForParameter = (paramName) => {
+    if (!productGroup) return [];
+    const values = new Set();
+    productGroup.variants.forEach(variant => {
+      if (variant.isActive && variant.parameters[paramName]) {
+        values.add(variant.parameters[paramName]);
+      }
+    });
+    return Array.from(values);
+  };
+
   // Модалка фото
   const handleImageClick = () => setShowImageModal(true);
   const handleCloseImageModal = () => setShowImageModal(false);
   const handlePrevImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
+    const images = getAllImages();
+    setActiveImage((prev) => {
+      const newIndex = (prev - 1 + images.length) % images.length;
+      return newIndex >= 0 && newIndex < images.length ? newIndex : 0;
+    });
   };
   const handleNextImage = (e) => {
     e.stopPropagation();
-    setActiveImage((prev) => (prev + 1) % allImages.length);
+    const images = getAllImages();
+    setActiveImage((prev) => {
+      const newIndex = (prev + 1) % images.length;
+      return newIndex >= 0 && newIndex < images.length ? newIndex : 0;
+    });
   };
   
   const handleCityChange = (e) => {
@@ -436,7 +499,7 @@ const Product = () => {
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img 
-                    src={product.image || allImages[activeImage]} 
+                    src={product.image || getAllImages()[activeImage]} 
                     alt={product.name} 
                     loading="lazy"
                     width="400"
@@ -444,13 +507,10 @@ const Product = () => {
                     style={{width: '100%', height: 'auto', maxWidth: '400px'}}
                   />
                 </div>
-                {allImages.length > 1 && (
+                {getAllImages().length > 1 && (
                   <>
-                    <div style={{textAlign:'center', color:'#888', fontSize:'1.05rem', marginTop: 20, marginBottom: 8, border:'none'}}>
-                      Чтобы увеличить, нажмите на картинку
-                    </div>
                     <div className="product-thumbs">
-                      {allImages.map((img, idx) => (
+                      {getAllImages().map((img, idx) => (
                         <img 
                           key={idx} 
                           src={img} 
@@ -477,103 +537,104 @@ const Product = () => {
                 {/* Компонент выбора вариаций */}
                 {productGroup && productGroup.parameters.length > 0 && (
                   <div className="product-variations" style={{
-                    marginBottom: '20px',
-                    padding: '15px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '8px',
-                    backgroundColor: '#f9f9f9'
+                    marginBottom: '20px'
                   }}>
-                    <h3 style={{ margin: '0 0 15px 0', fontSize: '1.1rem', fontWeight: '600' }}>
-                      Выберите параметры
-                    </h3>
-                    {productGroup.parameters.map((param, index) => (
-                      <div key={index} style={{ marginBottom: '15px' }}>
-                        <label style={{ 
-                          display: 'block', 
-                          marginBottom: '8px', 
-                          fontWeight: '500',
-                          color: '#333'
-                        }}>
-                          {param.name}
-                          {param.required && <span style={{ color: '#e74c3c' }}> *</span>}
-                        </label>
-                        
-                        {param.type === 'select' && (
-                          <select
-                            value={selectedParameters[param.name] || ''}
-                            onChange={(e) => handleParameterChange(param.name, e.target.value)}
-                            required={param.required}
-                            style={{
-                              width: '100%',
-                              padding: '8px 12px',
-                              border: '1px solid #ddd',
-                              borderRadius: '4px',
-                              fontSize: '14px'
-                            }}
-                          >
-                            <option value="">Выберите {param.name.toLowerCase()}</option>
-                            {param.values.map((value, valueIndex) => (
-                              <option key={valueIndex} value={value}>
-                                {value}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                        
-                        {param.type === 'radio' && (
-                          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                            {param.values.map((value, valueIndex) => (
-                              <label key={valueIndex} style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                cursor: 'pointer',
-                                fontSize: '14px'
-                              }}>
-                                <input
-                                  type="radio"
-                                  name={param.name}
-                                  value={value}
-                                  checked={selectedParameters[param.name] === value}
-                                  onChange={(e) => handleParameterChange(param.name, e.target.value)}
-                                  required={param.required}
-                                  style={{ marginRight: '6px' }}
-                                />
-                                {value}
-                              </label>
-                            ))}
-                          </div>
-                        )}
-                        
-                        {param.type === 'checkbox' && (
+                    {productGroup.parameters.map((param, index) => {
+                      // Для чекбоксов проверяем, есть ли вариации с этим параметром
+                      if (param.type === 'checkbox' && !hasVariationsWithParameter(param.name)) {
+                        return null; // Не показываем чекбокс, если нет вариаций с этим параметром
+                      }
+                      
+                      // Для select и radio используем только доступные значения
+                      const availableValues = param.type === 'select' || param.type === 'radio' 
+                        ? getAvailableValuesForParameter(param.name)
+                        : param.values;
+                      
+                      // Если нет доступных значений, не показываем параметр
+                      if (availableValues.length === 0) {
+                        return null;
+                      }
+                      
+                      return (
+                        <div key={index} style={{ marginBottom: '15px' }}>
                           <label style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            cursor: 'pointer',
-                            fontSize: '14px'
+                            display: 'block', 
+                            marginBottom: '8px', 
+                            fontWeight: '500',
+                            color: '#333'
                           }}>
-                            <input
-                              type="checkbox"
-                              checked={selectedParameters[param.name] === 'true'}
-                              onChange={(e) => handleParameterChange(param.name, e.target.checked ? 'true' : 'false')}
-                              style={{ marginRight: '6px' }}
-                            />
                             {param.name}
+                            {param.required && <span style={{ color: '#e74c3c' }}> *</span>}
                           </label>
-                        )}
-                      </div>
-                    ))}
+                          
+                          {param.type === 'select' && (
+                            <select
+                              value={selectedParameters[param.name] || ''}
+                              onChange={(e) => handleParameterChange(param.name, e.target.value)}
+                              required={param.required}
+                              style={{
+                                width: '100%',
+                                padding: '8px 12px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                fontSize: '14px',
+                                background: 'transparent'
+                              }}
+                            >
+                              <option value="">Выберите {param.name.toLowerCase()}</option>
+                              {availableValues.map((value, valueIndex) => (
+                                <option key={valueIndex} value={value}>
+                                  {value}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                          
+                          {param.type === 'radio' && (
+                            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                              {availableValues.map((value, valueIndex) => (
+                                <label key={valueIndex} style={{ 
+                                  display: 'flex', 
+                                  alignItems: 'center', 
+                                  cursor: 'pointer',
+                                  fontSize: '14px'
+                                }}>
+                                  <input
+                                    type="radio"
+                                    name={param.name}
+                                    value={value}
+                                    checked={selectedParameters[param.name] === value}
+                                    onChange={(e) => handleParameterChange(param.name, e.target.value)}
+                                    required={param.required}
+                                    style={{ marginRight: '6px' }}
+                                  />
+                                  {value}
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {param.type === 'checkbox' && (
+                            <label style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              cursor: 'pointer',
+                              fontSize: '14px'
+                            }}>
+                              <input
+                                type="checkbox"
+                                checked={selectedParameters[param.name] === 'true'}
+                                onChange={(e) => handleParameterChange(param.name, e.target.checked ? 'true' : 'false')}
+                                style={{ marginRight: '6px' }}
+                              />
+                              {param.name}
+                            </label>
+                          )}
+                        </div>
+                      );
+                    })}
                     
-                    {selectedVariant && (
-                      <div style={{
-                        marginTop: '15px',
-                        padding: '10px',
-                        backgroundColor: '#e8f5e8',
-                        border: '1px solid #4caf50',
-                        borderRadius: '4px'
-                      }}>
-                        <strong>Выбрана вариация:</strong> {selectedVariant.productId?.name}
-                      </div>
-                    )}
+
                   </div>
                 )}
 
@@ -582,7 +643,7 @@ const Product = () => {
                     <div className="product-price-label-value">
                       <div className="product-price-label">Цена</div>
                       <div className="product-price-value">
-                        {Number(getCurrentPrice()).toLocaleString('ru-RU')}
+                        {Number(getCurrentPrice()).toFixed(3).replace(/\.?0+$/, '')}
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
@@ -627,7 +688,6 @@ const Product = () => {
                   opacity: isCityChanging ? 0.8 : 1
                 }}>
                   <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
-                    <span>Ваш город:</span>
                     {detectingCity ? (
                       <span style={{color: '#666', fontSize: '0.9rem'}}>📍 Определяем...</span>
                     ) : (
@@ -643,13 +703,15 @@ const Product = () => {
                     )}
                   </div>
                   
-                  {/* Заменяем статичный блок на динамический компонент */}
-                  <DeliveryInfo 
-                    city={selectedCity} 
-                    onDeliverySelect={setSelectedDelivery}
-                    compact={true}
-                    selectedDelivery={selectedDelivery}
-                  />
+                  {/* Показываем выбор доставки только для городов кроме Алматы */}
+                  {selectedCity !== 'Алматы' && (
+                    <DeliveryInfo 
+                      city={selectedCity} 
+                      onDeliverySelect={setSelectedDelivery}
+                      compact={true}
+                      selectedDelivery={selectedDelivery}
+                    />
+                  )}
                   
                   <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
                     <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
@@ -710,7 +772,7 @@ const Product = () => {
                     <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? product.price + ' ₸' : ''}</span>
+                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? Number(product.price).toFixed(3).replace(/\.?0+$/, '') + ' ₸' : ''}</span>
                     <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
                   </div>
                 </div>
@@ -747,7 +809,7 @@ const Product = () => {
                     <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? product.price + ' ₸' : ''}</span>
+                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? Number(product.price).toFixed(3).replace(/\.?0+$/, '') + ' ₸' : ''}</span>
                     <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
                   </div>
                 </div>
@@ -757,13 +819,13 @@ const Product = () => {
         </div>
       </section>
       <Footer />
-    <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} />
+    <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} product={getCurrentProduct().name} />
     {/* Модальное окно для увеличенного фото */}
     {showImageModal && (
       <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
         <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-          <img src={allImages[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
-          {allImages.length > 1 && (
+          <img src={getAllImages()[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
+          {getAllImages().length > 1 && (
             <>
               <button 
                 onClick={handlePrevImage} 
@@ -814,7 +876,7 @@ const Product = () => {
                 ›
               </button>
               <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
-                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {allImages.length}</span>
+                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {getAllImages().length}</span>
               </div>
             </>
           )}

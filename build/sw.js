@@ -1,8 +1,6 @@
-const CACHE_NAME = 'electro-cache-v1';
+const CACHE_NAME = 'electro-cache-v2';
 const urlsToCache = [
   '/',
-  '/static/css/main.css',
-  '/static/js/main.js',
   '/images/hero/hero-main.webp',
   '/logo.png',
   '/fonts/Bounded-Regular.ttf',

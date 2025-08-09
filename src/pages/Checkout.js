@@ -43,7 +43,7 @@ const Checkout = () => {
                   <div style={{fontWeight: 500, fontSize: 20, color: '#1a2236', marginBottom: 6}}>{product.name}</div>
                   <div style={{display: 'flex', alignItems: 'center', gap: 12, marginTop: 8}}>
                     <span style={{color: '#888', fontSize: 15}}>Цена за 1 шт:</span>
-                    <span style={{color: '#FFB300', fontWeight: 700, fontSize: 18}}>{total.toLocaleString('ru-RU')} ₸</span>
+                    <span style={{color: '#FFB300', fontWeight: 700, fontSize: 18}}>{Number(total).toFixed(3).replace(/\.?0+$/, '')} ₸</span>
                   </div>
                 </div>
               </div>
@@ -120,17 +120,17 @@ const Checkout = () => {
             <div className="total-section">
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{fontWeight: 500, fontSize: 16, color: '#666'}}>Стоимость товара:</span>
-                <span style={{fontWeight: 600, fontSize: 16, color: '#333'}}>{total.toLocaleString('ru-RU')} ₸</span>
+                <span style={{fontWeight: 600, fontSize: 16, color: '#333'}}>{Number(total).toFixed(3).replace(/\.?0+$/, '')} ₸</span>
               </div>
               {deliveryCost > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                   <span style={{fontWeight: 500, fontSize: 16, color: '#666'}}>Доставка:</span>
-                  <span style={{fontWeight: 600, fontSize: 16, color: '#333'}}>{deliveryCost.toLocaleString('ru-RU')} ₸</span>
+                  <span style={{fontWeight: 600, fontSize: 16, color: '#333'}}>{Number(deliveryCost).toFixed(3).replace(/\.?0+$/, '')} ₸</span>
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #e0e0e0', paddingTop: 12 }}>
                 <span style={{fontWeight: 600, fontSize: 18, color: '#222'}}>Итого к оплате:</span>
-                <span style={{color: '#FFB300', fontWeight: 700, fontSize: 22}}>{finalTotal.toLocaleString('ru-RU')} ₸</span>
+                <span style={{color: '#FFB300', fontWeight: 700, fontSize: 22}}>{Number(finalTotal).toFixed(3).replace(/\.?0+$/, '')} ₸</span>
               </div>
             </div>
             <button type="submit" className="submit-button">Оформить заказ</button>

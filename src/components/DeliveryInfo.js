@@ -51,6 +51,14 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     }
   };
 
+  const handleDeliveryChange = (e) => {
+    const selectedType = e.target.value;
+    const selectedOption = deliveryInfo.deliveryOptions.find(option => option.type === selectedType);
+    if (selectedOption) {
+      handleDeliverySelect(selectedOption);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ 
@@ -84,111 +92,55 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     return null;
   }
 
-  // Компактный вид для страницы товара
+  // Компактный вид для страницы товара - выпадающий список
   if (compact) {
-    const visibleOptions = showAllOptions ? deliveryInfo.deliveryOptions : deliveryInfo.deliveryOptions.slice(0, 3);
-    const hasMoreOptions = deliveryInfo.deliveryOptions.length > 3;
-
     return (
       <div style={{ marginBottom: 12 }}>
-        <div style={{ display: 'grid', gap: 8 }}>
-          {visibleOptions.map((option, index) => (
-            <div
-              key={index}
-              onClick={() => handleDeliverySelect(option)}
-              style={{
-                border: selectedDelivery && selectedDelivery.type === option.type ? '2px solid #ffc107' : '1px solid #e0e0e0',
-                borderRadius: 6,
-                padding: 10,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                background: selectedDelivery && selectedDelivery.type === option.type ? '#fffbf0' : '#fff',
-                fontSize: '0.85rem',
-                boxShadow: selectedDelivery && selectedDelivery.type === option.type ? '0 2px 8px rgba(255, 193, 7, 0.3)' : 'none'
-              }}
-              onMouseEnter={(e) => {
-                if (!selectedDelivery || selectedDelivery.type !== option.type) {
-                  e.currentTarget.style.borderColor = '#ffc107';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.2)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!selectedDelivery || selectedDelivery.type !== option.type) {
-                  e.currentTarget.style.borderColor = '#e0e0e0';
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
-            >
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                marginBottom: 2
-              }}>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 6,
-                  fontWeight: 600, 
-                  color: '#333' 
-                }}>
-                  <span style={{ fontSize: '1rem' }}>
-                    {option.type === 'pickup' ? '🏬' : 
-                     option.type === 'indriver' ? '🚗' :
-                     option.type === 'yandex' ? '📦' :
-                     option.type === 'kazpost' ? '📮' :
-                     option.type === 'cdek' ? '🚚' :
-                     option.type === 'air' ? '✈️' : '🚚'}
-                  </span>
-                  {option.name}
-                </div>
-                <div style={{ 
-                  fontWeight: 700, 
-                  color: option.cost === 0 ? '#28a745' : '#ffc107',
-                  fontSize: '0.9rem'
-                }}>
-                  {option.cost === 0 ? 'Бесплатно' : `${option.cost} ₸`}
-                </div>
-              </div>
-              <div style={{ color: '#666', fontSize: '0.75rem', marginLeft: '1.5rem' }}>
-                {option.type === 'pickup' ? `Самовывоз из ${deliveryInfo.pickupPointsCount || 'наших'} пунктов` :
-                 option.type === 'indriver' ? 'Курьерская доставка в течение дня' :
-                 option.type === 'yandex' ? 'Быстрая курьерская доставка' :
-                 option.type === 'kazpost' ? 'Почтовая доставка 3-5 дней' :
-                 option.type === 'cdek' ? 'Экспресс доставка 1-2 дня' :
-                 option.type === 'air' ? 'Авиа доставка 1-3 дня' : option.description}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {hasMoreOptions && (
-          <button
-            onClick={() => setShowAllOptions(!showAllOptions)}
+        <div style={{ marginBottom: 8 }}>
+          <label style={{ 
+            display: 'block', 
+            fontSize: '0.9rem', 
+            fontWeight: 600, 
+            color: '#1e88e5', 
+            marginBottom: 4 
+          }}>
+            Способ доставки
+          </label>
+          <select 
+            value={selectedDelivery ? selectedDelivery.type : ''} 
+            onChange={handleDeliveryChange}
+            className="delivery-select"
             style={{
-              background: 'transparent',
-              border: '1px solid #e0e0e0',
-              borderRadius: 6,
-              padding: '8px 16px',
-              cursor: 'pointer',
-              fontSize: '0.8rem',
-              color: '#666',
-              marginTop: 8,
               width: '100%',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.borderColor = '#ffc107';
-              e.target.style.color = '#ffc107';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.borderColor = '#e0e0e0';
-              e.target.style.color = '#666';
+              border: '1px solid #1e88e5',
+              borderRadius: 4,
+              padding: '4px 8px',
+              fontSize: '0.95rem',
+              color: '#1e88e5',
+              fontWeight: 600,
+              backgroundColor: '#fff',
+              cursor: 'pointer',
+              outline: 'none',
+              transition: 'all 0.2s ease',
+              transformOrigin: 'top',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+              appearance: 'none',
+              backgroundImage: "url(\"data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e88e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e\")",
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 8px center',
+              backgroundSize: '16px',
+              paddingRight: '32px'
             }}
           >
-            {showAllOptions ? 'Скрыть' : `+ еще ${deliveryInfo.deliveryOptions.length - 3} варианта`}
-          </button>
-        )}
+            <option value="">Выберите способ доставки</option>
+            {deliveryInfo.deliveryOptions.map((option, index) => (
+              <option key={index} value={option.type}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     );
   }

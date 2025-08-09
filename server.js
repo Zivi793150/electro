@@ -1,3 +1,6 @@
+// Загружаем переменные окружения
+require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -146,6 +149,72 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   } catch (error) {
     console.error('Ошибка загрузки файла:', error);
     res.status(500).json({ error: 'Ошибка загрузки файла: ' + error.message });
+  }
+});
+
+// Telegram Bot API endpoint
+app.post('/api/send-telegram', async (req, res) => {
+  try {
+    const { name, phone, message, product } = req.body;
+    
+    // Получаем токен бота из переменных окружения
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    if (!botToken) {
+      console.error('Telegram bot token не настроен');
+      return res.status(500).json({ error: 'Telegram bot не настроен' });
+    }
+    
+    // Формируем сообщение
+    const telegramMessage = `
+🔔 Новая заявка с сайта!
+
+👤 Имя: ${name}
+📞 Телефон: ${phone}
+💬 Сообщение: ${message || 'Не указано'}
+${product ? `🛍️ Товар: ${product}` : ''}
+⏰ Время: ${new Date().toLocaleString('ru-RU')}
+🌐 Источник: ${req.headers.referer || 'Прямой переход'}
+    `;
+    
+    let success = false;
+    
+    // Если указан Chat ID - отправляем туда
+    if (chatId) {
+      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: telegramMessage,
+          parse_mode: 'HTML'
+        })
+      });
+      
+      const result = await response.json();
+      success = result.ok;
+      
+      if (!success) {
+        console.error('Ошибка Telegram API:', result);
+      }
+    } else {
+      // Если Chat ID не указан - сохраняем в лог
+      console.log('Telegram сообщение (Chat ID не настроен):', telegramMessage);
+      success = true; // Считаем успешным, так как логируем
+    }
+    
+    if (success) {
+      res.json({ success: true, message: 'Сообщение отправлено в Telegram' });
+    } else {
+      res.status(500).json({ error: 'Ошибка отправки в Telegram' });
+    }
+    
+  } catch (error) {
+    console.error('Ошибка отправки в Telegram:', error);
+    res.status(500).json({ error: 'Ошибка отправки в Telegram' });
   }
 });
 

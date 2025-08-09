@@ -1,36 +1,30 @@
 // Утилита для отправки форм в Telegram
-// В реальном проекте здесь будет интеграция с Telegram Bot API
 
-export const sendToTelegram = async (formData) => {
+export const sendToTelegram = async (formData, product = null) => {
   try {
-    // Здесь будет реальная отправка в Telegram
-    // Пока что просто логируем данные
+    // Отправляем данные на наш API endpoint
+    const response = await fetch('/api/send-telegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: formData.name,
+        phone: formData.phone,
+        message: formData.message,
+        product: product
+      })
+    });
     
-    const message = `
-🔔 Новая заявка с сайта!
-
-👤 Имя: ${formData.name}
-📞 Телефон: ${formData.phone}
-💬 Сообщение: ${formData.message || 'Не указано'}
-⏰ Время: ${new Date().toLocaleString('ru-RU')}
-    `;
-
-    console.log('Отправка в Telegram:', message);
+    const result = await response.json();
     
-    // В реальном проекте здесь будет fetch запрос к Telegram Bot API
-    // const response = await fetch('/api/send-telegram', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     chat_id: 'YOUR_CHAT_ID',
-    //     text: message,
-    //     parse_mode: 'HTML'
-    //   })
-    // });
+    if (result.success) {
+      return { success: true, message: 'Заявка успешно отправлена!' };
+    } else {
+      console.error('Ошибка API:', result.error);
+      return { success: false, message: result.error || 'Ошибка отправки заявки' };
+    }
     
-    return { success: true, message: 'Заявка успешно отправлена!' };
   } catch (error) {
     console.error('Ошибка отправки в Telegram:', error);
     return { success: false, message: 'Ошибка отправки заявки' };

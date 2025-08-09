@@ -76,12 +76,20 @@ function ProductVariations() {
 
   const handleEditGroup = (group) => {
     setEditingGroup(group);
+    
+    // Обрабатываем вариации, чтобы правильно извлечь ID товаров
+    const processedVariants = (group.variants || []).map(variant => ({
+      ...variant,
+      productId: variant.productId?._id || variant.productId || '',
+      parameters: variant.parameters || {}
+    }));
+    
     setFormData({
       name: group.name,
       description: group.description || '',
       baseProductId: group.baseProductId?._id || '',
       parameters: group.parameters || [],
-      variants: group.variants || []
+      variants: processedVariants
     });
     setShowForm(true);
   };
@@ -172,7 +180,7 @@ function ProductVariations() {
       ...prev,
       variants: [...prev.variants, {
         productId: '',
-        parameters: new Map(),
+        parameters: {},
         isActive: true
       }]
     }));
@@ -200,7 +208,7 @@ function ProductVariations() {
       variants: prev.variants.map((variant, i) => 
         i === variantIndex ? { 
           ...variant, 
-          parameters: new Map(variant.parameters).set(paramName, value) 
+          parameters: { ...variant.parameters, [paramName]: value }
         } : variant
       )
     }));
@@ -213,12 +221,12 @@ function ProductVariations() {
       setLoading(true);
       setError(''); // Очищаем предыдущие ошибки
       
-      // Преобразуем Map в обычный объект для отправки
+      // Параметры уже хранятся как обычный объект
       const submitData = {
         ...formData,
         variants: formData.variants.map(variant => ({
           ...variant,
-          parameters: Object.fromEntries(variant.parameters)
+          parameters: variant.parameters || {}
         }))
       };
 
@@ -559,7 +567,7 @@ function ProductVariations() {
                           <label className="form-label">{param.name}:</label>
                           {param.type === 'select' && (
                             <select
-                              value={variant.parameters.get(param.name) || ''}
+                              value={variant.parameters[param.name] || ''}
                               onChange={(e) => updateVariantParameter(index, param.name, e.target.value)}
                               className="form-select"
                               required={param.required}
@@ -580,7 +588,7 @@ function ProductVariations() {
                                     type="radio"
                                     name={`${index}-${param.name}`}
                                     value={value}
-                                    checked={variant.parameters.get(param.name) === value}
+                                    checked={variant.parameters[param.name] === value}
                                     onChange={(e) => updateVariantParameter(index, param.name, e.target.value)}
                                     required={param.required}
                                   />
@@ -593,7 +601,7 @@ function ProductVariations() {
                             <label className="checkbox-label">
                               <input
                                 type="checkbox"
-                                checked={variant.parameters.get(param.name) === 'true'}
+                                checked={variant.parameters[param.name] === 'true'}
                                 onChange={(e) => updateVariantParameter(index, param.name, e.target.checked ? 'true' : 'false')}
                               />
                               <span>{param.name}</span>

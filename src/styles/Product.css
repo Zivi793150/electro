@@ -566,9 +566,78 @@
   color: #1565c0;
 }
 
+/* Стили для выпадающего списка способов доставки */
+.delivery-select {
+  border: 1px solid #1e88e5;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.95rem;
+  color: #1e88e5;
+  font-weight: 600;
+  background-color: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  /* Принудительное открытие вниз */
+  transform-origin: top;
+  /* Дополнительные стили для корректного отображения в разных браузерах */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231e88e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
+}
+
+.delivery-select:hover {
+  border-color: #1565c0;
+  background-color: #f8f9fa;
+}
+
+.delivery-select:focus {
+  border-color: #1565c0;
+  box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+}
+
+/* Направление открытия выпадающего списка вниз */
+.delivery-select {
+  direction: ltr;
+}
+
+/* Скрытие стандартной стрелки в IE */
+.delivery-select::-ms-expand {
+  display: none;
+}
+
+/* Стили для опций в выпадающем списке */
+.delivery-select option {
+  background-color: #fff;
+  color: #1e88e5;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.delivery-select option:hover {
+  background-color: #f8f9fa;
+}
+
+.delivery-select option:checked {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
 /* Медиа-запросы для выпадающего списка городов */
 @media (max-width: 900px) {
   .city-select {
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    padding-right: 28px;
+    background-size: 14px;
+  }
+  
+  .delivery-select {
     font-size: 0.9rem;
     padding: 6px 10px;
     padding-right: 28px;
@@ -583,10 +652,24 @@
     padding-right: 26px;
     background-size: 12px;
   }
+  
+  .delivery-select {
+    font-size: 0.85rem;
+    padding: 5px 8px;
+    padding-right: 26px;
+    background-size: 12px;
+  }
 }
 
 @media (max-width: 600px) {
   .city-select {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+    padding-right: 24px;
+    background-size: 12px;
+  }
+  
+  .delivery-select {
     font-size: 0.8rem;
     padding: 4px 6px;
     padding-right: 24px;
