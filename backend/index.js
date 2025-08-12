@@ -22,6 +22,34 @@ app.use(cors({
 
 app.use(express.json());
 
+// Telegram endpoint (Render backend)
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+app.post('/api/send-telegram', async (req, res) => {
+  try {
+    const { name, phone, message, product } = req.body;
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    if (!botToken || !chatId) {
+      return res.status(500).json({ error: 'Telegram bot не настроен' });
+    }
+    const text = `\n🔔 Новая заявка с сайта!\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n💬 Сообщение: ${message || 'Не указано'}\n${product ? `🛍️ Товар: ${product}` : ''}\n⏰ Время: ${new Date().toLocaleString('ru-RU')}`;
+    const tgResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+    });
+    const result = await tgResp.json();
+    if (result.ok) {
+      return res.json({ success: true });
+    }
+    console.error('Telegram error:', result);
+    return res.status(500).json({ error: 'Ошибка Telegram API' });
+  } catch (e) {
+    console.error('Ошибка /api/send-telegram:', e);
+    return res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 // Middleware для кеширования статических ресурсов
 app.use((req, res, next) => {
   // Кеширование изображений на 1 год
