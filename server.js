@@ -9,6 +9,7 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const pickupPointsRouter = require('./api/pickup-points');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
 

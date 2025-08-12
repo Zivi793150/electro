@@ -2,8 +2,12 @@
 
 export const sendToTelegram = async (formData, product = null) => {
   try {
+    // Определяем базовый URL API (локально шлём на порт сервера)
+    const isLocalDev = typeof window !== 'undefined' && window.location.origin.includes('localhost:3000');
+    const API_BASE = isLocalDev ? 'http://localhost:5000' : '';
+
     // Отправляем данные на наш API endpoint
-    const response = await fetch('/api/send-telegram', {
+    const response = await fetch(`${API_BASE}/api/send-telegram`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

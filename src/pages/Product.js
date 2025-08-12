@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatTenge } from '../utils/price';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -634,8 +635,11 @@ const Product = () => {
                       );
                     })}
                     
-
+                    
                   </div>
+                )}
+                {productGroup && productGroup.parameters.length > 0 && (
+                  <div className="product-divider"></div>
                 )}
 
                 <div className="product-buy-row">
@@ -643,7 +647,7 @@ const Product = () => {
                     <div className="product-price-label-value">
                       <div className="product-price-label">Цена</div>
                       <div className="product-price-value">
-                        {Number(getCurrentPrice()).toFixed(3).replace(/\.?0+$/, '')}
+                        {formatTenge(getCurrentPrice())}
                         <span className="product-currency">₸</span>
                       </div>
                     </div>
@@ -772,7 +776,7 @@ const Product = () => {
                     <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? Number(product.price).toFixed(3).replace(/\.?0+$/, '') + ' ₸' : ''}</span>
+                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
                     <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
                   </div>
                 </div>
@@ -809,7 +813,7 @@ const Product = () => {
                     <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? Number(product.price).toFixed(3).replace(/\.?0+$/, '') + ' ₸' : ''}</span>
+                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
                     <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
                   </div>
                 </div>
