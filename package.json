@@ -38,6 +38,7 @@
     "backend": "node backend/index.js",
     "dev": "concurrently \"npm run server\" \"npm start\""
   },
+  "proxy": "http://localhost:5000",
   "eslintConfig": {
     "extends": [
       "react-app",

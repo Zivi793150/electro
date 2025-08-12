@@ -3,8 +3,9 @@
 export const sendToTelegram = async (formData, product = null) => {
   try {
     // Определяем базовый URL API (локально шлём на порт сервера)
-    const isLocalDev = typeof window !== 'undefined' && window.location.origin.includes('localhost:3000');
-    const API_BASE = isLocalDev ? 'http://localhost:5000' : '';
+    // Dev → используем CRA proxy; Prod → ходим на Render
+    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const API_BASE = isLocal ? '' : 'https://electro-a8bl.onrender.com';
 
     // Отправляем данные на наш API endpoint
     const response = await fetch(`${API_BASE}/api/send-telegram`, {
