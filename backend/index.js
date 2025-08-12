@@ -30,7 +30,15 @@ app.post('/api/send-telegram', async (req, res) => {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (!botToken) return res.status(500).json({ error: 'Telegram bot не настроен' });
-    const text = `\n🔔 Новая заявка с сайта!\n\n👤 Имя: ${name}\n📞 Телефон: ${phone}\n💬 Сообщение: ${message || 'Не указано'}\n${product ? `🛍️ Товар: ${product}` : ''}\n⏰ Время: ${new Date().toLocaleString('ru-RU')}`;
+    const escapeHtml = (v = '') => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const text = [
+      'Новая заявка с сайта',
+      `\n<b>Имя:</b> ${escapeHtml(name)}`,
+      `<b>Телефон:</b> ${escapeHtml(phone)}`,
+      `<b>Сообщение:</b> ${escapeHtml(message || 'Не указано')}`,
+      product ? `<b>Товар:</b> ${escapeHtml(product)}` : null,
+      `<b>Время:</b> ${new Date().toLocaleString('ru-RU')}`
+    ].filter(Boolean).join('\n');
     // Если CHAT_ID не задан, просто логируем (чтобы не падать 500)
     if (!chatId) {
       console.log('TG message (no CHAT_ID):', text);
