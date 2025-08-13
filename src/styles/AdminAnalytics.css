@@ -12,6 +12,25 @@
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: #1e88e5;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
 }
 
 .admin-analytics-header h1 {
@@ -42,6 +61,38 @@
   cursor: pointer;
 }
 
+/* Табы навигации */
+.analytics-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #f0f0f0;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #1e88e5;
+}
+
+.tab-btn.active {
+  color: #1e88e5;
+  border-bottom-color: #1e88e5;
+  font-weight: 600;
+}
+
 .stats-overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -68,6 +119,13 @@
   color: #666;
   font-size: 1rem;
   font-weight: 500;
+}
+
+.stats-trend {
+  font-size: 0.85rem;
+  color: #4caf50;
+  font-weight: 500;
+  margin-top: 8px;
 }
 
 .stats-number {
@@ -157,6 +215,13 @@
   color: #666;
 }
 
+.stat-percentage {
+  font-size: 0.85rem;
+  color: #1e88e5;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
 .top-products {
   display: flex;
   flex-direction: column;
@@ -201,6 +266,13 @@
   color: #666;
 }
 
+.product-engagement {
+  font-size: 0.85rem;
+  color: #4caf50;
+  font-weight: 500;
+  margin-top: 3px;
+}
+
 .page-stats {
   display: flex;
   flex-direction: column;
@@ -225,6 +297,13 @@
 .page-views {
   font-size: 0.9rem;
   color: #666;
+}
+
+.page-bounce {
+  font-size: 0.85rem;
+  color: #f44336;
+  font-weight: 500;
+  margin-top: 3px;
 }
 
 .events-section {
@@ -352,6 +431,45 @@
   color: #666;
 }
 
+/* Секция инсайтов */
+.insights-section {
+  margin-bottom: 40px;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.insight-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.insight-card h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.insight-card ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.insight-card li {
+  margin-bottom: 8px;
+  color: #555;
+  line-height: 1.5;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .admin-analytics {
@@ -364,11 +482,34 @@
     align-items: flex-start;
   }
   
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .mobile-menu-toggle {
+    display: block;
+  }
+  
+  .analytics-tabs {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .tab-btn {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+  
   .stats-overview {
     grid-template-columns: 1fr;
   }
   
   .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .insights-grid {
     grid-template-columns: 1fr;
   }
   
@@ -384,5 +525,38 @@
   .pagination {
     flex-direction: column;
     gap: 10px;
+  }
+  
+  .period-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-analytics {
+    padding: 10px;
+  }
+  
+  .admin-analytics-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .stats-card {
+    padding: 15px;
+  }
+  
+  .stats-number {
+    font-size: 2rem;
+  }
+  
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .insight-card {
+    padding: 20px;
   }
 }
