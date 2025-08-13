@@ -113,7 +113,11 @@ const Header = () => {
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
-            <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone">
+            <a 
+              href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+              className="top-bar-phone"
+              data-analytics-context="header"
+            >
               {siteSettings.contactInfo.phone}
             </a>
           </div>
@@ -162,7 +166,11 @@ const Header = () => {
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Телефон:</div>
-              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value">
+              <a 
+                href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+                className="mobile-contact-value"
+                data-analytics-context="mobile_menu"
+              >
                 {siteSettings.contactInfo.phone}
               </a>
             </div>

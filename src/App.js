@@ -1,9 +1,10 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Checkout from './pages/Checkout';
 import AdminApp from './admin/AdminApp';
 import FloatingButtons from './components/FloatingButtons';
+import { initPageTracking } from './utils/analytics';
 
 // Lazy loading для всех страниц
 const Home = lazy(() => import('./pages/Home'));
@@ -14,6 +15,7 @@ const About = lazy(() => import('./pages/About'));
 const Contacts = lazy(() => import('./pages/Contacts'));
 const Policy = lazy(() => import('./pages/Policy'));
 const Cooperation = lazy(() => import('./pages/Cooperation'));
+const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Fallback компонент для загрузки
@@ -31,6 +33,11 @@ const LoadingFallback = () => (
 );
 
 function App() {
+  useEffect(() => {
+    // Инициализируем отслеживание аналитики
+    initPageTracking();
+  }, []);
+
   return (
     <Router>
       <div className="App">
@@ -38,7 +45,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<Catalog />} />
-          <Route path="/category" element={<Category />} />
+          <Route path="/catalog/:category" element={<Category />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/about" element={<About />} />
           <Route path="/contacts" element={<Contacts />} />
@@ -46,6 +53,7 @@ function App() {
           <Route path="/cooperation" element={<Cooperation />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin/*" element={<AdminApp />} />
+          <Route path="/analytics" element={<AdminAnalytics />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>

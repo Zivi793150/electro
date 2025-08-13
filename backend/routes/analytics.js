@@ -1,0 +1,219 @@
+const express = require('express');
+const router = express.Router();
+const Analytics = require('../models/Analytics');
+const { v4: uuidv4 } = require('uuid');
+
+// Middleware для генерации sessionId если его нет
+const ensureSession = (req, res, next) => {
+  if (!req.session.analyticsId) {
+    req.session.analyticsId = uuidv4();
+  }
+  next();
+};
+
+// Записать событие
+router.post('/track', ensureSession, async (req, res) => {
+  try {
+    const {
+      eventType,
+      eventData = {},
+      productId,
+      page,
+      referrer
+    } = req.body;
+
+    const analytics = new Analytics({
+      eventType,
+      eventData,
+      sessionId: req.session.analyticsId,
+      userAgent: req.get('User-Agent'),
+      ipAddress: req.ip || req.connection.remoteAddress,
+      productId,
+      page,
+      referrer
+    });
+
+    await analytics.save();
+    res.json({ success: true, sessionId: req.session.analyticsId });
+  } catch (error) {
+    console.error('Ошибка записи аналитики:', error);
+    res.status(500).json({ error: 'Ошибка записи события' });
+  }
+});
+
+// Получить статистику (для админки)
+router.get('/stats', async (req, res) => {
+  try {
+    const { period = '7d', eventType } = req.query;
+    
+    // Определяем период
+    let startDate = new Date();
+    switch (period) {
+      case '24h':
+        startDate.setDate(startDate.getDate() - 1);
+        break;
+      case '7d':
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case '30d':
+        startDate.setDate(startDate.getDate() - 30);
+        break;
+      case '90d':
+        startDate.setDate(startDate.getDate() - 90);
+        break;
+      default:
+        startDate.setDate(startDate.getDate() - 7);
+    }
+
+    // Базовый фильтр по дате
+    const dateFilter = { timestamp: { $gte: startDate } };
+    
+    // Добавляем фильтр по типу события если указан
+    if (eventType) {
+      dateFilter.eventType = eventType;
+    }
+
+    // Общая статистика по типам событий
+    const eventStats = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: '$eventType',
+          count: { $sum: 1 },
+          uniqueSessions: { $addToSet: '$sessionId' }
+        }
+      },
+      {
+        $project: {
+          eventType: '$_id',
+          count: 1,
+          uniqueSessions: { $size: '$uniqueSessions' }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
+    // Статистика по дням
+    const dailyStats = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } },
+            eventType: '$eventType'
+          },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.date': 1 } }
+    ]);
+
+    // Топ товаров по просмотрам
+    const topProducts = await Analytics.aggregate([
+      { $match: { ...dateFilter, eventType: 'product_view', productId: { $exists: true } } },
+      {
+        $group: {
+          _id: '$productId',
+          views: { $sum: 1 },
+          uniqueViews: { $addToSet: '$sessionId' }
+        }
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product'
+        }
+      },
+      {
+        $project: {
+          productId: '$_id',
+          productName: { $arrayElemAt: ['$product.name', 0] },
+          views: 1,
+          uniqueViews: { $size: '$uniqueViews' }
+        }
+      },
+      { $sort: { views: -1 } },
+      { $limit: 10 }
+    ]);
+
+    // Статистика по страницам
+    const pageStats = await Analytics.aggregate([
+      { $match: { ...dateFilter, page: { $exists: true } } },
+      {
+        $group: {
+          _id: '$page',
+          views: { $sum: 1 },
+          uniqueViews: { $addToSet: '$sessionId' }
+        }
+      },
+      {
+        $project: {
+          page: '$_id',
+          views: 1,
+          uniqueViews: { $size: '$uniqueViews' }
+        }
+      },
+      { $sort: { views: -1 } }
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        period,
+        startDate,
+        eventStats,
+        dailyStats,
+        topProducts,
+        pageStats,
+        summary: {
+          totalEvents: eventStats.reduce((sum, stat) => sum + stat.count, 0),
+          uniqueSessions: new Set(eventStats.flatMap(stat => stat.uniqueSessions)).size
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Ошибка получения статистики:', error);
+    res.status(500).json({ error: 'Ошибка получения статистики' });
+  }
+});
+
+// Получить детальную информацию по событиям
+router.get('/events', async (req, res) => {
+  try {
+    const { page = 1, limit = 50, eventType, productId, sessionId } = req.query;
+    const skip = (page - 1) * limit;
+
+    const filter = {};
+    if (eventType) filter.eventType = eventType;
+    if (productId) filter.productId = productId;
+    if (sessionId) filter.sessionId = sessionId;
+
+    const events = await Analytics.find(filter)
+      .sort({ timestamp: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('productId', 'name');
+
+    const total = await Analytics.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: {
+        events,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Ошибка получения событий:', error);
+    res.status(500).json({ error: 'Ошибка получения событий' });
+  }
+});
+
+module.exports = router;

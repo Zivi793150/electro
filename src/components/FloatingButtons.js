@@ -1,8 +1,10 @@
 import React from 'react';
+import { trackButtonClick } from '../utils/analytics';
 import '../styles/FloatingButtons.css';
 
 const FloatingButtons = () => {
   const handleWhatsAppClick = () => {
+    trackButtonClick('WhatsApp', 'floating_button');
     const phoneNumber = '+77474777989';
     const message = 'Здравствуйте! Хочу получить консультацию по электроинструментам Tanker.';
     const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\s/g, '')}?text=${encodeURIComponent(message)}`;
@@ -10,6 +12,7 @@ const FloatingButtons = () => {
   };
 
   const handlePhoneClick = () => {
+    trackButtonClick('Позвонить', 'floating_button');
     const phoneNumber = '+77474777989';
     window.location.href = `tel:${phoneNumber}`;
   };

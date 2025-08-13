@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { MongoClient, ObjectId } = require('mongodb');
+const session = require('express-session');
 require('dotenv').config();
 const path = require('path');
 
@@ -22,6 +23,17 @@ app.use(cors({
 
 app.use(express.json());
 
+// Настройка сессий для аналитики
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 часа
+  }
+}));
+
 // Telegram endpoint (Render backend)
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 app.post('/api/send-telegram', async (req, res) => {
@@ -30,15 +42,7 @@ app.post('/api/send-telegram', async (req, res) => {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (!botToken) return res.status(500).json({ error: 'Telegram bot не настроен' });
-    const escapeHtml = (v = '') => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const text = [
-      'Новая заявка с сайта',
-      `\n<b>Имя:</b> ${escapeHtml(name)}`,
-      `<b>Телефон:</b> ${escapeHtml(phone)}`,
-      `<b>Сообщение:</b> ${escapeHtml(message || 'Не указано')}`,
-      product ? `<b>Товар:</b> ${escapeHtml(product)}` : null,
-      `<b>Время:</b> ${new Date().toLocaleString('ru-RU')}`
-    ].filter(Boolean).join('\n');
+         const text = `\nНовая заявка с сайта!\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> ${phone}\n<b>Сообщение:</b> ${message || 'Не указано'}\n${product ? `<b>Товар:</b> ${product}` : ''}\n<b>Время:</b> ${new Date().toLocaleString('ru-RU')}`;
     // Если CHAT_ID не задан, просто логируем (чтобы не падать 500)
     if (!chatId) {
       console.log('TG message (no CHAT_ID):', text);
@@ -698,6 +702,10 @@ app.get('/api/product-groups/by-product/:productId', async (req, res) => {
     res.status(500).json({ error: 'Ошибка при получении группы вариаций' });
   }
 });
+
+// Подключаем роуты аналитики
+const analyticsRoutes = require('./routes/analytics');
+app.use('/api/analytics', analyticsRoutes);
 
 mongoose.connection.once('open', () => {
   console.log('MongoDB подключена успешно');

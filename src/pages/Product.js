@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import DeliveryInfo from '../components/DeliveryInfo';
+import { trackProductView, trackButtonClick } from '../utils/analytics';
 import '../styles/Product.css';
 import '../styles/ProductVariations.css';
 
@@ -202,6 +203,9 @@ const Product = () => {
         }
         
         setProduct(productData);
+        
+        // Отслеживаем просмотр товара
+        trackProductView(id, productData.name);
         
         // Загружаем группу вариаций для этого товара
         try {
@@ -672,9 +676,27 @@ const Product = () => {
                   </div>
                   <span className="product-price-divider"></span>
                   <div className="product-buy-btns">
-                    <button className="product-btn-ask" onClick={handleOpenModal}>Задать вопрос</button>
+                    <button 
+                      className="product-btn-ask" 
+                      onClick={() => {
+                        trackButtonClick('Задать вопрос', 'product_page', id);
+                        handleOpenModal();
+                      }}
+                      data-analytics-context="product_page"
+                    >
+                      Задать вопрос
+                    </button>
                     <div className="product-btns-divider"></div>
-                    <button className="product-btn-buy" onClick={handleBuy}>Купить</button>
+                    <button 
+                      className="product-btn-buy" 
+                      onClick={() => {
+                        trackButtonClick('Купить', 'product_page', id);
+                        handleBuy();
+                      }}
+                      data-analytics-context="product_page"
+                    >
+                      Купить
+                    </button>
                   </div>
                 </div>
                 <div className="product-divider"></div>

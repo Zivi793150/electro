@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { validateForm, sendToTelegram } from '../utils/telegram';
+import { trackFormSubmit } from '../utils/analytics';
 import '../styles/Modal.css';
 
 const Modal = ({ isOpen, onClose, onSubmit, product = null }) => {
@@ -44,6 +45,9 @@ const Modal = ({ isOpen, onClose, onSubmit, product = null }) => {
       const result = await sendToTelegram(formData, product);
       
       if (result.success) {
+        // Отслеживаем успешную отправку формы
+        trackFormSubmit('contact_form', product?.id || null);
+        alert('Спасибо за вашу заявку! Менеджер обязательно ответит в течение 2 минут');
         onSubmit(formData);
         setFormData({ name: '', phone: '', message: '' });
         setErrors({});

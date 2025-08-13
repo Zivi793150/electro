@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { trackPageView } from '../utils/analytics';
 import '../styles/Catalog.css';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -82,6 +83,11 @@ const Catalog = () => {
         setError('Ошибка загрузки товаров');
         setLoading(false);
       });
+  }, []);
+
+  // Отслеживаем просмотр страницы каталога
+  useEffect(() => {
+    trackPageView('catalog');
   }, []);
 
   // Извлечение категорий из товаров
