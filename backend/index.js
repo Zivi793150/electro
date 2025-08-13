@@ -153,7 +153,7 @@ const informationSchema = new mongoose.Schema({
 
 const Information = mongoose.model('Information', informationSchema);
 
-// API endpoint для получения всех продуктов с поддержкой лимита
+// API endpoint для получения всех продуктов с поддержкой лимита (для каталога - исключает вариации)
 app.get('/api/products', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
@@ -187,6 +187,21 @@ app.get('/api/products', async (req, res) => {
     res.json(products);
   } catch (err) {
     console.error('Ошибка получения продуктов:', err);
+    res.status(500).json({ error: 'Ошибка при получении продуктов' });
+  }
+});
+
+// API endpoint для получения всех продуктов для админки (включая вариации)
+app.get('/api/admin/products', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 0;
+    
+    // Для админки возвращаем ВСЕ товары, включая вариации
+    const products = await Product.find().limit(limit);
+    
+    res.json(products);
+  } catch (err) {
+    console.error('Ошибка получения продуктов для админки:', err);
     res.status(500).json({ error: 'Ошибка при получении продуктов' });
   }
 });

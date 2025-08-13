@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-  const API_URL = 'https://electro-a8bl.onrender.com/api/products';
+  const API_URL = 'https://electro-a8bl.onrender.com/api/admin/products'; // Используем админский endpoint для получения всех товаров
+  const PRODUCTS_API_URL = 'https://electro-a8bl.onrender.com/api/products'; // Для создания/обновления/удаления товаров
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
@@ -192,7 +193,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         localStorage.removeItem('lastUploadedImageVariants');
       }
       
-      const res = await fetch(isEdit ? `${API_URL}/${initialData._id}` : API_URL, {
+      const res = await fetch(isEdit ? `${PRODUCTS_API_URL}/${initialData._id}` : PRODUCTS_API_URL, {
         method: isEdit ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -390,6 +391,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
 
 const ProductList = ({ onLogout }) => {
   const [products, setProducts] = useState([]);
+  const [productGroups, setProductGroups] = useState([]); // Добавляем состояние для групп вариаций
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -401,10 +403,14 @@ const ProductList = ({ onLogout }) => {
 
   const fetchProducts = () => {
     setLoading(true);
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
-        setProducts(Array.isArray(data) ? data : []);
+    Promise.all([
+      fetch(API_URL),
+      fetch('https://electro-a8bl.onrender.com/api/product-groups')
+    ])
+      .then(responses => Promise.all(responses.map(res => res.json())))
+      .then(([productsData, groupsData]) => {
+        setProducts(Array.isArray(productsData) ? productsData : []);
+        setProductGroups(Array.isArray(groupsData) ? groupsData : []);
         setLoading(false);
       })
       .catch(() => {
@@ -430,7 +436,7 @@ const ProductList = ({ onLogout }) => {
   const handleDelete = async (product) => {
     if (!window.confirm(`Удалить товар «${product.name}»?`)) return;
     try {
-      const res = await fetch(`${API_URL}/${product._id}`, { method: 'DELETE' });
+      const res = await fetch(`${PRODUCTS_API_URL}/${product._id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Ошибка при удалении товара');
       fetchProducts();
     } catch (e) {
@@ -473,7 +479,7 @@ const ProductList = ({ onLogout }) => {
 
     try {
       const deletePromises = selectedProducts.map(productId => 
-        fetch(`${API_URL}/${productId}`, { method: 'DELETE' })
+        fetch(`${PRODUCTS_API_URL}/${productId}`, { method: 'DELETE' })
       );
 
       await Promise.all(deletePromises);
@@ -484,6 +490,25 @@ const ProductList = ({ onLogout }) => {
     } catch (e) {
       alert('Ошибка при удалении товаров');
     }
+  };
+
+  // Функция для определения, является ли товар вариацией
+  const isProductVariant = (productId) => {
+    return productGroups.some(group => 
+      group.variants.some(variant => 
+        variant.productId === productId || variant.productId._id === productId
+      )
+    );
+  };
+
+  // Функция для получения информации о группе вариаций
+  const getVariantGroupInfo = (productId) => {
+    const group = productGroups.find(group => 
+      group.variants.some(variant => 
+        variant.productId === productId || variant.productId._id === productId
+      )
+    );
+    return group;
   };
 
   const handleDuplicate = async (product) => {
@@ -497,7 +522,7 @@ const ProductList = ({ onLogout }) => {
       // Добавляем "(копия)" к названию
       productCopy.name = productCopy.name + ' (копия)';
       
-      const response = await fetch(API_URL, {
+      const response = await fetch(PRODUCTS_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productCopy)
@@ -523,8 +548,8 @@ const ProductList = ({ onLogout }) => {
       <div style={{maxWidth: 1100, margin: '0 auto', background: '#fff', borderRadius: 10, border: '1.5px solid #e0e0e0', padding: 24}}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18}}>
           <h2 className="admin-header" style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Товары</h2>
-          <div>
-            <button onClick={()=>{setShowForm(true);setEditProduct(null);}} style={{background: '#FF6B00', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>+ Добавить товар</button>
+          <div className="admin-nav">
+            <button onClick={()=>{setShowForm(true);setEditProduct(null);}} className="nav-btn" style={{background: '#FF6B00'}}>+ Добавить товар</button>
             {selectedProducts.length > 0 && (
               <button 
                 onClick={handleDeleteSelected} 
@@ -543,11 +568,11 @@ const ProductList = ({ onLogout }) => {
                 🗑️ Удалить выбранные ({selectedProducts.length})
               </button>
             )}
-            <button onClick={() => navigate('/admin/variations')} style={{background: '#9c27b0', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🔄 Вариации</button>
-            <button onClick={() => navigate('/admin/settings')} style={{background: '#1e88e5', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>⚙️ Настройки</button>
-            <button onClick={() => navigate('/admin/analytics')} style={{background: '#4caf50', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📊 Аналитика</button>
-            <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
-            <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>
+            <button onClick={() => navigate('/admin/variations')} className="nav-btn nav-variations">🔄 Вариации</button>
+            <button onClick={() => navigate('/admin/settings')} className="nav-btn nav-settings">⚙️ Настройки</button>
+            <button onClick={() => navigate('/admin/analytics')} className="nav-btn nav-analytics">📊 Аналитика</button>
+            <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn nav-pickup">🏬 Пункты самовывоза</button>
+            <button onClick={onLogout} className="nav-btn nav-logout">Выйти</button>
           </div>
         </div>
         
@@ -624,7 +649,23 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px'}}>
                     <img src={product.image || '/images/products/placeholder.png'} alt={product.name} style={{width: 44, height: 44, objectFit: 'contain', borderRadius: 5, background: '#f5f7fa', border: '1px solid #e0e0e0'}} />
                   </td>
-                  <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>{product.name}</td>
+                  <td style={{padding: '6px 6px', fontWeight: 500, color: '#1a2236'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                      {product.name}
+                      {isProductVariant(product._id) && (
+                        <span style={{
+                          background: '#FF6B00',
+                          color: '#fff',
+                          fontSize: '10px',
+                          padding: '2px 6px',
+                          borderRadius: '10px',
+                          fontWeight: '600'
+                        }}>
+                          🔄 Вариация
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? String(product.price).replace('.', ',') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
                   <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['Short description'] || ''}</td>

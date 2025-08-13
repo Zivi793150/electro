@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'https://electro-a8bl.onrender.com/api';
-const PRODUCTS_URL = `${API_URL}/products`;
+const PRODUCTS_URL = `${API_URL}/admin/products`; // Используем админский endpoint для получения всех товаров
 const GROUPS_URL = `${API_URL}/product-groups`;
 
 function ProductVariations() {
@@ -47,13 +47,16 @@ function ProductVariations() {
         throw new Error(`Ошибка загрузки групп: ${groupsRes.status} - ${errorText}`);
       }
 
-      const [productsData, groupsData] = await Promise.all([
-        productsRes.json(),
-        groupsRes.json()
-      ]);
+             const [productsData, groupsData] = await Promise.all([
+         productsRes.json(),
+         groupsRes.json()
+       ]);
 
-      setProducts(productsData);
-      setGroups(groupsData);
+       console.log('Загруженные товары:', productsData);
+       console.log('Загруженные группы:', groupsData);
+
+       setProducts(productsData);
+       setGroups(groupsData);
     } catch (err) {
       console.error('Ошибка загрузки данных:', err);
       setError(err.message);
@@ -75,19 +78,49 @@ function ProductVariations() {
   };
 
   const handleEditGroup = (group) => {
+    console.log('Редактируем группу:', group);
     setEditingGroup(group);
     
     // Обрабатываем вариации, чтобы правильно извлечь ID товаров
-    const processedVariants = (group.variants || []).map(variant => ({
-      ...variant,
-      productId: variant.productId?._id || variant.productId || '',
-      parameters: variant.parameters || {}
-    }));
+    const processedVariants = (group.variants || []).map(variant => {
+      console.log('Обрабатываем вариацию:', variant);
+      
+      // Определяем правильный ID товара
+      let productId = '';
+      if (typeof variant.productId === 'string') {
+        productId = variant.productId;
+      } else if (variant.productId && variant.productId._id) {
+        productId = variant.productId._id;
+      } else if (variant.productId && typeof variant.productId === 'object') {
+        productId = variant.productId.toString();
+      }
+      
+      console.log('Извлеченный productId:', productId);
+      
+      return {
+        ...variant,
+        productId: productId,
+        parameters: variant.parameters || {}
+      };
+    });
+    
+    // Определяем правильный ID базового товара
+    let baseProductId = '';
+    if (typeof group.baseProductId === 'string') {
+      baseProductId = group.baseProductId;
+    } else if (group.baseProductId && group.baseProductId._id) {
+      baseProductId = group.baseProductId._id;
+    } else if (group.baseProductId && typeof group.baseProductId === 'object') {
+      baseProductId = group.baseProductId.toString();
+    }
+    
+    console.log('Извлеченный baseProductId:', baseProductId);
+    console.log('Обработанные вариации:', processedVariants);
     
     setFormData({
       name: group.name,
       description: group.description || '',
-      baseProductId: group.baseProductId?._id || '',
+      baseProductId: baseProductId,
       parameters: group.parameters || [],
       variants: processedVariants
     });
@@ -284,17 +317,17 @@ function ProductVariations() {
             <span className="btn-icon">+</span>
             Создать группу
           </button>
-          <div className="navigation-buttons">
-            <button onClick={() => navigate('/admin/products')} className="nav-btn products-btn">
+          <div className="admin-nav">
+            <button onClick={() => navigate('/admin/products')} className="nav-btn nav-products">
               📦 Товары
             </button>
-            <button onClick={() => navigate('/admin/settings')} className="nav-btn settings-btn">
+            <button onClick={() => navigate('/admin/settings')} className="nav-btn nav-settings">
               ⚙️ Настройки
             </button>
-            <button onClick={() => navigate('/admin/analytics')} className="nav-btn analytics-btn">
+            <button onClick={() => navigate('/admin/analytics')} className="nav-btn nav-analytics">
               📊 Аналитика
             </button>
-            <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn pickup-btn">
+            <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn nav-pickup">
               🏬 Пункты самовывоза
             </button>
           </div>
@@ -393,7 +426,15 @@ function ProductVariations() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="variations-form">
+                         <form onSubmit={handleSubmit} className="variations-form">
+               {/* Отладочная информация */}
+               {process.env.NODE_ENV === 'development' && (
+                 <div style={{background: '#f0f0f0', padding: '10px', marginBottom: '20px', fontSize: '12px'}}>
+                   <strong>Отладка:</strong><br/>
+                   baseProductId: {formData.baseProductId}<br/>
+                   variants: {JSON.stringify(formData.variants.map(v => ({productId: v.productId, isActive: v.isActive})))}
+                 </div>
+               )}
               {/* Основная информация */}
               <div className="form-section">
                 <h3 className="section-title">Основная информация</h3>
@@ -436,7 +477,7 @@ function ProductVariations() {
                       <option value="">Выберите товар</option>
                       {products.map(product => (
                         <option key={product._id} value={product._id}>
-                          {product.name}
+                          {product.name} (ID: {product._id})
                         </option>
                       ))}
                     </select>
@@ -552,7 +593,7 @@ function ProductVariations() {
                            <option value="">Выберите товар</option>
                            {products.map(product => (
                              <option key={product._id} value={product._id}>
-                               {product.name} - {product.price} ₸
+                               {product.name} - {product.price} ₸ (ID: {product._id})
                              </option>
                            ))}
                          </select>

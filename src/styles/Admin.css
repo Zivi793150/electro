@@ -97,6 +97,38 @@
   font-weight: 600;
 }
 
+/* Единая панель навигации в админке */
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-nav .nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-nav .nav-products { background: #6c757d; }
+.admin-nav .nav-variations { background: #9c27b0; }
+.admin-nav .nav-settings { background: #1e88e5; }
+.admin-nav .nav-analytics { background: #4caf50; }
+.admin-nav .nav-pickup { background: #28a745; }
+.admin-nav .nav-logout { background: #e53935; }
+
+@media (max-width: 768px) {
+  .admin-nav { gap: 8px; }
+  .admin-nav .nav-btn { height: 34px; padding: 0 12px; }
+}
+
 .admin-form {
   font-family: 'Inter', sans-serif;
 }

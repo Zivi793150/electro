@@ -133,15 +133,15 @@ const SiteSettings = ({ onLogout }) => {
       <div style={{maxWidth: 1100, margin: '0 auto', background: '#fff', borderRadius: 10, border: '1.5px solid #e0e0e0', padding: 24}}>
         <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24}}>
           <h2 className="admin-header" style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Настройки сайта</h2>
-          <div>
-            <button onClick={() => navigate('/admin/products')} style={{background: '#6c757d', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📦 Товары</button>
-            <button onClick={() => navigate('/admin/variations')} style={{background: '#9c27b0', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🔄 Вариации</button>
-            <button onClick={() => navigate('/admin/analytics')} style={{background: '#4caf50', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📊 Аналитика</button>
-            <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
-            <button onClick={handleSave} disabled={saving} style={{background: '#007bff', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>
+          <div className="admin-nav">
+            <button onClick={() => navigate('/admin/products')} className="nav-btn nav-products">📦 Товары</button>
+            <button onClick={() => navigate('/admin/variations')} className="nav-btn nav-variations">🔄 Вариации</button>
+            <button onClick={() => navigate('/admin/analytics')} className="nav-btn nav-analytics">📊 Аналитика</button>
+            <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn nav-pickup">🏬 Пункты самовывоза</button>
+            <button onClick={handleSave} disabled={saving} className="nav-btn" style={{background:'#007bff'}}>
               {saving ? 'Сохранение...' : '💾 Сохранить'}
             </button>
-            <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>
+            <button onClick={onLogout} className="nav-btn nav-logout">Выйти</button>
           </div>
         </div>
 

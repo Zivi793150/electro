@@ -254,79 +254,34 @@ const PickupPoints = ({ onLogout }) => {
           }}>
             🏬 Управление пунктами самовывоза
           </h1>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="admin-nav">
             <button
               onClick={() => navigate('/admin/products')}
-              style={{
-                background: '#6c757d',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                padding: '10px 16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: 14
-              }}
+              className="nav-btn nav-products"
             >
               📦 Товары
             </button>
             <button
               onClick={() => navigate('/admin/variations')}
-              style={{
-                background: '#9c27b0',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                padding: '10px 16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: 14
-              }}
+              className="nav-btn nav-variations"
             >
               🔄 Вариации
             </button>
             <button
               onClick={() => navigate('/admin/analytics')}
-              style={{
-                background: '#4caf50',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                padding: '10px 16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: 14
-              }}
+              className="nav-btn nav-analytics"
             >
               📊 Аналитика
             </button>
             <button
               onClick={() => navigate('/admin/settings')}
-              style={{
-                background: '#1e88e5',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                padding: '10px 16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: 14
-              }}
+              className="nav-btn nav-settings"
             >
               ⚙️ Настройки
             </button>
             <button
               onClick={onLogout}
-              style={{
-                background: '#dc3545',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                padding: '10px 16px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: 14
-              }}
+              className="nav-btn nav-logout"
             >
               Выйти
             </button>
