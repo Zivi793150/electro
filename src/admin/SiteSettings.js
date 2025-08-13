@@ -135,6 +135,8 @@ const SiteSettings = ({ onLogout }) => {
           <h2 className="admin-header" style={{fontWeight: 700, fontSize: 24, color: '#1a2236', margin: 0}}>Настройки сайта</h2>
           <div>
             <button onClick={() => navigate('/admin/products')} style={{background: '#6c757d', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📦 Товары</button>
+            <button onClick={() => navigate('/admin/variations')} style={{background: '#9c27b0', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🔄 Вариации</button>
+            <button onClick={() => navigate('/analytics')} style={{background: '#4caf50', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📊 Аналитика</button>
             <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
             <button onClick={handleSave} disabled={saving} style={{background: '#007bff', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>
               {saving ? 'Сохранение...' : '💾 Сохранить'}

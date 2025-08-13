@@ -138,3 +138,76 @@
     font-size: 16px; /* Предотвращает зум на iOS */
   }
 }
+
+/* Стили для навигации в админке */
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.navigation-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.products-btn {
+  background: #6c757d;
+}
+
+.products-btn:hover {
+  background: #5a6268;
+}
+
+.settings-btn {
+  background: #1e88e5;
+}
+
+.settings-btn:hover {
+  background: #1976d2;
+}
+
+.analytics-btn {
+  background: #4caf50;
+}
+
+.analytics-btn:hover {
+  background: #45a049;
+}
+
+.pickup-btn {
+  background: #28a745;
+}
+
+.pickup-btn:hover {
+  background: #218838;
+}
+
+/* Адаптивность для навигации */
+@media (max-width: 768px) {
+  .header-actions {
+    align-items: stretch;
+  }
+  
+  .navigation-buttons {
+    justify-content: center;
+  }
+  
+  .nav-btn {
+    flex: 1;
+    min-width: 120px;
+  }
+}

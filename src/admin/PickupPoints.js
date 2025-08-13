@@ -271,6 +271,36 @@ const PickupPoints = ({ onLogout }) => {
               📦 Товары
             </button>
             <button
+              onClick={() => navigate('/admin/variations')}
+              style={{
+                background: '#9c27b0',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              🔄 Вариации
+            </button>
+            <button
+              onClick={() => navigate('/analytics')}
+              style={{
+                background: '#4caf50',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              📊 Аналитика
+            </button>
+            <button
               onClick={() => navigate('/admin/settings')}
               style={{
                 background: '#1e88e5',

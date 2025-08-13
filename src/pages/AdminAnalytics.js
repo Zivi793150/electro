@@ -152,6 +152,51 @@ const AdminAnalytics = () => {
           </div>
 
           <div className="stats-details">
+            {/* Каналы трафика */}
+            <div className="stats-section">
+              <h3>📣 Каналы трафика</h3>
+              <div className="stats-grid">
+                {stats.channelStats.map((c, idx) => (
+                  <div key={idx} className="stat-item">
+                    <div className="stat-info">
+                      <div className="stat-label">{c.channel}</div>
+                      <div className="stat-count">{c.count.toLocaleString()}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* UTM источники */}
+            <div className="stats-section">
+              <h3>🔗 UTM источники</h3>
+              <div className="stats-grid">
+                {stats.utmSourceStats.map((u, idx) => (
+                  <div key={idx} className="stat-item">
+                    <div className="stat-info">
+                      <div className="stat-label">{u.utm_source}</div>
+                      <div className="stat-count">{u.count.toLocaleString()}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Устройства */}
+            <div className="stats-section">
+              <h3>📱 Устройства</h3>
+              <div className="stats-grid">
+                {stats.deviceStats.map((d, idx) => (
+                  <div key={idx} className="stat-item">
+                    <div className="stat-info">
+                      <div className="stat-label">{d.os || 'Other'}</div>
+                      <div className="stat-count">{d.count.toLocaleString()}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="stats-section">
               <h3>📊 Статистика по типам событий</h3>
               <div className="stats-grid">

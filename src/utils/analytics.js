@@ -10,9 +10,58 @@ const getSessionId = () => {
   return sessionId;
 };
 
+// Helpers
+const parseUtmParams = () => {
+  const params = new URLSearchParams(window.location.search || '');
+  return {
+    utm_source: params.get('utm_source') || '',
+    utm_medium: params.get('utm_medium') || '',
+    utm_campaign: params.get('utm_campaign') || '',
+    utm_term: params.get('utm_term') || '',
+    utm_content: params.get('utm_content') || ''
+  };
+};
+
+const getDeviceInfo = () => {
+  const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  let os = 'Other';
+  if (/Windows NT/i.test(ua)) os = 'Windows';
+  else if (/Android/i.test(ua)) os = 'Android';
+  else if (/iPhone|iPad|iPod/i.test(ua)) os = 'iOS';
+  else if (/Mac OS X/i.test(ua)) os = 'macOS';
+  else if (/Linux/i.test(ua)) os = 'Linux';
+
+  let browser = 'Other';
+  if (/Chrome\//i.test(ua) && !/Edge\//i.test(ua)) browser = 'Chrome';
+  else if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) browser = 'Safari';
+  else if (/Firefox\//i.test(ua)) browser = 'Firefox';
+  else if (/Edg\//i.test(ua)) browser = 'Edge';
+
+  return { isMobile, os, browser };
+};
+
+const detectChannel = (referrer) => {
+  try {
+    const host = referrer ? new URL(referrer).hostname : '';
+    if (!host) return 'direct';
+    if (/google\.|yandex\.|bing\.|yahoo\./i.test(host)) return 'organic';
+    if (/t\.me|telegram|wa\.me|whatsapp|vk\.com|facebook|instagram|instagr|ok\.ru/i.test(host)) return 'social';
+    return 'referral';
+  } catch {
+    return 'direct';
+  }
+};
+
 // Отправка события на сервер
 const trackEvent = async (eventType, eventData = {}, productId = null) => {
   try {
+    const clientSessionId = getSessionId();
+    const utm = parseUtmParams();
+    const device = getDeviceInfo();
+    const referrer = document.referrer || '';
+    const channel = detectChannel(referrer);
+
     const response = await fetch(`${API_BASE}/api/analytics/track`, {
       method: 'POST',
       headers: {
@@ -20,10 +69,16 @@ const trackEvent = async (eventType, eventData = {}, productId = null) => {
       },
       body: JSON.stringify({
         eventType,
-        eventData,
+        eventData: {
+          ...eventData,
+          ...utm,
+          device,
+          channel
+        },
+        clientSessionId,
         productId,
         page: window.location.pathname,
-        referrer: document.referrer
+        referrer
       })
     });
 

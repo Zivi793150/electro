@@ -545,6 +545,7 @@ const ProductList = ({ onLogout }) => {
             )}
             <button onClick={() => navigate('/admin/variations')} style={{background: '#9c27b0', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🔄 Вариации</button>
             <button onClick={() => navigate('/admin/settings')} style={{background: '#1e88e5', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>⚙️ Настройки</button>
+            <button onClick={() => navigate('/analytics')} style={{background: '#4caf50', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>📊 Аналитика</button>
             <button onClick={() => navigate('/admin/pickup-points')} style={{background: '#28a745', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', marginRight: 12, cursor: 'pointer'}}>🏬 Пункты самовывоза</button>
             <button onClick={onLogout} style={{background: '#e53935', color: '#fff', fontWeight: 600, fontSize: 15, border: 'none', borderRadius: 7, padding: '8px 18px', cursor: 'pointer'}}>Выйти</button>
           </div>

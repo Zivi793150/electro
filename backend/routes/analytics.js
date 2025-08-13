@@ -19,18 +19,29 @@ router.post('/track', ensureSession, async (req, res) => {
       eventData = {},
       productId,
       page,
-      referrer
+      referrer,
+      clientSessionId
     } = req.body;
 
     const analytics = new Analytics({
       eventType,
       eventData,
       sessionId: req.session.analyticsId,
+      clientSessionId,
       userAgent: req.get('User-Agent'),
       ipAddress: req.ip || req.connection.remoteAddress,
       productId,
       page,
-      referrer
+      referrer,
+      channel: eventData?.channel || 'direct',
+      device: eventData?.device || undefined,
+      utm: {
+        utm_source: eventData?.utm_source || '',
+        utm_medium: eventData?.utm_medium || '',
+        utm_campaign: eventData?.utm_campaign || '',
+        utm_term: eventData?.utm_term || '',
+        utm_content: eventData?.utm_content || ''
+      }
     });
 
     await analytics.save();
@@ -108,6 +119,52 @@ router.get('/stats', async (req, res) => {
       { $sort: { '_id.date': 1 } }
     ]);
 
+    // Статистика по часам
+    const hourlyStats = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: { hour: { $hour: '$timestamp' }, eventType: '$eventType' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.hour': 1 } }
+    ]);
+
+    // Статистика по каналам (direct / organic / social / referral)
+    const channelStats = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: '$channel',
+          count: { $sum: 1 }
+        }
+      },
+      { $project: { channel: '$_id', count: 1 } },
+      { $sort: { count: -1 } }
+    ]);
+
+    // Статистика по UTM источникам
+    const utmSourceStats = await Analytics.aggregate([
+      { $match: { ...dateFilter, 'utm.utm_source': { $ne: '' } } },
+      { $group: { _id: '$utm.utm_source', count: { $sum: 1 } } },
+      { $project: { utm_source: '$_id', count: 1 } },
+      { $sort: { count: -1 } }
+    ]);
+
+    // Статистика по устройствам
+    const deviceStats = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: '$device.os',
+          count: { $sum: 1 }
+        }
+      },
+      { $project: { os: '$_id', count: 1 } },
+      { $sort: { count: -1 } }
+    ]);
+
     // Топ товаров по просмотрам
     const topProducts = await Analytics.aggregate([
       { $match: { ...dateFilter, eventType: 'product_view', productId: { $exists: true } } },
@@ -165,6 +222,10 @@ router.get('/stats', async (req, res) => {
         startDate,
         eventStats,
         dailyStats,
+        hourlyStats,
+        channelStats,
+        utmSourceStats,
+        deviceStats,
         topProducts,
         pageStats,
         summary: {

@@ -279,10 +279,26 @@ function ProductVariations() {
             Создавайте группы товаров с различными параметрами и ценами
           </p>
         </div>
-        <button onClick={handleCreateGroup} className="create-btn">
-          <span className="btn-icon">+</span>
-          Создать группу
-        </button>
+        <div className="header-actions">
+          <button onClick={handleCreateGroup} className="create-btn">
+            <span className="btn-icon">+</span>
+            Создать группу
+          </button>
+          <div className="navigation-buttons">
+            <button onClick={() => navigate('/admin/products')} className="nav-btn products-btn">
+              📦 Товары
+            </button>
+            <button onClick={() => navigate('/admin/settings')} className="nav-btn settings-btn">
+              ⚙️ Настройки
+            </button>
+            <button onClick={() => navigate('/analytics')} className="nav-btn analytics-btn">
+              📊 Аналитика
+            </button>
+            <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn pickup-btn">
+              🏬 Пункты самовывоза
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Ошибки */}
