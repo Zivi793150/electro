@@ -94,64 +94,55 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
 
   // Компактный вид для страницы товара
   if (compact) {
-    // Для Алматы показываем карточки, для остальных городов — выпадающий список
+    // Для Алматы рисуем плашку как на скрине (город, бесплатная доставка, самовывоз с адресом, примечание)
     if (deliveryInfo.isAlmaty) {
+      const mainPoint = deliveryInfo.firstPickupPoint || deliveryInfo.pickupPoints?.[0] || {};
       return (
-        <div style={{ marginBottom: 12 }}>
-          {/* Отображение опций доставки из API */}
-          {deliveryInfo.deliveryOptions.map((option, index) => (
-            <div
-              key={index}
-              onClick={() => handleDeliverySelect(option)}
-              style={{
-                border: selectedDelivery && selectedDelivery.type === option.type ? '2px solid #28a745' : '1px solid #e0e0e0',
-                borderRadius: 6,
-                padding: 12,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                background: selectedDelivery && selectedDelivery.type === option.type ? '#f8fff8' : '#fff',
-                fontSize: '0.9rem',
-                marginBottom: 8
-              }}
-              onMouseEnter={(e) => {
-                if (!selectedDelivery || selectedDelivery.type !== option.type) {
-                  e.currentTarget.style.borderColor = '#28a745';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(40, 167, 69, 0.2)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!selectedDelivery || selectedDelivery.type !== option.type) {
-                  e.currentTarget.style.borderColor = '#e0e0e0';
-                  e.currentTarget.style.boxShadow = 'none';
-                }
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: '#333' }}>
-                <span style={{ fontSize: '16px' }}>
-                  {option.type === 'free' ? '🚚' : '🏬'}
-                </span>
-                <span>{option.name}</span>
-              </div>
-              <div style={{ fontSize: '0.8rem', color: '#28a745', fontWeight: 600, marginTop: 4 }}>
-                {option.description}
+        <div style={{
+          border: '1px solid #e0e0e0',
+          borderRadius: 6,
+          background: '#fff',
+          padding: 12,
+          marginTop: 6
+        }}>
+          <div style={{ fontWeight: 700, color: '#1976d2', marginBottom: 8 }}>
+            Ваш город: {deliveryInfo.city}
+          </div>
+          <div style={{ display: 'grid', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ color: '#ef6c00' }}>🚚</span>
+              <div>
+                <div style={{ fontWeight: 600 }}>Бесплатная доставка по городу</div>
+                <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня — БЕСПЛАТНО</div>
               </div>
             </div>
-          ))}
 
-          {/* Информационная строка */}
-          <div style={{
-            background: '#f8f9fa',
-            border: '1px solid #e9ecef',
-            borderRadius: 6,
-            padding: 8,
-            fontSize: '0.8rem',
-            color: '#6c757d',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6
-          }}>
-            <span style={{ fontSize: '14px' }}>ⓘ</span>
-            <span>{deliveryInfo.deliveryNote || 'Срок доставки рассчитывается менеджером после оформления заказа'}</span>
+            {deliveryInfo.hasPickupPoints && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: '#607d8b' }}>🏬</span>
+                <div>
+                  <div style={{ fontWeight: 600 }}>Самовывоз из магазина {mainPoint.address ? `ул. ${mainPoint.address}` : ''}</div>
+                  <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня {mainPoint.workingHours || 'с 9:00 до 18:00'} — больше 5</div>
+                </div>
+              </div>
+            )}
+
+            <div style={{
+              border: '1px solid #e0e0e0',
+              background: '#f9fafb',
+              borderRadius: 6,
+              padding: 10,
+              color: '#333'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ color: '#607d8b' }}>ℹ️</span>
+                <div>
+                  <div>Срок доставки рассчитывается</div>
+                  <div>менеджером после</div>
+                  <div>оформления заказа</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       );

@@ -9,6 +9,12 @@
   z-index: 1000;
 }
 
+/* Фиксация стилей шапки от переопределений на страницах (например, каталог) */
+.header, .header * {
+  font-family: Roboto, Helvetica, Arial, sans-serif !important;
+  box-sizing: border-box;
+}
+
 .header-united-bar {
   display: flex;
   align-items: center;

@@ -242,26 +242,16 @@ router.get('/delivery/:city', async (req, res) => {
       city,
       isAlmaty,
       hasPickupPoints: pickupPoints.length > 0,
-      deliveryOptions: [],
-      deliveryNote: 'Срок доставки рассчитывается менеджером после оформления заказа'
+      deliveryOptions: []
     };
     
-    if (isAlmaty) {
-      // Для Алматы - используем настройки из базы данных
-      deliveryInfo.deliveryOptions = [
-        {
-          type: 'free',
-          name: 'Бесплатная доставка по городу',
-          cost: 0,
-          description: 'Сегодня — БЕСПЛАТНО'
-        },
-        {
-          type: 'pickup',
-          name: 'Самовывоз из магазина ул. Толе би 216Б',
-          cost: 0,
-          description: 'Сегодня с 9:00 до 18:00 — больше 5'
-        }
-      ];
+    if (isAlmaty && pickupPoints.length > 0) {
+      deliveryInfo.deliveryOptions.push({
+        type: 'pickup',
+        name: 'Самовывоз',
+        cost: 0,
+        description: 'Бесплатно'
+      });
     } else {
       // Для других городов - платные варианты доставки
       deliveryInfo.deliveryOptions = [
