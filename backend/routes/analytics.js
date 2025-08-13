@@ -180,6 +180,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$channel',
           pageViews: { $sum: { $cond: [{ $eq: ['$eventType', 'page_view'] }, 1, 0] } },
+          phoneClicks: { $sum: { $cond: [{ $eq: ['$eventType', 'phone_click'] }, 1, 0] } },
           formSubmits: { $sum: { $cond: [{ $eq: ['$eventType', 'form_submit'] }, 1, 0] } },
           uniqueSessions: { $addToSet: '$sessionId' }
         }
@@ -188,12 +189,20 @@ router.get('/stats', async (req, res) => {
         $project: {
           channel: '$_id',
           pageViews: 1,
+          phoneClicks: 1,
           formSubmits: 1,
           uniqueSessions: { $size: '$uniqueSessions' },
           conversion: {
             $cond: [
               { $gt: ['$pageViews', 0] },
               { $multiply: [{ $divide: ['$formSubmits', '$pageViews'] }, 100] },
+              0
+            ]
+          },
+          conversionPhone: {
+            $cond: [
+              { $gt: ['$pageViews', 0] },
+              { $multiply: [{ $divide: ['$phoneClicks', '$pageViews'] }, 100] },
               0
             ]
           }
@@ -225,6 +234,41 @@ router.get('/stats', async (req, res) => {
       }
     ]);
     const funnelTotals = funnelTotalsAgg[0] || { pageViews: 0, buttonClicks: 0, formSubmits: 0, uniqueSessions: 0 };
+
+    // Клики по телефону по страницам
+    const phoneClicksByPage = await Analytics.aggregate([
+      { $match: { ...dateFilter, eventType: 'phone_click' } },
+      {
+        $group: {
+          _id: '$page',
+          clicks: { $sum: 1 },
+          uniqueSessions: { $addToSet: '$sessionId' }
+        }
+      },
+      { $project: { page: '$_id', clicks: 1, uniqueSessions: { $size: '$uniqueSessions' } } },
+      { $sort: { clicks: -1 } }
+    ]);
+
+    // Клики по кнопкам (CTA)
+    const buttonClicksStats = await Analytics.aggregate([
+      { $match: { ...dateFilter, eventType: 'button_click' } },
+      {
+        $group: {
+          _id: { text: '$eventData.buttonText', context: '$eventData.context' },
+          count: { $sum: 1 },
+          uniqueSessions: { $addToSet: '$sessionId' }
+        }
+      },
+      {
+        $project: {
+          buttonText: '$_id.text',
+          context: '$_id.context',
+          count: 1,
+          uniqueSessions: { $size: '$uniqueSessions' }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
 
     // Топ товаров по просмотрам
     const topProducts = await Analytics.aggregate([
@@ -288,6 +332,8 @@ router.get('/stats', async (req, res) => {
         channelConversion,
         utmSourceStats,
         deviceStats,
+        phoneClicksByPage,
+        buttonClicksStats,
         topProducts,
         pageStats,
         funnelTotals,

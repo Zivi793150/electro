@@ -152,6 +152,32 @@ const AdminAnalytics = () => {
           </div>
 
           <div className="stats-details">
+            {/* Клики по телефону по страницам */}
+            <div className="stats-section">
+              <h3>📞 Клики по телефону (по страницам)</h3>
+              <div className="page-stats">
+                {stats.phoneClicksByPage.map((row, index) => (
+                  <div key={index} className="page-stat">
+                    <div className="page-name">{row.page || 'Главная'}</div>
+                    <div className="page-views">Кликов: {row.clicks.toLocaleString()} | Сессий: {row.uniqueSessions.toLocaleString()}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Клики по кнопкам (CTA) */}
+            <div className="stats-section">
+              <h3>🖱️ Клики по CTA</h3>
+              <div className="cta-grid">
+                {stats.buttonClicksStats.map((btn, idx) => (
+                  <div key={idx} className="cta-item">
+                    <div className="cta-title">{btn.buttonText || 'Кнопка'}</div>
+                    <div className="cta-context">{btn.context || 'без контекста'}</div>
+                    <div className="cta-metrics">Кликов: {btn.count.toLocaleString()} • Сессий: {btn.uniqueSessions.toLocaleString()}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
             {/* Воронка действий */}
             <div className="stats-section">
               <h3>🛤️ Воронка: Просмотры → Клики → Заявки</h3>
@@ -181,6 +207,7 @@ const AdminAnalytics = () => {
                     <div className="stat-info">
                       <div className="stat-label">{c.channel}</div>
                       <div className="stat-count">{c.count.toLocaleString()}</div>
+                      <div className="stat-unique">Сессий: {c.uniqueSessions.toLocaleString()}</div>
                     </div>
                   </div>
                 ))}
@@ -196,6 +223,7 @@ const AdminAnalytics = () => {
                     <div className="stat-info">
                       <div className="stat-label">{u.utm_source}</div>
                       <div className="stat-count">{u.count.toLocaleString()}</div>
+                      <div className="stat-unique">Сессий: {u.uniqueSessions.toLocaleString()}</div>
                     </div>
                   </div>
                 ))}
