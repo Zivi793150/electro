@@ -10,6 +10,7 @@ const AdminProductList = lazy(() => import('./ProductList'));
 const SiteSettings = lazy(() => import('./SiteSettings'));
 const PickupPoints = lazy(() => import('./PickupPoints'));
 const ProductVariations = lazy(() => import('./ProductVariations'));
+const AdminAnalytics = lazy(() => import('../pages/AdminAnalytics'));
 
 const AdminApp = () => {
   const navigate = useNavigate();
@@ -46,6 +47,7 @@ const AdminApp = () => {
         <Route path="/variations" element={isAuth ? <ProductVariations onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={isAuth ? <SiteSettings onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/pickup-points" element={isAuth ? <PickupPoints onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/analytics" element={isAuth ? <AdminAnalytics /> : <Navigate to="/login" />} />
         <Route path="/" element={isAuth ? <Navigate to="/products" /> : <Navigate to="/login" />} />
         <Route path="*" element={isAuth ? <Navigate to="/products" /> : <Navigate to="/login" />} />
       </Routes>

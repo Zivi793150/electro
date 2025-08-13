@@ -15,8 +15,6 @@ const About = lazy(() => import('./pages/About'));
 const Contacts = lazy(() => import('./pages/Contacts'));
 const Policy = lazy(() => import('./pages/Policy'));
 const Cooperation = lazy(() => import('./pages/Cooperation'));
-const AdminAnalytics = lazy(() => import('./pages/AdminAnalytics'));
-const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Fallback компонент для загрузки
@@ -54,8 +52,6 @@ function App() {
           <Route path="/cooperation" element={<Cooperation />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/admin/*" element={<AdminApp />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/analytics" element={<AdminAnalytics />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
