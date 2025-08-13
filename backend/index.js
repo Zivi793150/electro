@@ -10,18 +10,63 @@ const app = express();
 
 // Настройка CORS для разрешения запросов с вашего домена
 app.use(cors({
-  origin: [
-    'https://www.eltok.kz',
-    'https://eltok.kz',
-    'http://localhost:3000',
-    'http://localhost:3001'
-  ],
+  origin: function (origin, callback) {
+    // Разрешаем запросы без origin (например, мобильные приложения)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'https://www.eltok.kz',
+      'https://eltok.kz',
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://electro-a8bl.onrender.com'
+    ];
+    
+    // Проверяем, является ли origin разрешенным
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Разрешаем все поддомены eltok.kz
+    if (origin.endsWith('.eltok.kz')) {
+      return callback(null, true);
+    }
+    
+    callback(new Error('CORS: Origin не разрешен'));
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
+  exposedHeaders: ['Content-Length', 'X-Requested-With'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 app.use(express.json());
+
+// Дополнительные CORS заголовки для всех ответов
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  
+  // Разрешаем запросы с основного домена и поддоменов
+  const allowedOrigins = ['https://www.eltok.kz', 'https://eltok.kz', 'http://localhost:3000', 'http://localhost:3001'];
+  
+  if (allowedOrigins.includes(origin) || (origin && origin.endsWith('.eltok.kz'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 часа
+  
+  // Обработка preflight запросов
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 
 // Настройка сессий для аналитики
 app.use(session({
@@ -96,6 +141,16 @@ mongoose.connect(mongoUri)
 
 app.get('/', (req, res) => {
   res.json({ message: 'Backend работает!', timestamp: new Date().toISOString() });
+});
+
+// Тестовый endpoint для проверки CORS
+app.get('/api/test-cors', (req, res) => {
+  res.json({ 
+    message: 'CORS работает!', 
+    timestamp: new Date().toISOString(),
+    origin: req.headers.origin,
+    method: req.method
+  });
 });
 
 // Модель продукта
@@ -567,6 +622,13 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
     
     await client.close();
     
+    // Получаем настройки сайта
+    let siteInfo = await Information.findOne();
+    if (!siteInfo) {
+      siteInfo = new Information();
+      await siteInfo.save();
+    }
+    
     // Если это Алматы и есть пункты самовывоза - бесплатная доставка
     const isAlmaty = city.toLowerCase().includes('алматы') || city.toLowerCase().includes('алмата');
     
@@ -575,16 +637,26 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
       isAlmaty,
       hasPickupPoints: pickupPoints.length > 0,
       pickupPointsCount: pickupPoints.length,
-      deliveryOptions: []
+      deliveryOptions: [],
+      deliveryNote: siteInfo.deliveryInfo?.deliveryNote || 'Срок доставки рассчитывается менеджером после оформления заказа'
     };
     
-    if (isAlmaty && pickupPoints.length > 0) {
-      deliveryInfo.deliveryOptions.push({
-        type: 'pickup',
-        name: 'Самовывоз',
-        cost: 0,
-        description: 'Бесплатно'
-      });
+    if (isAlmaty) {
+      // Для Алматы - используем настройки из базы данных
+      deliveryInfo.deliveryOptions = [
+        {
+          type: 'free',
+          name: siteInfo.deliveryInfo?.freeDelivery || 'Бесплатная доставка по городу',
+          cost: 0,
+          description: siteInfo.deliveryInfo?.freeDeliveryNote || 'Сегодня — БЕСПЛАТНО'
+        },
+        {
+          type: 'pickup',
+          name: `Самовывоз из магазина ${siteInfo.deliveryInfo?.pickupAddress || 'ул. Толе би 216Б'}`,
+          cost: 0,
+          description: siteInfo.deliveryInfo?.pickupInfo || 'Сегодня с 9:00 до 18:00 — больше 5'
+        }
+      ];
     } else {
       // Для других городов - платные варианты доставки
       deliveryInfo.deliveryOptions = [
@@ -721,6 +793,20 @@ app.get('/api/product-groups/by-product/:productId', async (req, res) => {
 // Подключаем роуты аналитики
 const analyticsRoutes = require('./routes/analytics');
 app.use('/api/analytics', analyticsRoutes);
+
+// Обработка ошибок CORS
+app.use((err, req, res, next) => {
+  if (err.message === 'CORS') {
+    res.status(403).json({ error: 'CORS: Запрос заблокирован' });
+  } else {
+    next(err);
+  }
+});
+
+// Обработка 404 ошибок
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'API endpoint не найден' });
+});
 
 mongoose.connection.once('open', () => {
   console.log('MongoDB подключена успешно');

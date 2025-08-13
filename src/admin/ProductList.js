@@ -460,7 +460,7 @@ const ProductList = ({ onLogout }) => {
       setSelectedProducts([]);
       setSelectAll(false);
     } else {
-      setSelectedProducts(products.map(product => product._id));
+      setSelectedProducts(products.filter(product => product && product._id).map(product => product._id));
       setSelectAll(true);
     }
   };
@@ -494,19 +494,35 @@ const ProductList = ({ onLogout }) => {
 
   // Функция для определения, является ли товар вариацией
   const isProductVariant = (productId) => {
+    if (!productId || !Array.isArray(productGroups)) return false;
     return productGroups.some(group => 
-      group.variants.some(variant => 
-        variant.productId === productId || variant.productId._id === productId
-      )
+      Array.isArray(group.variants) && group.variants.some(variant => {
+        if (!variant.productId) return false;
+        if (typeof variant.productId === 'string') {
+          return variant.productId === productId;
+        }
+        if (variant.productId && variant.productId._id) {
+          return variant.productId._id === productId;
+        }
+        return false;
+      })
     );
   };
 
   // Функция для получения информации о группе вариаций
   const getVariantGroupInfo = (productId) => {
+    if (!productId || !Array.isArray(productGroups)) return null;
     const group = productGroups.find(group => 
-      group.variants.some(variant => 
-        variant.productId === productId || variant.productId._id === productId
-      )
+      Array.isArray(group.variants) && group.variants.some(variant => {
+        if (!variant.productId) return false;
+        if (typeof variant.productId === 'string') {
+          return variant.productId === productId;
+        }
+        if (variant.productId && variant.productId._id) {
+          return variant.productId._id === productId;
+        }
+        return false;
+      })
     );
     return group;
   };
@@ -633,7 +649,7 @@ const ProductList = ({ onLogout }) => {
             </tr>
           </thead>
           <tbody>
-            {products.map(product => (
+            {products.filter(product => product && product._id).map(product => (
                 <tr key={product._id} style={{
                   borderBottom: '1px solid #e0e0e0',
                   backgroundColor: selectedProducts.includes(product._id) ? '#f8f9fa' : 'transparent'
