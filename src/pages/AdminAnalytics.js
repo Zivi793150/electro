@@ -88,6 +88,13 @@ const AdminAnalytics = () => {
       <div className="admin-analytics-header">
         <h1>📊 Аналитика сайта</h1>
         <div className="header-controls">
+          <button
+            onClick={() => window.location.assign('/admin/products')}
+            className="back-to-admin"
+            title="Назад к админке"
+          >
+            ← Назад
+          </button>
           <div className="period-selector">
             <label>Период:</label>
             <select value={period} onChange={(e) => setPeriod(e.target.value)}>

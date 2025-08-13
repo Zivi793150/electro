@@ -91,7 +91,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$eventType',
           count: { $sum: 1 },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -138,7 +138,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$channel',
           count: { $sum: 1 },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -154,7 +154,7 @@ router.get('/stats', async (req, res) => {
     // Статистика по UTM источникам
     const utmSourceStats = await Analytics.aggregate([
       { $match: { ...dateFilter, 'utm.utm_source': { $ne: '' } } },
-      { $group: { _id: '$utm.utm_source', count: { $sum: 1 }, uniqueSessions: { $addToSet: '$sessionId' } } },
+      { $group: { _id: '$utm.utm_source', count: { $sum: 1 }, uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } } } },
       { $project: { utm_source: '$_id', count: 1, uniqueSessions: { $size: '$uniqueSessions' } } },
       { $sort: { count: -1 } }
     ]);
@@ -166,7 +166,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$device.os',
           count: { $sum: 1 },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       { $project: { os: '$_id', count: 1, uniqueSessions: { $size: '$uniqueSessions' } } },
@@ -182,7 +182,7 @@ router.get('/stats', async (req, res) => {
           pageViews: { $sum: { $cond: [{ $eq: ['$eventType', 'page_view'] }, 1, 0] } },
           phoneClicks: { $sum: { $cond: [{ $eq: ['$eventType', 'phone_click'] }, 1, 0] } },
           formSubmits: { $sum: { $cond: [{ $eq: ['$eventType', 'form_submit'] }, 1, 0] } },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -220,7 +220,7 @@ router.get('/stats', async (req, res) => {
           pageViews: { $sum: { $cond: [{ $eq: ['$eventType', 'page_view'] }, 1, 0] } },
           buttonClicks: { $sum: { $cond: [{ $eq: ['$eventType', 'button_click'] }, 1, 0] } },
           formSubmits: { $sum: { $cond: [{ $eq: ['$eventType', 'form_submit'] }, 1, 0] } },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -242,7 +242,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$page',
           clicks: { $sum: 1 },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       { $project: { page: '$_id', clicks: 1, uniqueSessions: { $size: '$uniqueSessions' } } },
@@ -256,7 +256,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: { text: '$eventData.buttonText', context: '$eventData.context' },
           count: { $sum: 1 },
-          uniqueSessions: { $addToSet: '$sessionId' }
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -277,7 +277,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$productId',
           views: { $sum: 1 },
-          uniqueViews: { $addToSet: '$sessionId' }
+          uniqueViews: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -307,7 +307,7 @@ router.get('/stats', async (req, res) => {
         $group: {
           _id: '$page',
           views: { $sum: 1 },
-          uniqueViews: { $addToSet: '$sessionId' }
+          uniqueViews: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
         }
       },
       {
@@ -319,6 +319,19 @@ router.get('/stats', async (req, res) => {
       },
       { $sort: { views: -1 } }
     ]);
+
+    // Общее количество уникальных сессий за период (по clientSessionId с резервом на sessionId)
+    const uniqueSessionsOverallAgg = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: null,
+          sessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
+        }
+      },
+      { $project: { _id: 0, count: { $size: '$sessions' } } }
+    ]);
+    const uniqueSessionsOverall = uniqueSessionsOverallAgg[0]?.count || 0;
 
     res.json({
       success: true,
@@ -339,7 +352,7 @@ router.get('/stats', async (req, res) => {
         funnelTotals,
         summary: {
           totalEvents: eventStats.reduce((sum, stat) => sum + stat.count, 0),
-          uniqueSessions: new Set(eventStats.flatMap(stat => stat.uniqueSessions)).size
+          uniqueSessions: uniqueSessionsOverall
         }
       }
     });

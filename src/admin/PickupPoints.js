@@ -286,7 +286,7 @@ const PickupPoints = ({ onLogout }) => {
               🔄 Вариации
             </button>
             <button
-              onClick={() => navigate('/analytics')}
+              onClick={() => navigate('/admin/analytics')}
               style={{
                 background: '#4caf50',
                 color: '#fff',

@@ -22,6 +22,20 @@
   gap: 15px;
 }
 
+.back-to-admin {
+  background: white;
+  border: 1px solid #e0e0e0;
+  color: #1e88e5;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.back-to-admin:hover {
+  border-color: #1e88e5;
+}
+
 .mobile-menu-toggle {
   display: none;
   background: #1e88e5;

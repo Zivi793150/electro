@@ -729,15 +729,13 @@ const Product = () => {
                     )}
                   </div>
                   
-                  {/* Показываем выбор доставки только для городов кроме Алматы */}
-                  {selectedCity !== 'Алматы' && (
-                    <DeliveryInfo 
-                      city={selectedCity} 
-                      onDeliverySelect={setSelectedDelivery}
-                      compact={true}
-                      selectedDelivery={selectedDelivery}
-                    />
-                  )}
+                  {/* Способы доставки (для Алматы – карточки, для остальных – список) */}
+                  <DeliveryInfo 
+                    city={selectedCity} 
+                    onDeliverySelect={setSelectedDelivery}
+                    compact={true}
+                    selectedDelivery={selectedDelivery}
+                  />
                   
                   <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
                     <span style={{fontSize:15, color:'#888'}}>ⓘ</span>

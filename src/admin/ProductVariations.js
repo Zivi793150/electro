@@ -291,7 +291,7 @@ function ProductVariations() {
             <button onClick={() => navigate('/admin/settings')} className="nav-btn settings-btn">
               ⚙️ Настройки
             </button>
-            <button onClick={() => navigate('/analytics')} className="nav-btn analytics-btn">
+            <button onClick={() => navigate('/admin/analytics')} className="nav-btn analytics-btn">
               📊 Аналитика
             </button>
             <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn pickup-btn">

@@ -92,22 +92,104 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     return null;
   }
 
-  // Компактный вид для страницы товара - выпадающий список
+  // Компактный вид для страницы товара
   if (compact) {
+    // Для Алматы показываем карточки, для остальных городов — выпадающий список
+    if (deliveryInfo.isAlmaty) {
+      // Гарантируем 5 карточек для Алматы, даже если с бэка пришёл только самовывоз
+      // Для Алматы скрываем "Самовывоз"
+      const defaultAlmatyOptions = [
+        { type: 'yandex', name: 'Яндекс Доставка' },
+        { type: 'sdek', name: 'СДЭК' },
+        { type: 'kazpost', name: 'Казпочта' },
+        { type: 'courier', name: 'Курьер по городу' }
+      ];
+
+      const filteredIncoming = (deliveryInfo.deliveryOptions || []).filter(opt => {
+        const name = (opt.name || '').toLowerCase();
+        return opt.type !== 'pickup' && !name.includes('самовывоз');
+      });
+
+      const incomingByType = new Map(filteredIncoming.map(opt => [opt.type, opt]));
+
+      const almatyOptions = defaultAlmatyOptions.map(def => (
+        incomingByType.get(def.type) || def
+      ));
+      const visibleOptions = showAllOptions ? almatyOptions : almatyOptions.slice(0, 2);
+
+      return (
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ display: 'grid', gap: 8 }}>
+            {visibleOptions.map((option, index) => (
+              <div
+                key={index}
+                onClick={() => handleDeliverySelect(option)}
+                style={{
+                  border: selectedDelivery && selectedDelivery.type === option.type ? '2px solid #ffc107' : '1px solid #e0e0e0',
+                  borderRadius: 6,
+                  padding: 10,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: selectedDelivery && selectedDelivery.type === option.type ? '#fffbf0' : '#fff',
+                  fontSize: '0.9rem'
+                }}
+                onMouseEnter={(e) => {
+                  if (!selectedDelivery || selectedDelivery.type !== option.type) {
+                    e.currentTarget.style.borderColor = '#ffc107';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 193, 7, 0.2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!selectedDelivery || selectedDelivery.type !== option.type) {
+                    e.currentTarget.style.borderColor = '#e0e0e0';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, color: '#333' }}>
+                  {option.name}
+                </div>
+              </div>
+            ))}
+          </div>
+          {almatyOptions.length > 2 && (
+            <div style={{ marginTop: 8 }}>
+              <button
+                onClick={() => setShowAllOptions(!showAllOptions)}
+                style={{
+                  background: '#fff',
+                  color: '#1e88e5',
+                  border: '1px solid #1e88e5',
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}
+              >
+                {showAllOptions ? 'скрыть' : 'еще'}
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Остальные города — выпадающий список
     return (
       <div style={{ marginBottom: 12 }}>
         <div style={{ marginBottom: 8 }}>
-          <label style={{ 
-            display: 'block', 
-            fontSize: '0.9rem', 
-            fontWeight: 600, 
-            color: '#1e88e5', 
-            marginBottom: 4 
+          <label style={{
+            display: 'block',
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            color: '#1e88e5',
+            marginBottom: 4
           }}>
             Способ доставки
           </label>
-          <select 
-            value={selectedDelivery ? selectedDelivery.type : ''} 
+          <select
+            value={selectedDelivery ? selectedDelivery.type : ''}
             onChange={handleDeliveryChange}
             className="delivery-select"
             style={{

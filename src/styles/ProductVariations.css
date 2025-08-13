@@ -1,5 +1,5 @@
 .product-variations {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   padding: 15px;
   border: none;
   border-radius: 8px;
@@ -15,6 +15,11 @@
 
 .product-variations .parameter-group {
   margin-bottom: 15px;
+}
+
+/* Уменьшаем отступ у последней группы параметров (регулятор) */
+.product-variations .parameter-group:last-of-type {
+  margin-bottom: 8px;
 }
 
 .product-variations label {
