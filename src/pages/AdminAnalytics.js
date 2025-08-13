@@ -152,6 +152,26 @@ const AdminAnalytics = () => {
           </div>
 
           <div className="stats-details">
+            {/* Воронка действий */}
+            <div className="stats-section">
+              <h3>🛤️ Воронка: Просмотры → Клики → Заявки</h3>
+              <div className="funnel-grid">
+                <div className="funnel-step">
+                  <div className="funnel-label">Просмотры страниц</div>
+                  <div className="funnel-value">{stats.funnelTotals.pageViews.toLocaleString()}</div>
+                </div>
+                <div className="funnel-arrow">→</div>
+                <div className="funnel-step">
+                  <div className="funnel-label">Клики по кнопкам</div>
+                  <div className="funnel-value">{stats.funnelTotals.buttonClicks.toLocaleString()}</div>
+                </div>
+                <div className="funnel-arrow">→</div>
+                <div className="funnel-step">
+                  <div className="funnel-label">Отправки форм</div>
+                  <div className="funnel-value">{stats.funnelTotals.formSubmits.toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
             {/* Каналы трафика */}
             <div className="stats-section">
               <h3>📣 Каналы трафика</h3>
@@ -182,7 +202,7 @@ const AdminAnalytics = () => {
               </div>
             </div>
 
-            {/* Устройства */}
+            {/* Устройства (уникальные сессии, не просто события) */}
             <div className="stats-section">
               <h3>📱 Устройства</h3>
               <div className="stats-grid">
@@ -190,7 +210,8 @@ const AdminAnalytics = () => {
                   <div key={idx} className="stat-item">
                     <div className="stat-info">
                       <div className="stat-label">{d.os || 'Other'}</div>
-                      <div className="stat-count">{d.count.toLocaleString()}</div>
+                      <div className="stat-count">{d.uniqueSessions.toLocaleString()}</div>
+                      <div className="stat-unique">Сессий: {d.uniqueSessions.toLocaleString()}</div>
                     </div>
                   </div>
                 ))}
@@ -242,12 +263,7 @@ const AdminAnalytics = () => {
                 {stats.pageStats.map((page, index) => (
                   <div key={index} className="page-stat">
                     <div className="page-name">{page.page || 'Главная'}</div>
-                    <div className="page-views">
-                      Просмотров: {page.views.toLocaleString()} | Уникальных: {page.uniqueViews.toLocaleString()}
-                    </div>
-                    <div className="page-bounce">
-                      Отказы: {((page.views - page.uniqueViews) / page.views * 100).toFixed(1)}%
-                    </div>
+                    <div className="page-views">Просмотров: {page.views.toLocaleString()}</div>
                   </div>
                 ))}
               </div>
@@ -273,13 +289,17 @@ const AdminAnalytics = () => {
               <ul>
                 <li>Пик активности: 14:00 - 18:00</li>
                 <li>Самый популярный день: Среда</li>
-                <li>Мобильные пользователи: 65%</li>
+                <li>Доля мобильных: {(() => {
+                  const mobile = stats.deviceStats.find(d => (d.os||'').toLowerCase().includes('android') || (d.os||'').toLowerCase().includes('ios'))?.uniqueSessions || 0;
+                  const total = stats.deviceStats.reduce((s,d)=>s+(d.uniqueSessions||0),0) || 1;
+                  return ((mobile/total)*100).toFixed(1)+'%';
+                })()}</li>
               </ul>
             </div>
             <div className="insight-card">
               <h3>🚀 Возможности роста</h3>
               <ul>
-                <li>Улучшите UX на мобильных устройствах</li>
+                <li>Улучшите UX на мобильных: добавьте быстрые CTA "Позвонить"/"WhatsApp" выше</li>
                 <li>Добавьте push-уведомления</li>
                 <li>Создайте персонализированные рекомендации</li>
               </ul>

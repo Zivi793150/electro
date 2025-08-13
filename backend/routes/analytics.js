@@ -137,18 +137,25 @@ router.get('/stats', async (req, res) => {
       {
         $group: {
           _id: '$channel',
-          count: { $sum: 1 }
+          count: { $sum: 1 },
+          uniqueSessions: { $addToSet: '$sessionId' }
         }
       },
-      { $project: { channel: '$_id', count: 1 } },
+      {
+        $project: {
+          channel: '$_id',
+          count: 1,
+          uniqueSessions: { $size: '$uniqueSessions' }
+        }
+      },
       { $sort: { count: -1 } }
     ]);
 
     // Статистика по UTM источникам
     const utmSourceStats = await Analytics.aggregate([
       { $match: { ...dateFilter, 'utm.utm_source': { $ne: '' } } },
-      { $group: { _id: '$utm.utm_source', count: { $sum: 1 } } },
-      { $project: { utm_source: '$_id', count: 1 } },
+      { $group: { _id: '$utm.utm_source', count: { $sum: 1 }, uniqueSessions: { $addToSet: '$sessionId' } } },
+      { $project: { utm_source: '$_id', count: 1, uniqueSessions: { $size: '$uniqueSessions' } } },
       { $sort: { count: -1 } }
     ]);
 
@@ -158,12 +165,66 @@ router.get('/stats', async (req, res) => {
       {
         $group: {
           _id: '$device.os',
-          count: { $sum: 1 }
+          count: { $sum: 1 },
+          uniqueSessions: { $addToSet: '$sessionId' }
         }
       },
-      { $project: { os: '$_id', count: 1 } },
+      { $project: { os: '$_id', count: 1, uniqueSessions: { $size: '$uniqueSessions' } } },
       { $sort: { count: -1 } }
     ]);
+
+    // Конверсия по каналам: page_view vs form_submit
+    const channelConversion = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: '$channel',
+          pageViews: { $sum: { $cond: [{ $eq: ['$eventType', 'page_view'] }, 1, 0] } },
+          formSubmits: { $sum: { $cond: [{ $eq: ['$eventType', 'form_submit'] }, 1, 0] } },
+          uniqueSessions: { $addToSet: '$sessionId' }
+        }
+      },
+      {
+        $project: {
+          channel: '$_id',
+          pageViews: 1,
+          formSubmits: 1,
+          uniqueSessions: { $size: '$uniqueSessions' },
+          conversion: {
+            $cond: [
+              { $gt: ['$pageViews', 0] },
+              { $multiply: [{ $divide: ['$formSubmits', '$pageViews'] }, 100] },
+              0
+            ]
+          }
+        }
+      },
+      { $sort: { conversion: -1 } }
+    ]);
+
+    // Воронка по событиям
+    const funnelTotalsAgg = await Analytics.aggregate([
+      { $match: dateFilter },
+      {
+        $group: {
+          _id: null,
+          pageViews: { $sum: { $cond: [{ $eq: ['$eventType', 'page_view'] }, 1, 0] } },
+          buttonClicks: { $sum: { $cond: [{ $eq: ['$eventType', 'button_click'] }, 1, 0] } },
+          formSubmits: { $sum: { $cond: [{ $eq: ['$eventType', 'form_submit'] }, 1, 0] } },
+          uniqueSessions: { $addToSet: '$sessionId' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          pageViews: 1,
+          buttonClicks: 1,
+          formSubmits: 1,
+          uniqueSessions: { $size: '$uniqueSessions' }
+        }
+      }
+    ]);
+    const funnelTotals = funnelTotalsAgg[0] || { pageViews: 0, buttonClicks: 0, formSubmits: 0, uniqueSessions: 0 };
 
     // Топ товаров по просмотрам
     const topProducts = await Analytics.aggregate([
@@ -224,10 +285,12 @@ router.get('/stats', async (req, res) => {
         dailyStats,
         hourlyStats,
         channelStats,
+        channelConversion,
         utmSourceStats,
         deviceStats,
         topProducts,
         pageStats,
+        funnelTotals,
         summary: {
           totalEvents: eventStats.reduce((sum, stat) => sum + stat.count, 0),
           uniqueSessions: new Set(eventStats.flatMap(stat => stat.uniqueSessions)).size

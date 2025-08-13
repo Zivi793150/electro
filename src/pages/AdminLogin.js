@@ -88,20 +88,7 @@ const AdminLogin = () => {
           </button>
         </form>
 
-        <div className="admin-login-footer">
-          <div className="quick-access">
-            <h3>Быстрый доступ</h3>
-            <button 
-              onClick={goToAnalytics}
-              className="analytics-btn"
-            >
-              📊 Открыть аналитику
-            </button>
-            <p className="note">
-              Для просмотра аналитики не требуется авторизация
-            </p>
-          </div>
-        </div>
+        {/* footer без быстрого доступа удален по требованию */}
       </div>
     </div>
   );
