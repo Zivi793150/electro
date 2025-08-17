@@ -653,11 +653,13 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
 // Получить все группы вариаций
 app.get('/api/product-groups', async (req, res) => {
   try {
+    console.log('Запрос на получение групп вариаций...');
     const groups = await ProductGroup.find().populate('baseProductId').populate('variants.productId');
+    console.log('Найдено групп:', groups.length);
     res.json(groups);
   } catch (err) {
     console.error('Ошибка получения групп вариаций:', err);
-    res.status(500).json({ error: 'Ошибка при получении групп вариаций' });
+    res.status(500).json({ error: 'Ошибка при получении групп вариаций', details: err.message });
   }
 });
 
@@ -679,15 +681,17 @@ app.get('/api/product-groups/:id', async (req, res) => {
 // Создать новую группу вариаций
 app.post('/api/product-groups', async (req, res) => {
   try {
+    console.log('Создание группы вариаций с данными:', req.body);
     const group = new ProductGroup(req.body);
     const savedGroup = await group.save();
     const populatedGroup = await ProductGroup.findById(savedGroup._id)
       .populate('baseProductId')
       .populate('variants.productId');
+    console.log('Группа создана:', populatedGroup);
     res.status(201).json(populatedGroup);
   } catch (err) {
     console.error('Ошибка создания группы вариаций:', err);
-    res.status(500).json({ error: 'Ошибка при создании группы вариаций' });
+    res.status(500).json({ error: 'Ошибка при создании группы вариаций', details: err.message });
   }
 });
 
