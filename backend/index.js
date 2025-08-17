@@ -349,13 +349,7 @@ app.post('/api/information', async (req, res) => {
 
 
 
-// API endpoint для загрузки файлов (перенаправляем на основной хостинг)
-app.post('/api/upload', (req, res) => {
-  res.status(400).json({ 
-    error: 'Загрузка файлов должна производиться на основном хостинге',
-    message: 'Используйте /api/upload на основном домене'
-  });
-});
+
 
 // Обработка ошибок multer
 app.use((error, req, res, next) => {
