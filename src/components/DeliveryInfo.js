@@ -6,7 +6,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
   const [error, setError] = useState('');
   const [showAllOptions, setShowAllOptions] = useState(false);
 
-  const API_URL = 'https://electro-a8bl.onrender.com/api/pickup-points';
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/pickup-points';
 
   useEffect(() => {
     if (city) {
@@ -97,10 +97,10 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     // Для Алматы рисуем плашку как на скрине (город, бесплатная доставка, самовывоз с адресом, примечание)
     if (deliveryInfo.isAlmaty) {
       const mainPoint = deliveryInfo.firstPickupPoint || deliveryInfo.pickupPoints?.[0] || {};
-      return (
+    return (
         <div style={{
           border: '1px solid #e0e0e0',
-          borderRadius: 6,
+                borderRadius: 6,
           background: '#fff',
           padding: 12,
           marginTop: 6
@@ -127,7 +127,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
               </div>
             )}
 
-            <div style={{
+                <div style={{ 
               border: '1px solid #e0e0e0',
               background: '#f9fafb',
               borderRadius: 6,

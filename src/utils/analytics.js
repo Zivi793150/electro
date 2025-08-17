@@ -1,4 +1,4 @@
-const API_BASE = 'https://electro-a8bl.onrender.com';
+const API_BASE = 'https://electro-1-vjdu.onrender.com';
 
 // Генерируем уникальный sessionId для анонимных пользователей
 const getSessionId = () => {

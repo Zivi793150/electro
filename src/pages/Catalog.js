@@ -67,7 +67,7 @@ const Catalog = () => {
     };
   }, [isDropdownOpen]);
 
-          const API_URL = 'https://electro-a8bl.onrender.com/api/products';
+          const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   // Загрузка товаров
   useEffect(() => {

@@ -9,12 +9,6 @@
   z-index: 1000;
 }
 
-/* Фиксация стилей шапки от переопределений на страницах (например, каталог) */
-.header, .header * {
-  font-family: Roboto, Helvetica, Arial, sans-serif !important;
-  box-sizing: border-box;
-}
-
 .header-united-bar {
   display: flex;
   align-items: center;
@@ -61,7 +55,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Bounded', Arial, sans-serif;
   font-weight: 400;
 }
 
@@ -387,8 +381,6 @@
     min-height: 56px;
   }
   
-
-  
   .mobile-menu-content {
     width: 280px;
   }
@@ -400,8 +392,6 @@
     min-height: 52px;
   }
   
-
-  
   .mobile-menu-content {
     width: 260px;
   }
@@ -412,8 +402,6 @@
     padding: 0 6px;
     min-height: 48px;
   }
-  
-
   
   .mobile-menu-content {
     width: 240px;

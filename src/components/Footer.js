@@ -20,7 +20,7 @@ const Footer = () => {
 
   // Загружаем информацию сайта
   useEffect(() => {
-    fetch('https://electro-a8bl.onrender.com/api/information')
+    fetch('https://electro-1-vjdu.onrender.com/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {

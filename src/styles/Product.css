@@ -1,11 +1,8 @@
 /* Оптимизированные стили для страницы товара */
-.product-page, .product-page * {
-  font-family: Roboto, Helvetica, Arial, sans-serif !important;
-}
 .product-page {
   background: #fff;
   min-height: 100vh;
-  font-family: 'Roboto', Helvetica, Arial, sans-serif !important;
+  font-family: 'Bounded', Arial, sans-serif;
 }
 .product-main { padding: 32px 0; }
 .product-container {

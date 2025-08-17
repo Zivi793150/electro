@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
@@ -8,6 +9,7 @@ import '../styles/Home.css';
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
+  const navigate = useNavigate();
 
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
@@ -20,7 +22,7 @@ const Home = () => {
     return product.image || '/images/products/placeholder.png';
   };
 
-  const API_URL = 'https://electro-a8bl.onrender.com/api/products';
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   useEffect(() => {
     fetch(`${API_URL}?limit=8`)
@@ -36,6 +38,17 @@ const Home = () => {
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = () => {
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
+  };
+  
+  // Функция для перехода в каталог с фильтром по категории
+  const handleProductClick = (product) => {
+    if (product.category) {
+      // Переходим в каталог с фильтром по категории товара
+      navigate(`/catalog?category=${encodeURIComponent(product.category.trim())}`);
+    } else {
+      // Если категории нет, переходим в общий каталог
+      navigate('/catalog');
+    }
   };
 
   const advantages = [
@@ -93,10 +106,10 @@ const Home = () => {
         <div style={{maxWidth: 1200, margin: '0 auto', width: '100%'}}>
           <div className="home-products-grid" style={{gap: 0}}>
             {miniProducts.map((product) => (
-              <a
-                href={`/product/${product._id}`}
+              <div
                 key={product._id}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                onClick={() => handleProductClick(product)}
+                style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
               >
                 <div
                   className="product-card kaspi-style mini-product-card"
@@ -123,7 +136,7 @@ const Home = () => {
                     <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>

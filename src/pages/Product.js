@@ -183,7 +183,7 @@ const Product = () => {
   
   const navigate = useNavigate();
 
-  const API_URL = 'https://electro-a8bl.onrender.com/api/products';
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   useEffect(() => {
     setLoading(true);
@@ -208,20 +208,25 @@ const Product = () => {
         trackProductView(id, productData.name);
         
         // Загружаем группу вариаций для этого товара
-        try {
-          const groupRes = await fetch(`https://electro-a8bl.onrender.com/api/product-groups/by-product/${id}`);
+         try {
+         const groupRes = await fetch(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${id}`);
           if (groupRes.ok) {
             const groupData = await groupRes.json();
             setProductGroup(groupData);
             
-            // Если это базовый товар группы, устанавливаем его как выбранную вариацию
-            if (groupData.baseProductId?._id === id) {
-              setSelectedVariant({
-                productId: groupData.baseProductId,
-                parameters: {},
-                price: productData.price
-              });
-            }
+             // Инициализация выбранной вариации
+             if (groupData.baseProductId?._id === id) {
+               // Открыли страницу базового товара
+               setSelectedVariant(null);
+               setSelectedParameters({});
+             } else {
+               // Открыли страницу вариации — находим её и выставляем параметры
+               const currentVariant = (groupData.variants || []).find(v => v.productId && (v.productId._id === id));
+               if (currentVariant) {
+                 setSelectedVariant(currentVariant);
+                 setSelectedParameters(currentVariant.parameters || {});
+               }
+             }
           }
         } catch (groupError) {
           console.log('Группа вариаций не найдена для товара:', groupError);
@@ -247,7 +252,7 @@ const Product = () => {
 
   // Загружаем информацию сайта
   useEffect(() => {
-    fetch('https://electro-a8bl.onrender.com/api/information')
+   fetch('https://electro-1-vjdu.onrender.com/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {
@@ -455,7 +460,7 @@ const Product = () => {
 
   const fetchDeliveryInfo = async (cityName) => {
     try {
-      const response = await fetch(`https://electro-a8bl.onrender.com/api/pickup-points/delivery/${encodeURIComponent(cityName)}`);
+      const response = await fetch(`https://electro-1-vjdu.onrender.com/api/pickup-points/delivery/${encodeURIComponent(cityName)}`);
       if (response.ok) {
         const data = await response.json();
         setDeliveryInfo(data);
@@ -504,7 +509,7 @@ const Product = () => {
               <div className="product-gallery-inner">
                 <div className="product-image-main" onClick={handleImageClick} style={{cursor:'zoom-in'}}>
                   <img 
-                    src={product.image || getAllImages()[activeImage]} 
+                    src={getAllImages()[activeImage]} 
                     alt={product.name} 
                     loading="lazy"
                     width="400"
@@ -737,17 +742,17 @@ const Product = () => {
                     selectedDelivery={selectedDelivery}
                   />
                   
-                  <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
-                    <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
-                    <span>
-                      {selectedCity === 'Алматы' 
-                        ? 'Срок доставки рассчитывается менеджером после оформления заказа'
-                        : selectedDelivery 
+                  {selectedCity !== 'Алматы' && (
+                    <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
+                      <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
+                      <span>
+                        {selectedDelivery 
                           ? `Доставка в ${selectedCity} через ${selectedDelivery.name.toLowerCase()}. ${selectedDelivery.type === 'pickup' ? 'Самовывоз из наших пунктов' : selectedDelivery.type === 'indriver' ? 'В течение дня' : selectedDelivery.type === 'yandex' ? '1-2 дня' : selectedDelivery.type === 'kazpost' ? '3-5 дней' : selectedDelivery.type === 'cdek' ? '1-2 дня' : selectedDelivery.type === 'air' ? '1-3 дня' : '1-3 дня'}.`
                           : `Доставка в ${selectedCity} осуществляется через курьерские службы. Срок доставки 1-3 дня.`
-                      }
-                    </span>
-                  </div>
+                        }
+                      </span>
+                    </div>
+                  )}
                 </div>
               </>
             </div>

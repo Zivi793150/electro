@@ -26,7 +26,7 @@ const Header = () => {
 
   // Загружаем информацию сайта
   useEffect(() => {
-    fetch('https://electro-a8bl.onrender.com/api/information')
+    fetch('https://electro-1-vjdu.onrender.com/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {
@@ -62,7 +62,7 @@ const Header = () => {
           <div className="logo">
             <picture>
               <source srcSet="/logo.webp" type="image/webp" />
-              <img src="/logo.png" alt="Tanker Tools" className="logo-image" width="133" height="41" />
+              <img src="/logo.png" alt="Tanker Tools" className="logo-image" />
             </picture>
           </div>
         </div>
@@ -71,12 +71,12 @@ const Header = () => {
         <div className="mobile-title">
           <picture>
             <source srcSet="/logo.webp" type="image/webp" />
-            <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" width="133" height="41" />
+            <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
           </picture>
         </div>
         
         {/* Desktop Navigation */}
-        <nav className="main-nav desktop-nav" style={{ fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400 }}>
+        <nav className="main-nav desktop-nav">
           <Link to="/">Главная</Link>
           <span className="nav-sep" />
           <Link to="/catalog">Каталог</Link>
@@ -113,11 +113,7 @@ const Header = () => {
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
-            <a 
-              href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
-              className="top-bar-phone"
-              data-analytics-context="header"
-            >
+            <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone">
               {siteSettings.contactInfo.phone}
             </a>
           </div>
@@ -136,7 +132,7 @@ const Header = () => {
             <div className="mobile-title">
               <picture>
                 <source srcSet="/logo.webp" type="image/webp" />
-                <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" width="133" height="41" />
+                <img src="/logo.png" alt="Tanker Tools" className="mobile-logo-image" />
               </picture>
             </div>
           </div>
@@ -166,11 +162,7 @@ const Header = () => {
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Телефон:</div>
-              <a 
-                href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
-                className="mobile-contact-value"
-                data-analytics-context="mobile_menu"
-              >
+              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value">
                 {siteSettings.contactInfo.phone}
               </a>
             </div>

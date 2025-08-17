@@ -4,7 +4,7 @@ export const sendToTelegram = async (formData, product = null) => {
   try {
     // Определяем базовый URL API (локально шлём на порт сервера)
     // Всегда шлём на прод-сервер (Render), чтобы избежать 404 от CRA dev-сервера
-    const API_BASE = 'https://electro-a8bl.onrender.com';
+    const API_BASE = 'https://electro-1-vjdu.onrender.com';
 
     // Отправляем данные на наш API endpoint
     const response = await fetch(`${API_BASE}/api/send-telegram`, {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://electro-a8bl.onrender.com/api/information';
+const API_URL = 'https://electro-1-vjdu.onrender.com/api/information';
 
 const SiteSettings = ({ onLogout }) => {
   const navigate = useNavigate();

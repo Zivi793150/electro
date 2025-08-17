@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-  const API_URL = 'https://electro-a8bl.onrender.com/api/admin/products'; // Используем админский endpoint для получения всех товаров
-  const PRODUCTS_API_URL = 'https://electro-a8bl.onrender.com/api/products'; // Для создания/обновления/удаления товаров
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/admin/products'; // Используем админский endpoint для получения всех товаров
+  const PRODUCTS_API_URL = 'https://electro-1-vjdu.onrender.com/api/products'; // Для создания/обновления/удаления товаров
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
@@ -71,7 +71,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const formData = new FormData();
       formData.append('image', files[0]); // Изменили 'file' на 'image'
       
-      const response = await fetch('https://electro-a8bl.onrender.com/api/upload', {
+      const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
         method: 'POST',
         body: formData
       });
@@ -405,7 +405,7 @@ const ProductList = ({ onLogout }) => {
     setLoading(true);
     Promise.all([
       fetch(API_URL),
-      fetch('https://electro-a8bl.onrender.com/api/product-groups')
+       fetch('https://electro-1-vjdu.onrender.com/api/product-groups')
     ])
       .then(responses => Promise.all(responses.map(res => res.json())))
       .then(([productsData, groupsData]) => {

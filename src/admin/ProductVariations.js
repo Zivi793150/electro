@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://electro-a8bl.onrender.com/api';
+const API_URL = 'https://electro-1-vjdu.onrender.com/api';
 const PRODUCTS_URL = `${API_URL}/admin/products`; // Используем админский endpoint для получения всех товаров
 const GROUPS_URL = `${API_URL}/product-groups`;
 
