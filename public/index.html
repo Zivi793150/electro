@@ -81,10 +81,9 @@
         font-style: normal;
         font-display: swap;
       }
-      /* Убираем глобальное навязывание Bounded. Шрифт Bounded — только в шапке. */
-      .header, .top-bar {
-        font-family: 'Bounded', Arial, sans-serif !important;
-      }
+      /* По умолчанию сайт в Bounded, кроме отдельных страниц (товар) */
+      html, body { font-family: 'Bounded', Arial, sans-serif; }
+      .header, .top-bar { font-family: 'Bounded', Arial, sans-serif !important; }
       
       /* Оптимизации для изображений */
       img {
