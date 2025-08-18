@@ -6,6 +6,28 @@ import { trackPageView } from '../utils/analytics';
 import '../styles/Catalog.css';
 import { Link, useLocation } from 'react-router-dom';
 
+// Надёжный fetch с повторами и таймаутом
+const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: { 'Accept': 'application/json', ...(options.headers || {}) },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (attempt === retries) throw error;
+      await new Promise(r => setTimeout(r, backoffMs * Math.pow(2, attempt)));
+    }
+  }
+};
+
 const Catalog = () => {
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
@@ -73,7 +95,7 @@ const Catalog = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(API_URL)
+    fetchWithRetry(API_URL)
       .then(res => res.json())
       .then(data => {
         setProducts(data);

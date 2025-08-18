@@ -6,6 +6,28 @@ import Modal from '../components/Modal';
 import AboutCompanySection from '../components/AboutCompanySection';
 import '../styles/Home.css';
 
+// Надёжный fetch с повторами и таймаутом
+const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: { 'Accept': 'application/json', ...(options.headers || {}) },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (attempt === retries) throw error;
+      await new Promise(r => setTimeout(r, backoffMs * Math.pow(2, attempt)));
+    }
+  }
+};
+
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
@@ -25,7 +47,7 @@ const Home = () => {
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   useEffect(() => {
-    fetch(`${API_URL}?limit=8`)
+    fetchWithRetry(`${API_URL}?limit=8`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);

@@ -9,6 +9,28 @@ import { trackProductView, trackButtonClick } from '../utils/analytics';
 import '../styles/Product.css';
 import '../styles/ProductVariations.css';
 
+// Надёжный fetch с повторами и таймаутом
+const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: { 'Accept': 'application/json', ...(options.headers || {}) },
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (attempt === retries) throw error;
+      await new Promise(r => setTimeout(r, backoffMs * Math.pow(2, attempt)));
+    }
+  }
+};
+
 const categories = [
   { id: 'grinders', name: 'Болгарки' },
   { id: 'screwdrivers', name: 'Шуруповёрты' },
@@ -192,7 +214,7 @@ const Product = () => {
     const fetchProductAndGroup = async () => {
       try {
         // Загружаем товар
-        const productRes = await fetch(`${API_URL}/${id}`);
+        const productRes = await fetchWithRetry(`${API_URL}/${id}`);
         const productData = await productRes.json();
         
         if (productData.error) {
@@ -209,7 +231,7 @@ const Product = () => {
         
         // Загружаем группу вариаций для этого товара
          try {
-         const groupRes = await fetch(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${id}`);
+         const groupRes = await fetchWithRetry(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${id}`);
           if (groupRes.ok) {
             const groupData = await groupRes.json();
             setProductGroup(groupData);
@@ -243,7 +265,7 @@ const Product = () => {
   }, [id]);
 
   useEffect(() => {
-    fetch(`${API_URL}?limit=4`)
+    fetchWithRetry(`${API_URL}?limit=4`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
@@ -252,7 +274,7 @@ const Product = () => {
 
   // Загружаем информацию сайта
   useEffect(() => {
-   fetch('https://electro-1-vjdu.onrender.com/api/information')
+   fetchWithRetry('https://electro-1-vjdu.onrender.com/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {

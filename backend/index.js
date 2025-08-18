@@ -5,6 +5,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const session = require('express-session');
 require('dotenv').config();
 const path = require('path');
+const compression = require('compression');
 
 const app = express();
 
@@ -31,6 +32,9 @@ app.options('*', (req, res) => {
   res.header('Access-Control-Allow-Credentials', 'true');
   res.sendStatus(200);
 });
+
+// Сжатие ответов для ускорения доставки и снижения трафика
+app.use(compression());
 
 app.use(express.json());
 
@@ -101,7 +105,14 @@ app.use((req, res, next) => {
 const mongoUri = process.env.MONGO_URI || 'mongodb+srv://electro:electro123@cluster0.mongodb.net/Tanker_products?retryWrites=true&w=majority';
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(mongoUri)
+// Более устойчивое подключение к MongoDB
+mongoose.connect(mongoUri, {
+  serverSelectionTimeoutMS: 5000, // быстрее отваливаемся при недоступности
+  socketTimeoutMS: 45000,
+  maxPoolSize: 10,
+  minPoolSize: 1,
+  family: 4
+})
   .then(() => console.log('MongoDB подключена'))
   .catch(err => console.error('Ошибка подключения к MongoDB:', err));
 
@@ -750,6 +761,10 @@ mongoose.connection.once('open', () => {
   console.log('MongoDB подключена успешно');
 });
 
-app.listen(PORT, () => {
+// Настройка таймаутов HTTP сервера для стабильности под нагрузкой/проксами
+const server = app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
-}); 
+});
+server.keepAliveTimeout = 65000; // чуть больше 60с
+server.headersTimeout = 66000;   // больше keepAliveTimeout
+server.requestTimeout = 65000;

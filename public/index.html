@@ -28,18 +28,15 @@
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     
     <!-- Preconnect для внешних доменов -->
-    <link rel="preconnect" href="https://electro-a8bl.onrender.com" crossorigin>
-    <link rel="dns-prefetch" href="https://electro-a8bl.onrender.com">
+    <link rel="preconnect" href="https://electro-1-vjdu.onrender.com" crossorigin>
+    <link rel="dns-prefetch" href="https://electro-1-vjdu.onrender.com">
     <link rel="preconnect" href="https://nominatim.openstreetmap.org" crossorigin>
     <link rel="dns-prefetch" href="https://nominatim.openstreetmap.org">
     <link rel="preconnect" href="https://www.google.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.google.com">
     <link rel="preconnect" href="https://maps.googleapis.com" crossorigin>
     <link rel="dns-prefetch" href="https://maps.googleapis.com">
-    <link rel="preconnect" href="https://api.electro-a8bl.onrender.com" crossorigin>
-    <link rel="dns-prefetch" href="https://api.electro-a8bl.onrender.com">
-    <link rel="preconnect" href="https://YOUR_PLESK_DOMAIN" crossorigin>
-    <link rel="dns-prefetch" href="https://YOUR_PLESK_DOMAIN">
+    
     
     <!-- Preload критических ресурсов -->
     <link rel="preload" href="/images/hero/hero-main.webp" as="image" type="image/webp" fetchpriority="high">
@@ -67,10 +64,7 @@
     <link rel="preload" href="/fonts/Bounded-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="/fonts/hemico.ttf" as="font" type="font/ttf" crossorigin>
     
-    <!-- Подключение шрифта Bounded -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bounded:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Локальный шрифт Bounded предзагружен выше; удалили внешнюю зависимость -->
     
     <style>
       @font-face {
@@ -87,11 +81,9 @@
         font-style: normal;
         font-display: swap;
       }
-      body, html, * {
-        font-family: 'Bounded', Arial, sans-serif !important;
-      }
+      /* Убираем глобальное навязывание Bounded. Шрифт Bounded — только в шапке. */
       .header, .top-bar {
-        font-family: 'Hemico', Arial, sans-serif !important;
+        font-family: 'Bounded', Arial, sans-serif !important;
       }
       
       /* Оптимизации для изображений */
