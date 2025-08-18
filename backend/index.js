@@ -49,6 +49,59 @@ app.use(session({
   }
 }));
 
+// ===== Реальный курс USD→KZT с кэшированием =====
+const RATE_TTL_MS = 10 * 60 * 1000; // 10 минут
+let cachedRate = null;
+let cachedAt = 0;
+
+async function fetchUsdKztRate() {
+  const now = Date.now();
+  if (cachedRate && now - cachedAt < RATE_TTL_MS) return cachedRate;
+  try {
+    // Пул публичных источников (без ключа), идём по очереди
+    const sources = [
+      async () => {
+        const r = await fetch('https://open.er-api.com/v6/latest/USD');
+        const j = await r.json();
+        if (j && j.result === 'success' && j.rates && j.rates.KZT) return j.rates.KZT;
+        throw new Error('er-api fail');
+      },
+      async () => {
+        const r = await fetch('https://api.exchangerate.host/latest?base=USD&symbols=KZT');
+        const j = await r.json();
+        if (j && j.success !== false && j.rates && j.rates.KZT) return j.rates.KZT;
+        throw new Error('exchangerate.host fail');
+      }
+    ];
+    for (const src of sources) {
+      try {
+        const rate = await src();
+        if (rate && isFinite(rate)) {
+          cachedRate = Number(rate);
+          cachedAt = now;
+          return cachedRate;
+        }
+      } catch (_) {}
+    }
+  } catch (e) {
+    console.error('Ошибка получения курса USD→KZT:', e.message);
+  }
+  // Фолбэк: env или 480
+  const fallback = parseFloat(process.env.USD_KZT_RATE || '480');
+  cachedRate = fallback;
+  cachedAt = now;
+  return cachedRate;
+}
+
+app.get('/api/rate/usd-kzt', async (req, res) => {
+  try {
+    const rate = await fetchUsdKztRate();
+    res.json({ rate });
+  } catch (e) {
+    res.status(500).json({ error: 'Не удалось получить курс' });
+  }
+});
+
 // Telegram endpoint (Render backend)
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 app.post('/api/send-telegram', async (req, res) => {
@@ -286,7 +339,16 @@ app.post('/api/upload', upload, convertToWebP, createImageSizes, uploadToPleskMi
 // API endpoint для создания нового продукта
 app.post('/api/products', async (req, res) => {
   try {
-    const product = new Product(req.body);
+    const doc = { ...req.body };
+    // Если админ прислал цену в долларах, конвертируем и сохраняем обе
+    if (doc.priceUSD !== undefined && doc.priceUSD !== null && doc.priceUSD !== '') {
+      const usd = parseFloat(String(doc.priceUSD).replace(',', '.'));
+      const rate = await fetchUsdKztRate();
+      const kzt = Math.round(usd * rate * 1.2); // +20% наценка
+      doc.price = kzt;
+      doc.meta = { ...(doc.meta || {}), usdKztRateUsed: rate, margin: 0.2 };
+    }
+    const product = new Product(doc);
     const savedProduct = await product.save();
     res.status(201).json(savedProduct);
   } catch (err) {
@@ -298,9 +360,17 @@ app.post('/api/products', async (req, res) => {
 // API endpoint для обновления продукта
 app.put('/api/products/:id', async (req, res) => {
   try {
+    const doc = { ...req.body };
+    if (doc.priceUSD !== undefined && doc.priceUSD !== null && doc.priceUSD !== '') {
+      const usd = parseFloat(String(doc.priceUSD).replace(',', '.'));
+      const rate = await fetchUsdKztRate();
+      const kzt = Math.round(usd * rate * 1.2);
+      doc.price = kzt;
+      doc.meta = { ...(doc.meta || {}), usdKztRateUsed: rate, margin: 0.2 };
+    }
     const product = await Product.findByIdAndUpdate(
       req.params.id, 
-      req.body, 
+      doc, 
       { new: true, runValidators: true }
     );
     if (!product) return res.status(404).json({ error: 'Товар не найден' });

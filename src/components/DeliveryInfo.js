@@ -97,7 +97,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     const mainPoint = deliveryInfo.firstPickupPoint || deliveryInfo.pickupPoints?.[0] || {};
     const Container = ({ children }) => (
       <div style={{
-        border: '1px solid #e0e0e0',
+        border: 'none',
         borderRadius: 6,
         background: '#fff',
         padding: 12,
@@ -120,7 +120,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     // Для корректной отрисовки options добавим их прямо здесь
     const citySelectEl = (onCityChange && Array.isArray(cities) && cities.length > 0) ? (
       <div style={{ marginBottom: 10 }}>
-        <select value={city} onChange={onCityChange} className="city-select" style={{ border: 'none', boxShadow: 'none', background: '#fff' }}>
+        <select value={city} onChange={onCityChange} className="city-select" style={{ border: '1px solid #e0e0e0', borderRadius: 6, boxShadow: 'none', background: '#fff', padding: '6px 8px' }}>
           {cities.map(c => (
             <option key={c} value={c}>{c}</option>
           ))}

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
-  const [price, setPrice] = useState(initialData?.price !== undefined ? String(initialData.price) : '');
+  const [priceUSD, setPriceUSD] = useState(initialData?.priceUSD !== undefined ? String(initialData.priceUSD) : '');
   const [category, setCategory] = useState(initialData?.category || '');
   const [article, setArticle] = useState(initialData?.article || '');
   const [image, setImage] = useState(initialData?.image || '');
@@ -19,6 +19,33 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [equipment, setEquipment] = useState(initialData?.equipment || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Подсказка для итоговой цены в тенге для админа
+  const AdminPriceHint = ({ usd }) => {
+    const [rate, setRate] = useState(null);
+    useEffect(() => {
+      let mounted = true;
+      (async () => {
+        try {
+          const r = await fetch(process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/rate/usd-kzt` : '/api/rate/usd-kzt');
+          const j = await r.json();
+          if (mounted && j && j.rate) setRate(j.rate);
+        } catch (_) {
+          const fallback = parseFloat(process.env.REACT_APP_USD_KZT_RATE || '480');
+          if (mounted) setRate(fallback);
+        }
+      })();
+      return () => { mounted = false; };
+    }, []);
+    const val = parseFloat(String(usd || '').replace(',', '.'));
+    if (isNaN(val) || !rate) return null;
+    const kzt = Math.round(val * rate * 1.2);
+    return (
+      <div style={{marginTop:6,fontSize:13,color:'#666'}}>
+        Итог для пользователя: ≈ {kzt.toLocaleString('ru-RU')} ₸ (курс {rate}, +20%)
+      </div>
+    );
+  };
   
   // Состояние для динамических характеристик
   const [characteristicFields, setCharacteristicFields] = useState(() => {
@@ -154,14 +181,13 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     setError('');
     
     // Проверяем корректность цены, но сохраняем как строку
-    let parsedPrice = String(price).replace(',', '.');
-    if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
-      setError('Введите корректную цену (например: 19.65 или 19,65)');
+    let parsedUSD = String(priceUSD).replace(',', '.');
+    if (parsedUSD === '' || isNaN(Number(parsedUSD))) {
+      setError('Введите цену в USD (например: 199.99 или 199,99)');
       setLoading(false);
       return;
     }
-    // Сохраняем цену как строку, чтобы не терять нули
-    parsedPrice = String(parsedPrice);
+    parsedUSD = String(parsedUSD);
     
     // Собираем все фото в массив
     const allPhotos = [photo1, photo2, photo3].filter(photo => photo.trim() !== '');
@@ -173,7 +199,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     try {
       let payload = { 
         name, 
-        price: parsedPrice, 
+        priceUSD: parsedUSD, 
         category, 
         image, 
         images: allPhotos,
@@ -256,8 +282,9 @@ function ProductForm({ onClose, onSuccess, initialData }) {
           </div>
           
           <div style={{marginBottom:12}}>
-            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Цена *</label>
-            <input required type="text" value={price} onChange={e=>setPrice(e.target.value)} placeholder="Например: 19.65 или 19,65" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Цена (USD) *</label>
+            <input required type="text" value={priceUSD} onChange={e=>setPriceUSD(e.target.value)} placeholder="Например: 199.99" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <AdminPriceHint usd={priceUSD} />
           </div>
           
           <div style={{marginBottom:12}}>
@@ -383,6 +410,94 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         <div style={{display:'flex',justifyContent:'flex-end',gap:12}}>
           <button type="button" onClick={onClose} style={{background:'#6c757d',color:'#fff',border:'none',borderRadius:6,padding:'10px 20px',fontWeight:500,cursor:'pointer',fontSize:14}}>Отмена</button>
           <button type="submit" disabled={loading} style={{background:'#FF6B00',color:'#fff',border:'none',borderRadius:6,padding:'10px 20px',fontWeight:600,cursor:'pointer',fontSize:14}}>{loading ? (isEdit ? 'Сохранение...' : 'Добавление...') : (isEdit ? 'Сохранить' : 'Добавить товар')}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function DuplicateProductModal({ product, onClose, onSuccess }) {
+  const [name, setName] = useState(product?.name || '');
+  const [price, setPrice] = useState(product?.price !== undefined ? String(product.price) : '');
+  const [category, setCategory] = useState(product?.category || '');
+  const [article, setArticle] = useState(product?.article || '');
+  const [shortDescription, setShortDescription] = useState(product?.['Short description'] || '');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    let parsedPrice = String(price).replace(',', '.');
+    if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
+      setError('Введите корректную цену (например: 19.65 или 19,65)');
+      setLoading(false);
+      return;
+    }
+    parsedPrice = String(parsedPrice);
+
+    try {
+      const payload = { ...product };
+      delete payload._id;
+      delete payload.__v;
+      payload.name = name; // без добавления "копия"
+      payload.price = parsedPrice;
+      payload.category = category;
+      payload.article = article;
+      payload['Short description'] = shortDescription;
+
+      const res = await fetch(PRODUCTS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Ошибка при дублировании товара');
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      setError(err.message || 'Ошибка');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
+      <form onSubmit={handleCreate} style={{background:'#fff',borderRadius:10,padding:24,minWidth:620,maxWidth:900,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto',position:'relative'}}>
+        <button type="button" onClick={onClose} style={{position:'absolute',top:12,right:12,background:'none',border:'none',fontSize:22,color:'#666',cursor:'pointer'}}>✕</button>
+        <h3 style={{margin:'0 0 16px 0',fontWeight:700,fontSize:20,color:'#333'}}>Дублировать товар</h3>
+
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+          <div>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Название</label>
+            <input value={name} onChange={e=>setName(e.target.value)} style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          <div>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Цена (USD) *</label>
+            <input required value={priceUSD} onChange={e=>setPriceUSD(e.target.value)} placeholder="Напр.: 199.99" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          <div>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Категория</label>
+            <input value={category} onChange={e=>setCategory(e.target.value)} style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          <div>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Артикул</label>
+            <input value={article} onChange={e=>setArticle(e.target.value)} style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+          <div style={{gridColumn:'1 / span 2'}}>
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Краткое описание</label>
+            <textarea value={shortDescription} onChange={e=>setShortDescription(e.target.value)} rows={3} style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+          </div>
+        </div>
+
+        {error && <div style={{marginTop:12,color:'#d32f2f',fontSize:14}}>{error}</div>}
+        <div style={{marginTop:16,display:'flex',gap:10,justifyContent:'flex-end'}}>
+          <button type="button" onClick={onClose} style={{background:'#f1f3f5',color:'#333',border:'1px solid #dee2e6',borderRadius:6,padding:'8px 14px',cursor:'pointer'}}>Отмена</button>
+          <button type="submit" disabled={loading} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:6,padding:'8px 16px',cursor:'pointer',fontWeight:600}}>{loading ? 'Создание…' : 'Создать дубль'}</button>
         </div>
       </form>
     </div>
@@ -527,30 +642,18 @@ const ProductList = ({ onLogout }) => {
     return group;
   };
 
-  const handleDuplicate = async (product) => {
-    if (!window.confirm(`Дублировать товар "${product.name}"?`)) return;
+  const [duplicateProduct, setDuplicateProduct] = useState(null);
+  const handleDuplicate = (product) => {
+    setDuplicateProduct(product);
+  };
 
-    try {
-      // Создаем копию товара без _id
-      const productCopy = { ...product };
-      delete productCopy._id;
-      
-      // Добавляем "(копия)" к названию
-      productCopy.name = productCopy.name + ' (копия)';
-      
-      const response = await fetch(PRODUCTS_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productCopy)
-      });
-
-      if (!response.ok) throw new Error('Ошибка при дублировании товара');
-
-      fetchProducts();
-      alert('Товар успешно дублирован!');
-    } catch (e) {
-      alert('Ошибка при дублировании товара: ' + e.message);
-    }
+  const handleDuplicateFull = (product) => {
+    // Открываем полную форму добавления, предварительно заполнив данными товара
+    const clone = { ...product };
+    delete clone._id;
+    delete clone.__v;
+    setEditProduct(clone); // передадим как initialData
+    setShowForm(true);     // форма откроется в режиме создания (isEdit === false)
   };
 
   // Сброс выбора при изменении списка товаров
@@ -688,7 +791,10 @@ const ProductList = ({ onLogout }) => {
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
                     <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
                       <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Редактировать</button>
-                      <button onClick={()=>handleDuplicate(product)} style={{background: '#28a745', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Дублировать</button>
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6}}>
+                        <button onClick={()=>handleDuplicate(product)} style={{background: '#28a745', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 10px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Дублир. (коротко)</button>
+                        <button onClick={()=>handleDuplicateFull(product)} style={{background: '#0d6efd', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 10px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Дублир. (полная)</button>
+                      </div>
                       <button onClick={()=>handleDelete(product)} style={{background: '#e53935', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Удалить</button>
                     </div>
                   </td>
@@ -699,6 +805,13 @@ const ProductList = ({ onLogout }) => {
       )}
       </div>
       {showForm && <ProductForm onClose={handleFormClose} onSuccess={fetchProducts} initialData={editProduct} />}
+      {duplicateProduct && (
+        <DuplicateProductModal
+          product={duplicateProduct}
+          onClose={() => setDuplicateProduct(null)}
+          onSuccess={fetchProducts}
+        />
+      )}
     </div>
   );
 };

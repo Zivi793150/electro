@@ -361,6 +361,11 @@ const Product = () => {
   };
 
   // Функции для работы с вариациями
+  const normalize = (val) => {
+    if (val === undefined || val === null) return '';
+    return String(val).trim();
+  };
+
   const handleParameterChange = (paramName, value) => {
     const newParameters = { ...selectedParameters, [paramName]: value };
     setSelectedParameters(newParameters);
@@ -387,26 +392,14 @@ const Product = () => {
         
         // Проверяем, что все выбранные параметры совпадают
         return Object.entries(filteredParameters).every(([key, val]) => {
-          return variant.parameters[key] === val;
+          return normalize(variant.parameters[key]) === normalize(val);
         });
       });
-      
-      // Если точного совпадения нет, ищем вариацию с частичным совпадением
-      if (!matchingVariant && Object.keys(filteredParameters).length > 0) {
-        matchingVariant = productGroup.variants.find(variant => {
-          if (!variant.isActive) return false;
-          
-          // Проверяем, что хотя бы один параметр совпадает
-          return Object.entries(filteredParameters).some(([key, val]) => {
-            return variant.parameters[key] === val;
-          });
-        });
-      }
       
       if (matchingVariant) {
         setSelectedVariant(matchingVariant);
       } else {
-        // Если совпадения нет, сбрасываем на базовый товар
+        // Нет точной комбинации — не подставляем другой товар
         setSelectedVariant(null);
       }
     }
@@ -440,11 +433,32 @@ const Product = () => {
   // Получаем доступные значения для параметра
   const getAvailableValuesForParameter = (paramName) => {
     if (!productGroup) return [];
+    // Учитываем другие выбранные параметры, чтобы не предлагать невозможные комбинации
+    const otherParams = { ...selectedParameters };
+    delete otherParams[paramName];
     const values = new Set();
     productGroup.variants.forEach(variant => {
-      if (variant.isActive && variant.parameters[paramName]) {
-        values.add(variant.parameters[paramName]);
-      }
+      if (!variant.isActive) return;
+      // Совпадает ли вариант по всем другим выбранным параметрам?
+      const matchesOthers = Object.entries(otherParams).every(([k, v]) => {
+        if (!v || v === 'false') return true;
+        return normalize(variant.parameters[k]) === normalize(v);
+      });
+      if (!matchesOthers) return;
+      const val = variant.parameters[paramName];
+      if (val) values.add(val);
+    });
+    return Array.from(values);
+  };
+
+  // Все возможные значения параметра (без учёта выбранных других параметров)
+  const getAllValuesForParameter = (param) => {
+    if (Array.isArray(param.values) && param.values.length > 0) return param.values;
+    if (!productGroup) return [];
+    const values = new Set();
+    productGroup.variants.forEach(variant => {
+      const val = variant.parameters[param.name];
+      if (val) values.add(val);
     });
     return Array.from(values);
   };
@@ -582,15 +596,13 @@ const Product = () => {
                         return null; // Не показываем чекбокс, если нет вариаций с этим параметром
                       }
                       
-                      // Для select и radio используем только доступные значения
-                      const availableValues = param.type === 'select' || param.type === 'radio' 
+                      // Для select и radio показываем все возможные значения, но недоступные отключаем
+                      const allValues = param.type === 'select' || param.type === 'radio'
+                        ? getAllValuesForParameter(param)
+                        : param.values;
+                      const availableValues = param.type === 'select' || param.type === 'radio'
                         ? getAvailableValuesForParameter(param.name)
                         : param.values;
-                      
-                      // Если нет доступных значений, не показываем параметр
-                      if (availableValues.length === 0) {
-                        return null;
-                      }
                       
                       return (
                         <div key={index} style={{ marginBottom: '15px' }}>
@@ -619,8 +631,8 @@ const Product = () => {
                               }}
                             >
                               <option value="">Выберите {param.name.toLowerCase()}</option>
-                              {availableValues.map((value, valueIndex) => (
-                                <option key={valueIndex} value={value}>
+                              {allValues.map((value, valueIndex) => (
+                                <option key={valueIndex} value={value} disabled={!availableValues.includes(value)}>
                                   {value}
                                 </option>
                               ))}
@@ -629,7 +641,7 @@ const Product = () => {
                           
                           {param.type === 'radio' && (
                             <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                              {availableValues.map((value, valueIndex) => (
+                              {allValues.map((value, valueIndex) => (
                                 <label key={valueIndex} style={{ 
                                   display: 'flex', 
                                   alignItems: 'center', 
@@ -644,6 +656,7 @@ const Product = () => {
                                     onChange={(e) => handleParameterChange(param.name, e.target.value)}
                                     required={param.required}
                                     style={{ marginRight: '6px' }}
+                                    disabled={!availableValues.includes(value)}
                                   />
                                   {value}
                                 </label>
@@ -734,8 +747,9 @@ const Product = () => {
                 <div className="product-divider"></div>
                 <div style={{
                   marginTop: 14, 
-                  background: '#f5f7fa', 
-                  borderRadius: 10, 
+                  background: '#fff', 
+                  border: '1px solid #e0e0e0',
+                  borderRadius: 8, 
                   padding: '10px 12px 8px 12px', 
                   fontSize: '0.98rem', 
                   color: '#222', 
