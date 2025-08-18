@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDelivery = null }) => {
+const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDelivery = null, onCityChange, cities = [] }) => {
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -94,63 +94,79 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
 
   // Компактный вид для страницы товара
   if (compact) {
-    // Для Алматы рисуем плашку как на скрине (город, бесплатная доставка, самовывоз с адресом, примечание)
+    const mainPoint = deliveryInfo.firstPickupPoint || deliveryInfo.pickupPoints?.[0] || {};
+    const Container = ({ children }) => (
+      <div style={{
+        border: '1px solid #e0e0e0',
+        borderRadius: 6,
+        background: '#fff',
+        padding: 12,
+        marginTop: 6
+      }}>
+        {children}
+      </div>
+    );
+
+    const CitySelect = () => (
+      onCityChange && Array.isArray(cities) && cities.length > 0 ? (
+        <div style={{ marginBottom: 10 }}>
+          <select value={city} onChange={onCityChange} className="city-select" />
+          { /* Заполним options вручную ниже, так как React не может вставить опции после монтирования без них */ }
+          <noscript />
+        </div>
+      ) : null
+    );
+
+    // Для корректной отрисовки options добавим их прямо здесь
+    const citySelectEl = (onCityChange && Array.isArray(cities) && cities.length > 0) ? (
+      <div style={{ marginBottom: 10 }}>
+        <select value={city} onChange={onCityChange} className="city-select" style={{ border: 'none', boxShadow: 'none', background: '#fff' }}>
+          {cities.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+    ) : null;
+
     if (deliveryInfo.isAlmaty) {
-      const mainPoint = deliveryInfo.firstPickupPoint || deliveryInfo.pickupPoints?.[0] || {};
-    return (
-        <div style={{
-          border: '1px solid #e0e0e0',
-                borderRadius: 6,
-          background: '#fff',
-          padding: 12,
-          marginTop: 6
-        }}>
-          <div style={{ fontWeight: 700, color: '#1976d2', marginBottom: 8 }}>
-            Ваш город: {deliveryInfo.city}
-          </div>
+      return (
+        <Container>
+          {citySelectEl}
           <div style={{ display: 'grid', gap: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ color: '#ef6c00' }}>🚚</span>
-              <div>
-                <div style={{ fontWeight: 600 }}>Бесплатная доставка по городу</div>
-                <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня — БЕСПЛАТНО</div>
-              </div>
+            <div>
+              <div style={{ fontWeight: 600 }}>Бесплатная доставка по городу</div>
+              <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня — БЕСПЛАТНО</div>
             </div>
 
             {deliveryInfo.hasPickupPoints && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ color: '#607d8b' }}>🏬</span>
-                <div>
-                  <div style={{ fontWeight: 600 }}>Самовывоз из магазина {mainPoint.address ? `ул. ${mainPoint.address}` : ''}</div>
-                  <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня {mainPoint.workingHours || 'с 9:00 до 18:00'} — больше 5</div>
-                </div>
+              <div>
+                <div style={{ fontWeight: 600 }}>Самовывоз из магазина {mainPoint.address ? `ул. ${mainPoint.address}` : ''}</div>
+                <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня {mainPoint.workingHours || 'с 9:00 до 18:00'} — больше 5</div>
               </div>
             )}
 
-                <div style={{ 
-              border: '1px solid #e0e0e0',
+            <div style={{
+              border: 'none',
               background: '#f9fafb',
               borderRadius: 6,
               padding: 10,
               color: '#333'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ color: '#607d8b' }}>ℹ️</span>
-                <div>
-                  <div>Срок доставки рассчитывается</div>
-                  <div>менеджером после</div>
-                  <div>оформления заказа</div>
-                </div>
+              <div>
+                <div>Срок доставки рассчитывается</div>
+                <div>менеджером после</div>
+                <div>оформления заказа</div>
               </div>
             </div>
           </div>
-        </div>
+        </Container>
       );
     }
 
-    // Остальные города — выпадающий список
+    // Остальные города — выпадающий список внутри одного блока
     return (
-      <div style={{ marginBottom: 12 }}>
+      <Container>
+        {citySelectEl}
         <div style={{ marginBottom: 8 }}>
           <label style={{
             display: 'block',
@@ -167,7 +183,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
             className="delivery-select"
             style={{
               width: '100%',
-              border: '1px solid #1e88e5',
+              border: 'none',
               borderRadius: 4,
               padding: '4px 8px',
               fontSize: '0.95rem',
@@ -196,7 +212,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
             ))}
           </select>
         </div>
-      </div>
+      </Container>
     );
   }
 

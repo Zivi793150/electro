@@ -176,9 +176,17 @@ const informationSchema = new mongoose.Schema({
 const Information = mongoose.model('Information', informationSchema);
 
 // API endpoint для получения всех продуктов с поддержкой лимита (для каталога - исключает вариации)
+// Простое серверное кэширование списка товаров в памяти (для стабильности/скорости)
+let productsCache = { data: null, ts: 0 };
+const PRODUCTS_CACHE_TTL_MS = 60 * 1000; // 60s
+
 app.get('/api/products', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
+    const now = Date.now();
+    if (!req.query.limit && productsCache.data && (now - productsCache.ts < PRODUCTS_CACHE_TTL_MS)) {
+      return res.json(productsCache.data);
+    }
     
     // Получаем все группы вариаций
     const productGroups = await ProductGroup.find();
@@ -206,6 +214,9 @@ app.get('/api/products', async (req, res) => {
       ]
     }).limit(limit);
     
+    if (!limit) {
+      productsCache = { data: products, ts: now };
+    }
     res.json(products);
   } catch (err) {
     console.error('Ошибка получения продуктов:', err);

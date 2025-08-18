@@ -109,12 +109,17 @@ const Product = () => {
         },
         (error) => {
           console.log('Ошибка получения геолокации:', error);
+          // Быстрый фолбэк на Алматы, чтобы не тормозить в регионах с ограничениями
+          if (!localStorage.getItem('selectedCity')) {
+            setSelectedCity('Алматы');
+            localStorage.setItem('selectedCity', 'Алматы');
+          }
           setDetectingCity(false);
         },
         {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 минут
+          enableHighAccuracy: false,
+          timeout: 3000,
+          maximumAge: 600000 // 10 минут
         }
       );
     }
@@ -740,31 +745,17 @@ const Product = () => {
                   transform: isCityChanging ? 'scale(0.98)' : 'scale(1)',
                   opacity: isCityChanging ? 0.8 : 1
                 }}>
-                  <div style={{fontWeight: 600, color: '#1e88e5', marginBottom: 8, fontSize: '1.01rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
-                    {detectingCity ? (
-                      <span style={{color: '#666', fontSize: '0.9rem'}}>📍 Определяем...</span>
-                    ) : (
-                      <select 
-                        value={selectedCity} 
-                        onChange={handleCityChange}
-                        className="city-select"
-                      >
-                        {cities.map(city => (
-                          <option key={city} value={city}>{city}</option>
-                        ))}
-                      </select>
-                    )}
-                  </div>
-                  
-                  {/* Способы доставки (для Алматы – карточки, для остальных – список) */}
+                  {/* Единый блок: выбор города + инфо по доставке */}
                   <DeliveryInfo 
-                    city={selectedCity} 
+                    city={selectedCity}
+                    onCityChange={handleCityChange}
+                    cities={cities}
                     onDeliverySelect={setSelectedDelivery}
                     compact={true}
                     selectedDelivery={selectedDelivery}
                   />
                   
-                  {selectedCity !== 'Алматы' && (
+                  {false && selectedCity !== 'Алматы' && (
                     <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
                       <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
                       <span>
