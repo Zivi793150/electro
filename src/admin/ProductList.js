@@ -27,7 +27,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       let mounted = true;
       (async () => {
         try {
-          const r = await fetch(process.env.REACT_APP_API_URL ? `${process.env.REACT_APP_API_URL}/api/rate/usd-kzt` : '/api/rate/usd-kzt');
+          const r = await fetch('https://electro-1-vjdu.onrender.com/api/rate/usd-kzt');
           const j = await r.json();
           if (mounted && j && j.rate) setRate(j.rate);
         } catch (_) {
@@ -418,7 +418,11 @@ function ProductForm({ onClose, onSuccess, initialData }) {
 
 function DuplicateProductModal({ product, onClose, onSuccess }) {
   const [name, setName] = useState(product?.name || '');
-  const [price, setPrice] = useState(product?.price !== undefined ? String(product.price) : '');
+  const [priceUSD, setPriceUSD] = useState(
+    product?.priceUSD !== undefined
+      ? String(product.priceUSD)
+      : ''
+  );
   const [category, setCategory] = useState(product?.category || '');
   const [article, setArticle] = useState(product?.article || '');
   const [shortDescription, setShortDescription] = useState(product?.['Short description'] || '');
@@ -430,20 +434,21 @@ function DuplicateProductModal({ product, onClose, onSuccess }) {
     setLoading(true);
     setError('');
 
-    let parsedPrice = String(price).replace(',', '.');
-    if (parsedPrice === '' || isNaN(Number(parsedPrice))) {
-      setError('Введите корректную цену (например: 19.65 или 19,65)');
+    let parsedUSD = String(priceUSD).replace(',', '.');
+    if (parsedUSD === '' || isNaN(Number(parsedUSD))) {
+      setError('Введите цену в USD (например: 199.99 или 199,99)');
       setLoading(false);
       return;
     }
-    parsedPrice = String(parsedPrice);
+    parsedUSD = String(parsedUSD);
 
     try {
       const payload = { ...product };
       delete payload._id;
       delete payload.__v;
       payload.name = name; // без добавления "копия"
-      payload.price = parsedPrice;
+      delete payload.price; // цену в тенге бэкенд посчитает сам
+      payload.priceUSD = parsedUSD;
       payload.category = category;
       payload.article = article;
       payload['Short description'] = shortDescription;
@@ -747,7 +752,7 @@ const ProductList = ({ onLogout }) => {
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Название</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Цена</th>
                 <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Категория</th>
-                <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Краткое описание</th>
+                <th style={{padding: '8px 6px', textAlign: 'left', fontWeight: 600, color: '#222'}}>Артикул</th>
                 <th style={{padding: '8px 6px', textAlign: 'center', fontWeight: 600, color: '#222'}}>Действия</th>
             </tr>
           </thead>
@@ -787,7 +792,7 @@ const ProductList = ({ onLogout }) => {
                   </td>
                   <td style={{padding: '6px 6px', color: '#FFB300', fontWeight: 700}}>{product.price ? String(product.price).replace('.', ',') + ' ₸' : ''}</td>
                   <td style={{padding: '6px 6px', color: '#222'}}>{product.category || '-'}</td>
-                  <td style={{padding: '6px 6px', color: '#888', fontSize: 13}}>{product['Short description'] || ''}</td>
+                  <td style={{padding: '6px 6px', color: '#555', fontSize: 13}}>{product.article || '-'}</td>
                   <td style={{padding: '6px 6px', textAlign: 'center'}}>
                     <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
                       <button onClick={()=>handleEdit(product)} style={{background: '#1e88e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', fontWeight: 500, cursor: 'pointer', width: '100%'}}>Редактировать</button>

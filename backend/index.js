@@ -102,6 +102,27 @@ app.get('/api/rate/usd-kzt', async (req, res) => {
   }
 });
 
+// Простой CSV прайс-лист для оптовиков (name;article;price)
+app.get('/api/price-list.csv', async (req, res) => {
+  try {
+    const products = await Product.find({}).limit(2000);
+    const header = 'name;article;price\n';
+    const rows = products.map(p => {
+      const name = (p.name || '').toString().replace(/;/g, ',');
+      const article = (p.article || '').toString().replace(/;/g, ',');
+      const price = p.price != null ? p.price : '';
+      return `${name};${article};${price}`;
+    });
+    const csv = header + rows.join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="price-list.csv"');
+    return res.status(200).send(csv);
+  } catch (e) {
+    console.error('price-list.csv error', e);
+    return res.status(500).send('error');
+  }
+});
+
 // Telegram endpoint (Render backend)
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 app.post('/api/send-telegram', async (req, res) => {
@@ -191,7 +212,10 @@ const productGroupSchema = new mongoose.Schema({
     name: { type: String, required: true }, // например "Вольты", "С регулятором"
     type: { type: String, enum: ['select', 'radio', 'checkbox'], default: 'select' },
     values: [String], // возможные значения
-    required: { type: Boolean, default: false }
+    required: { type: Boolean, default: false },
+    // Видимость параметра: по умолчанию виден, можно сделать невидимым и показать только для конкретных товаров
+    visibleByDefault: { type: Boolean, default: true },
+    visibleForProductIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }]
   }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
@@ -774,7 +798,25 @@ app.get('/api/product-groups/:id', async (req, res) => {
 app.post('/api/product-groups', async (req, res) => {
   try {
     console.log('Создание группы вариаций с данными:', req.body);
-    const group = new ProductGroup(req.body);
+    const body = { ...req.body };
+    // Нормализуем параметры, чтобы гарантировать сохранение falsy значений и корректных типов
+    if (Array.isArray(body.parameters)) {
+      body.parameters = body.parameters.map((p) => ({
+        name: p.name,
+        type: p.type || 'select',
+        values: Array.isArray(p.values) ? p.values.filter(v => v !== null && v !== undefined && String(v).trim() !== '') : [],
+        required: !!p.required,
+        visibleByDefault: p.visibleByDefault === false ? false : true,
+        visibleForProductIds: Array.isArray(p.visibleForProductIds)
+          ? p.visibleForProductIds
+              .map(id => {
+                try { return new mongoose.Types.ObjectId(String(id)); } catch { return null; }
+              })
+              .filter(Boolean)
+          : []
+      }));
+    }
+    const group = new ProductGroup(body);
     const savedGroup = await group.save();
     const populatedGroup = await ProductGroup.findById(savedGroup._id)
       .populate('baseProductId')
@@ -790,9 +832,26 @@ app.post('/api/product-groups', async (req, res) => {
 // Обновить группу вариаций
 app.put('/api/product-groups/:id', async (req, res) => {
   try {
+    const body = { ...req.body, updatedAt: Date.now() };
+    if (Array.isArray(body.parameters)) {
+      body.parameters = body.parameters.map((p) => ({
+        name: p.name,
+        type: p.type || 'select',
+        values: Array.isArray(p.values) ? p.values.filter(v => v !== null && v !== undefined && String(v).trim() !== '') : [],
+        required: !!p.required,
+        visibleByDefault: p.visibleByDefault === false ? false : true,
+        visibleForProductIds: Array.isArray(p.visibleForProductIds)
+          ? p.visibleForProductIds
+              .map(id => {
+                try { return new mongoose.Types.ObjectId(String(id)); } catch { return null; }
+              })
+              .filter(Boolean)
+          : []
+      }));
+    }
     const group = await ProductGroup.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedAt: Date.now() },
+      { $set: body },
       { new: true, runValidators: true }
     ).populate('baseProductId').populate('variants.productId');
     

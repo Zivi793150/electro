@@ -235,14 +235,14 @@ const Product = () => {
         trackProductView(id, productData.name);
         
         // Загружаем группу вариаций для этого товара
-         try {
+        try {
          const groupRes = await fetchWithRetry(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${id}`);
           if (groupRes.ok) {
             const groupData = await groupRes.json();
             setProductGroup(groupData);
             
              // Инициализация выбранной вариации
-             if (groupData.baseProductId?._id === id) {
+            if (groupData.baseProductId?._id === id) {
                // Открыли страницу базового товара
                setSelectedVariant(null);
                setSelectedParameters({});
@@ -253,7 +253,7 @@ const Product = () => {
                  setSelectedVariant(currentVariant);
                  setSelectedParameters(currentVariant.parameters || {});
                }
-             }
+            }
           }
         } catch (groupError) {
           console.log('Группа вариаций не найдена для товара:', groupError);
@@ -590,7 +590,36 @@ const Product = () => {
                   <div className="product-variations" style={{
                     marginBottom: '20px'
                   }}>
-                    {productGroup.parameters.map((param, index) => {
+                    {productGroup.parameters
+                      .filter(param => {
+                        const visibleByDefault = param.visibleByDefault !== false;
+                        if (visibleByDefault) return true;
+
+                        const allowed = new Set((Array.isArray(param.visibleForProductIds) ? param.visibleForProductIds : []).map(String));
+                        if (allowed.size === 0) return false;
+
+                        const currentId = getCurrentProduct()?._id ? String(getCurrentProduct()._id) : '';
+                        if (currentId && allowed.has(currentId)) return true;
+
+                        // If a variant from the allowed list is still possible given the selected parameters (excluding this param), show it
+                        const otherParams = { ...selectedParameters };
+                        delete otherParams[param.name];
+                        const matchesOtherParams = (variant) => {
+                          return Object.entries(otherParams).every(([k, v]) => {
+                            if (!v || v === 'false') return true;
+                            return normalize(variant.parameters[k]) === normalize(v);
+                          });
+                        };
+                        const hasCandidate = (productGroup.variants || []).some(v => {
+                          if (!v.isActive || !v.productId) return false;
+                          const vid = typeof v.productId === 'string' ? v.productId : (v.productId._id || v.productId);
+                          if (!vid) return false;
+                          if (!allowed.has(String(vid))) return false;
+                          return matchesOtherParams(v);
+                        });
+                        return hasCandidate;
+                      })
+                      .map((param, index) => {
                       // Для чекбоксов проверяем, есть ли вариации с этим параметром
                       if (param.type === 'checkbox' && !hasVariationsWithParameter(param.name)) {
                         return null; // Не показываем чекбокс, если нет вариаций с этим параметром
@@ -600,7 +629,7 @@ const Product = () => {
                       const allValues = param.type === 'select' || param.type === 'radio'
                         ? getAllValuesForParameter(param)
                         : param.values;
-                      const availableValues = param.type === 'select' || param.type === 'radio'
+                      const availableValues = param.type === 'select' || param.type === 'radio' 
                         ? getAvailableValuesForParameter(param.name)
                         : param.values;
                       
@@ -684,7 +713,7 @@ const Product = () => {
                       );
                     })}
                     
-                    
+
                   </div>
                 )}
                 {productGroup && productGroup.parameters.length > 0 && (
@@ -748,7 +777,7 @@ const Product = () => {
                 <div style={{
                   marginTop: 14, 
                   background: '#fff', 
-                  border: '1px solid #e0e0e0',
+                  border: 'none',
                   borderRadius: 8, 
                   padding: '10px 12px 8px 12px', 
                   fontSize: '0.98rem', 
@@ -760,25 +789,25 @@ const Product = () => {
                   opacity: isCityChanging ? 0.8 : 1
                 }}>
                   {/* Единый блок: выбор города + инфо по доставке */}
-                  <DeliveryInfo 
-                    city={selectedCity}
+                    <DeliveryInfo 
+                      city={selectedCity} 
                     onCityChange={handleCityChange}
                     cities={cities}
-                    onDeliverySelect={setSelectedDelivery}
-                    compact={true}
-                    selectedDelivery={selectedDelivery}
-                  />
+                      onDeliverySelect={setSelectedDelivery}
+                      compact={true}
+                      selectedDelivery={selectedDelivery}
+                    />
                   
                   {false && selectedCity !== 'Алматы' && (
-                    <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
-                      <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
-                      <span>
+                  <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
+                    <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
+                    <span>
                         {selectedDelivery 
                           ? `Доставка в ${selectedCity} через ${selectedDelivery.name.toLowerCase()}. ${selectedDelivery.type === 'pickup' ? 'Самовывоз из наших пунктов' : selectedDelivery.type === 'indriver' ? 'В течение дня' : selectedDelivery.type === 'yandex' ? '1-2 дня' : selectedDelivery.type === 'kazpost' ? '3-5 дней' : selectedDelivery.type === 'cdek' ? '1-2 дня' : selectedDelivery.type === 'air' ? '1-3 дня' : '1-3 дня'}.`
                           : `Доставка в ${selectedCity} осуществляется через курьерские службы. Срок доставки 1-3 дня.`
-                        }
-                      </span>
-                    </div>
+                      }
+                    </span>
+                  </div>
                   )}
                 </div>
               </>

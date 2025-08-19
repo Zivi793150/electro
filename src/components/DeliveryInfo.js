@@ -98,7 +98,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     const Container = ({ children }) => (
       <div style={{
         border: 'none',
-        borderRadius: 6,
+                borderRadius: 6,
         background: '#fff',
         padding: 12,
         marginTop: 6
@@ -125,7 +125,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-      </div>
+                </div>
     ) : null;
 
     if (deliveryInfo.isAlmaty) {
@@ -136,7 +136,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
             <div>
               <div style={{ fontWeight: 600 }}>Бесплатная доставка по городу</div>
               <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня — БЕСПЛАТНО</div>
-            </div>
+                </div>
 
             {deliveryInfo.hasPickupPoints && (
               <div>
@@ -158,7 +158,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
                 <div>оформления заказа</div>
               </div>
             </div>
-          </div>
+        </div>
         </Container>
       );
     }
@@ -211,7 +211,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
               </option>
             ))}
           </select>
-        </div>
+      </div>
       </Container>
     );
   }

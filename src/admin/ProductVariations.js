@@ -5,6 +5,100 @@ const API_URL = 'https://electro-1-vjdu.onrender.com/api';
 const PRODUCTS_URL = `${API_URL}/admin/products`; // Используем админский endpoint для получения всех товаров
 const GROUPS_URL = `${API_URL}/product-groups`;
 
+// Поисковый селект для выбора товара(ов)
+function SearchableProductSelect({ products, value, onChange, multiple = false, placeholder = 'Выберите товар' }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const getLabel = (p) => `${p.name}${p.article ? ` (арт.: ${p.article})` : ''}${p.price ? ` — ${p.price} ₸` : ''}`;
+  const filtered = Array.isArray(products)
+    ? products.filter(p => {
+        const q = query.trim().toLowerCase();
+        if (!q) return true;
+        const name = (p.name || '').toLowerCase();
+        const article = (p.article || '').toLowerCase();
+        return name.includes(q) || article.includes(q);
+      })
+    : [];
+
+  const isSelected = (id) => {
+    if (multiple) return Array.isArray(value) && value.map(String).includes(String(id));
+    return String(value || '') === String(id);
+  };
+
+  const toggleId = (id) => {
+    if (multiple) {
+      const current = Array.isArray(value) ? value.map(String) : [];
+      const idStr = String(id);
+      const next = current.includes(idStr) ? current.filter(v => v !== idStr) : [...current, idStr];
+      onChange(next);
+    } else {
+      onChange(String(id));
+      setOpen(false);
+    }
+  };
+
+  const removeChip = (id) => {
+    if (!multiple) return;
+    const current = Array.isArray(value) ? value.map(String) : [];
+    onChange(current.filter(v => v !== String(id)));
+  };
+
+  const selectedProducts = multiple
+    ? (Array.isArray(value) ? value : []).map(id => products.find(p => String(p._id) === String(id))).filter(Boolean)
+    : (products.find(p => String(p._id) === String(value)) || null);
+
+  return (
+    <div className="sp-select" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}>
+      <div className="sp-control" onClick={() => setOpen(!open)}>
+        {multiple ? (
+          <div className="sp-chips">
+            {selectedProducts.length > 0 ? selectedProducts.map(p => (
+              <span key={p._id} className="sp-chip" onClick={(e) => { e.stopPropagation(); removeChip(p._id); }}>
+                {getLabel(p)} <span className="sp-x">×</span>
+              </span>
+            )) : <span className="sp-placeholder">{placeholder}</span>}
+          </div>
+        ) : (
+          <span className={selectedProducts ? 'sp-value' : 'sp-placeholder'}>
+            {selectedProducts ? getLabel(selectedProducts) : placeholder}
+          </span>
+        )}
+        <span className="sp-caret">▾</span>
+      </div>
+      {open && (
+        <div className="sp-dropdown">
+          <input
+            className="sp-search"
+            placeholder="Поиск по названию или артикулу"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            autoFocus
+          />
+          <div className="sp-list">
+            {filtered.length === 0 && (
+              <div className="sp-empty">Ничего не найдено</div>
+            )}
+            {filtered.map(p => (
+              <button
+                key={p._id}
+                type="button"
+                className={`sp-item${isSelected(p._id) ? ' selected' : ''}`}
+                onClick={() => toggleId(p._id)}
+              >
+                {multiple && (
+                  <input type="checkbox" readOnly checked={isSelected(p._id)} />
+                )}
+                <span className="sp-item-label">{getLabel(p)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ProductVariations() {
   const [products, setProducts] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -154,7 +248,9 @@ function ProductVariations() {
         name: '',
         type: 'select',
         values: [''],
-        required: false
+        required: false,
+        visibleByDefault: true,
+        visibleForProductIds: []
       }]
     }));
   };
@@ -477,7 +573,7 @@ function ProductVariations() {
                       <option value="">Выберите товар</option>
                       {products.map(product => (
                         <option key={product._id} value={product._id}>
-                          {product.name} (ID: {product._id})
+                          {product.name} {product.article ? `(арт.: ${product.article})` : ''}
                         </option>
                       ))}
                     </select>
@@ -515,6 +611,14 @@ function ProductVariations() {
                           <option value="radio">Радио кнопки</option>
                           <option value="checkbox">Чекбокс</option>
                         </select>
+                        <label className="checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={param.visibleByDefault ?? true}
+                            onChange={(e) => updateParameter(index, 'visibleByDefault', e.target.checked)}
+                          />
+                          <span>Виден по умолчанию</span>
+                        </label>
                       </div>
                       <div className="parameter-options">
                         <label className="checkbox-label">
@@ -567,6 +671,20 @@ function ProductVariations() {
                         </button>
                       </div>
                     </div>
+
+                    <div className="parameter-visibility">
+                      <label className="form-label">Показывать только для товаров:</label>
+                      <SearchableProductSelect
+                        products={products}
+                        multiple
+                        value={param.visibleForProductIds || []}
+                        onChange={(ids) => updateParameter(index, 'visibleForProductIds', ids)}
+                        placeholder="Выберите товары..."
+                      />
+                      <div style={{fontSize: 12, color: '#718096', marginTop: 6}}>
+                        Если снять галочку «Виден по умолчанию», параметр будет скрыт везде, кроме выбранных здесь товаров.
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -583,21 +701,14 @@ function ProductVariations() {
                 {formData.variants.map((variant, index) => (
                   <div key={index} className="variant-card">
                     <div className="variant-header">
-                                             <div className="variant-inputs">
-                         <select
-                           value={variant.productId}
-                           onChange={(e) => updateVariant(index, 'productId', e.target.value)}
-                           className="form-select"
-                           required
-                         >
-                           <option value="">Выберите товар</option>
-                           {products.map(product => (
-                             <option key={product._id} value={product._id}>
-                               {product.name} - {product.price} ₸ (ID: {product._id})
-                             </option>
-                           ))}
-                         </select>
-                       </div>
+                      <div className="variant-inputs">
+                        <SearchableProductSelect
+                          products={products}
+                          value={variant.productId || ''}
+                          onChange={(id) => updateVariant(index, 'productId', id)}
+                          placeholder="Выберите товар"
+                        />
+                      </div>
                       <div className="variant-options">
                         <label className="checkbox-label">
                           <input
@@ -1384,3 +1495,23 @@ function ProductVariations() {
 }
 
 export default ProductVariations;
+
+/* lightweight styles for SearchableProductSelect */
+/* These are scoped by class names used above */
+<style jsx>{`
+.sp-select { position: relative; width: 100%; }
+.sp-control { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 2px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; background: #fff; cursor: pointer; }
+.sp-placeholder { color: #a0aec0; }
+.sp-value { color: #2d3748; font-weight: 500; }
+.sp-caret { color: #718096; }
+.sp-dropdown { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,0.12); z-index: 20; padding: 10px; }
+.sp-search { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; }
+.sp-list { max-height: 260px; overflow: auto; display: flex; flex-direction: column; gap: 4px; }
+.sp-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid transparent; background: #f9fafb; cursor: pointer; text-align: left; }
+.sp-item.selected { background: #ebf8ff; border-color: #bee3f8; }
+.sp-item:hover { background: #edf2f7; }
+.sp-empty { padding: 10px; color: #718096; text-align: center; }
+.sp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sp-chip { background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; padding: 4px 8px; border-radius: 999px; font-size: 12px; cursor: pointer; }
+.sp-chip .sp-x { margin-left: 6px; }
+`}</style>

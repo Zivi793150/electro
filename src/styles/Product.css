@@ -642,6 +642,89 @@
   }
 }
 
+@media (max-width: 768px) {
+  /* Адаптация палочек-разграничителей для мобильных */
+  .product-flex::after {
+    display: none; /* Убираем вертикальную линию на мобильных */
+  }
+  
+  .product-divider {
+    width: 100% !important; /* Линия на всю ширину контейнера */
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-btns-divider {
+    width: 100% !important; /* Линия под кнопками на всю ширину */
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Исправляем отступы в характеристиках для мобильных */
+  .product-specs-flex-name {
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+    font-size: 0.9rem !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  .product-specs-flex-dots {
+    min-width: 0 !important;
+    margin: 0 !important;
+    margin-left: 0 !important; /* Убираем отрицательный отступ */
+    padding-left: 0 !important;
+  }
+  
+  .product-specs-flex-value {
+    max-width: 50% !important;
+    font-size: 0.9rem !important;
+    word-break: break-word !important;
+  }
+  
+  /* Исправляем выход кнопок за границы контейнера */
+  .product-info-block {
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  
+  .product-buy-row {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-buy-btns {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-btn-ask,
+  .product-btn-buy {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+  
+  /* Дополнительная защита от выхода за границы */
+  .product-container {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-flex {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+}
+
 @media (max-width: 700px) {
   .city-select {
     font-size: 0.85rem;
@@ -803,6 +886,59 @@
     font-weight: 400;
     line-height: 1.5;
   }
+  
+  /* Адаптация палочек-разграничителей */
+  .product-divider {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-btns-divider {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Исправляем выход кнопок за границы контейнера */
+  .product-info-block {
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  
+  .product-buy-row {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-buy-btns {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-btn-ask,
+  .product-btn-buy {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+  
+  /* Дополнительная защита от выхода за границы */
+  .product-container {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-flex {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
   .product-thumbs {
     gap: 8px;
     margin-top: 30px !important;
@@ -832,8 +968,9 @@
   
   /* Исправляем отображение характеристик на мобильных */
   .product-specs-flex-name {
-    min-width: 150px !important;
-    max-width: 43% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
     font-size: 0.9rem !important;
     white-space: normal !important;
     word-break: break-word !important;
@@ -844,7 +981,7 @@
   .product-specs-flex-dots {
     min-width: 0 !important;
     margin: 0 !important;
-    margin-left: -7px !important;
+    margin-left: 2px !important; /* Плотно к параметру */
     padding-left: 0 !important;
   }
   
@@ -933,6 +1070,59 @@
     font-weight: 400;
     line-height: 1.5;
   }
+  
+  /* Адаптация палочек-разграничителей */
+  .product-divider {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-btns-divider {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Исправляем выход кнопок за границы контейнера */
+  .product-info-block {
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  
+  .product-buy-row {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-buy-btns {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-btn-ask,
+  .product-btn-buy {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+  
+  /* Дополнительная защита от выхода за границы */
+  .product-container {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-flex {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
   .product-thumbs {
     gap: 6px;
     margin-top: 25px !important;
@@ -961,8 +1151,9 @@
   
   /* Исправляем отображение характеристик на мобильных */
   .product-specs-flex-name {
-    min-width: 140px !important;
-    max-width: 42% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
     font-size: 0.85rem !important;
     white-space: normal !important;
     word-break: break-word !important;
@@ -973,7 +1164,7 @@
   .product-specs-flex-dots {
     min-width: 0 !important;
     margin: 0 !important;
-    margin-left: -7px !important;
+    margin-left: 2px !important; /* Плотно к параметру */
     padding-left: 0 !important;
   }
   
@@ -1063,6 +1254,59 @@
     font-weight: 400;
     line-height: 1.5;
   }
+  
+  /* Адаптация палочек-разграничителей */
+  .product-divider {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-btns-divider {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Исправляем выход кнопок за границы контейнера */
+  .product-info-block {
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+  
+  .product-buy-row {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-buy-btns {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .product-btn-ask,
+  .product-btn-buy {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+  
+  /* Дополнительная защита от выхода за границы */
+  .product-container {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
+  .product-flex {
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+  
   .product-thumbs {
     gap: 5px;
     margin-top: 20px !important;
@@ -1091,8 +1335,9 @@
   
   /* Исправляем отображение характеристик на мобильных */
   .product-specs-flex-name {
-    min-width: 120px !important;
-    max-width: 40% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    width: auto !important;
     font-size: 0.8rem !important;
     white-space: normal !important;
     word-break: break-word !important;
@@ -1103,7 +1348,7 @@
   .product-specs-flex-dots {
     min-width: 0 !important;
     margin: 0 !important;
-    margin-left: -6px !important;
+    margin-left: 2px !important; /* Плотно к параметру */
     padding-left: 0 !important;
   }
   
