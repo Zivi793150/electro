@@ -471,14 +471,21 @@ app.post('/api/information', async (req, res) => {
       return res.status(400).json({ error: 'Данные информации не предоставлены' });
     }
     
+    console.log('Полученные данные для сохранения:', information);
+    console.log('Процент наценки:', information.markupPercentage);
+    
     let existingInformation = await Information.findOne();
     
     if (existingInformation) {
       // Обновляем существующую информацию
+      console.log('Обновляем существующую информацию');
       Object.assign(existingInformation, information);
+      console.log('После Object.assign:', existingInformation.markupPercentage);
       await existingInformation.save();
+      console.log('После сохранения:', existingInformation.markupPercentage);
     } else {
       // Создаем новую информацию
+      console.log('Создаем новую информацию');
       existingInformation = new Information(information);
       await existingInformation.save();
     }
