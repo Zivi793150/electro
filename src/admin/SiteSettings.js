@@ -7,6 +7,7 @@ const SiteSettings = ({ onLogout }) => {
   const navigate = useNavigate();
   const [information, setInformation] = useState({
     city: 'Алматы',
+    markupPercentage: 20,
     deliveryInfo: {
       freeDelivery: 'Бесплатная доставка по городу',
       freeDeliveryNote: 'Сегодня — БЕСПЛАТНО',
@@ -171,6 +172,20 @@ const SiteSettings = ({ onLogout }) => {
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
             />
             <small style={{color: '#6c757d', fontSize: 12}}>Отображается как "Ваш город: [название]"</small>
+          </div>
+          
+          <div style={{marginBottom: 0}}>
+            <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Процент наценки (%)</label>
+            <input 
+              type="number"
+              min="0"
+              max="100"
+              value={information.markupPercentage} 
+              onChange={(e) => setInformation(prev => ({...prev, markupPercentage: parseInt(e.target.value) || 0}))}
+              placeholder="20"
+              style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
+            />
+            <small style={{color: '#6c757d', fontSize: 12}}>Процент наценки при конвертации цен из USD в KZT (по умолчанию: 20%)</small>
           </div>
         </div>
 

@@ -592,6 +592,18 @@ const Product = () => {
                   }}>
                     {productGroup.parameters
                       .filter(param => {
+                        const paramNameLower = (param.name || '').toLowerCase();
+                        const isModelParam = paramNameLower.includes('модель');
+
+                        // Требуем, чтобы для «модель» были выбраны и мощность, и регулятор
+                        if (isModelParam) {
+                          const powerParam = (productGroup.parameters.find(p => (p.name || '').toLowerCase().includes('мощ')) || {}).name;
+                          const regulatorParam = (productGroup.parameters.find(p => (p.name || '').toLowerCase().includes('регуля')) || {}).name;
+                          const powerSelected = powerParam ? !!selectedParameters[powerParam] : false;
+                          const regulatorSelected = regulatorParam ? !!selectedParameters[regulatorParam] : false;
+                          if (!powerSelected || !regulatorSelected) return false;
+                        }
+
                         const visibleByDefault = param.visibleByDefault !== false;
                         if (visibleByDefault) return true;
 
@@ -604,6 +616,9 @@ const Product = () => {
                         // If a variant from the allowed list is still possible given the selected parameters (excluding this param), show it
                         const otherParams = { ...selectedParameters };
                         delete otherParams[param.name];
+                        // Если другие параметры ещё не выбраны, изначально скрываем
+                        const hasAnyOther = Object.values(otherParams).some(v => v && v !== 'false' && String(v).trim() !== '');
+                        if (!hasAnyOther) return false;
                         const matchesOtherParams = (variant) => {
                           return Object.entries(otherParams).every(([k, v]) => {
                             if (!v || v === 'false') return true;

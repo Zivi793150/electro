@@ -226,6 +226,7 @@ const ProductGroup = mongoose.model('ProductGroup', productGroupSchema);
 // Модель информации сайта
 const informationSchema = new mongoose.Schema({
   city: { type: String, default: 'Алматы' },
+  markupPercentage: { type: Number, default: 20, min: 0, max: 100 },
   deliveryInfo: {
     freeDelivery: { type: String, default: 'Бесплатная доставка по городу' },
     freeDeliveryNote: { type: String, default: 'Сегодня — БЕСПЛАТНО' },
@@ -368,9 +369,22 @@ app.post('/api/products', async (req, res) => {
     if (doc.priceUSD !== undefined && doc.priceUSD !== null && doc.priceUSD !== '') {
       const usd = parseFloat(String(doc.priceUSD).replace(',', '.'));
       const rate = await fetchUsdKztRate();
-      const kzt = Math.round(usd * rate * 1.2); // +20% наценка
+      
+      // Получаем настраиваемый процент наценки
+      let markupPercentage = 20; // по умолчанию
+      try {
+        const information = await Information.findOne();
+        if (information && information.markupPercentage !== undefined) {
+          markupPercentage = information.markupPercentage;
+        }
+      } catch (e) {
+        console.log('Ошибка получения процента наценки, используется 20%:', e.message);
+      }
+      
+      const markupMultiplier = 1 + (markupPercentage / 100);
+      const kzt = Math.round(usd * rate * markupMultiplier);
       doc.price = kzt;
-      doc.meta = { ...(doc.meta || {}), usdKztRateUsed: rate, margin: 0.2 };
+      doc.meta = { ...(doc.meta || {}), usdKztRateUsed: rate, margin: markupPercentage / 100 };
     }
     const product = new Product(doc);
     const savedProduct = await product.save();
@@ -388,9 +402,22 @@ app.put('/api/products/:id', async (req, res) => {
     if (doc.priceUSD !== undefined && doc.priceUSD !== null && doc.priceUSD !== '') {
       const usd = parseFloat(String(doc.priceUSD).replace(',', '.'));
       const rate = await fetchUsdKztRate();
-      const kzt = Math.round(usd * rate * 1.2);
+      
+      // Получаем настраиваемый процент наценки
+      let markupPercentage = 20; // по умолчанию
+      try {
+        const information = await Information.findOne();
+        if (information && information.markupPercentage !== undefined) {
+          markupPercentage = information.markupPercentage;
+        }
+      } catch (e) {
+        console.log('Ошибка получения процента наценки, используется 20%:', e.message);
+      }
+      
+      const markupMultiplier = 1 + (markupPercentage / 100);
+      const kzt = Math.round(usd * rate * markupMultiplier);
       doc.price = kzt;
-      doc.meta = { ...(doc.meta || {}), usdKztRateUsed: rate, margin: 0.2 };
+      doc.meta = { ...(doc.meta || {}), usdKztRateUsed: rate, margin: markupPercentage / 100 };
     }
     const product = await Product.findByIdAndUpdate(
       req.params.id, 

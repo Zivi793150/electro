@@ -23,13 +23,23 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   // Подсказка для итоговой цены в тенге для админа
   const AdminPriceHint = ({ usd }) => {
     const [rate, setRate] = useState(null);
+    const [markupPercentage, setMarkupPercentage] = useState(20);
+    
     useEffect(() => {
       let mounted = true;
       (async () => {
         try {
+          // Получаем курс валют
           const r = await fetch('https://electro-1-vjdu.onrender.com/api/rate/usd-kzt');
           const j = await r.json();
           if (mounted && j && j.rate) setRate(j.rate);
+          
+          // Получаем процент наценки
+          const infoResponse = await fetch('https://electro-1-vjdu.onrender.com/api/information');
+          const infoData = await infoResponse.json();
+          if (mounted && infoData.information && infoData.information.markupPercentage !== undefined) {
+            setMarkupPercentage(infoData.information.markupPercentage);
+          }
         } catch (_) {
           const fallback = parseFloat(process.env.REACT_APP_USD_KZT_RATE || '480');
           if (mounted) setRate(fallback);
@@ -37,12 +47,14 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       })();
       return () => { mounted = false; };
     }, []);
+    
     const val = parseFloat(String(usd || '').replace(',', '.'));
     if (isNaN(val) || !rate) return null;
-    const kzt = Math.round(val * rate * 1.2);
+    const markupMultiplier = 1 + (markupPercentage / 100);
+    const kzt = Math.round(val * rate * markupMultiplier);
     return (
       <div style={{marginTop:6,fontSize:13,color:'#666'}}>
-        Итог для пользователя: ≈ {kzt.toLocaleString('ru-RU')} ₸ (курс {rate}, +20%)
+        Итог для пользователя: ≈ {kzt.toLocaleString('ru-RU')} ₸ (курс {rate}, +{markupPercentage}%)
       </div>
     );
   };
