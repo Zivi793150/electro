@@ -448,13 +448,23 @@ app.delete('/api/products/:id', async (req, res) => {
 app.get('/api/information', async (req, res) => {
   try {
     let information = await Information.findOne();
+    console.log('Загружена информация из БД:', information ? 'найдена' : 'не найдена');
     
     // Если информации нет, создаем с дефолтными значениями
     if (!information) {
+      console.log('Создаем новую информацию с дефолтными значениями');
       information = new Information();
       await information.save();
+    } else {
+      // Миграция: добавляем поле markupPercentage если его нет
+      if (information.markupPercentage === undefined) {
+        console.log('Добавляем поле markupPercentage к существующей записи');
+        information.markupPercentage = 20;
+        await information.save();
+      }
     }
     
+    console.log('Процент наценки в ответе:', information.markupPercentage);
     res.json({ information });
   } catch (err) {
     console.error('Ошибка получения информации:', err);
@@ -471,25 +481,27 @@ app.post('/api/information', async (req, res) => {
       return res.status(400).json({ error: 'Данные информации не предоставлены' });
     }
     
-    console.log('Полученные данные для сохранения:', information);
-    console.log('Процент наценки:', information.markupPercentage);
+    console.log('Получены данные для сохранения:', JSON.stringify(information, null, 2));
+    console.log('Процент наценки в запросе:', information.markupPercentage);
     
     let existingInformation = await Information.findOne();
+    console.log('Существующая информация в БД:', existingInformation ? 'найдена' : 'не найдена');
     
     if (existingInformation) {
+      console.log('Старый процент наценки:', existingInformation.markupPercentage);
       // Обновляем существующую информацию
-      console.log('Обновляем существующую информацию');
       Object.assign(existingInformation, information);
-      console.log('После Object.assign:', existingInformation.markupPercentage);
+      console.log('Новый процент наценки после Object.assign:', existingInformation.markupPercentage);
       await existingInformation.save();
-      console.log('После сохранения:', existingInformation.markupPercentage);
+      console.log('Процент наценки после сохранения:', existingInformation.markupPercentage);
     } else {
+      console.log('Создаем новую информацию с процентом наценки:', information.markupPercentage);
       // Создаем новую информацию
-      console.log('Создаем новую информацию');
       existingInformation = new Information(information);
       await existingInformation.save();
     }
     
+    console.log('Финальный процент наценки в ответе:', existingInformation.markupPercentage);
     res.json({ success: true, information: existingInformation });
   } catch (err) {
     console.error('Ошибка сохранения информации:', err);

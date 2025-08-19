@@ -46,8 +46,8 @@ const SiteSettings = ({ onLogout }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.information) {
-          console.log('Загруженные данные:', data.information);
-          console.log('Процент наценки из БД:', data.information.markupPercentage);
+          console.log('Загружена информация из БД:', data.information);
+          console.log('Процент наценки:', data.information.markupPercentage);
           setInformation(data.information);
         }
       } else {
@@ -64,7 +64,7 @@ const SiteSettings = ({ onLogout }) => {
     setSaving(true);
     setMessage('');
     
-    console.log('Отправляем данные:', information);
+    console.log('Отправляем данные на сохранение:', information);
     console.log('Процент наценки:', information.markupPercentage);
     
     try {
@@ -77,6 +77,8 @@ const SiteSettings = ({ onLogout }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
+          console.log('Ответ сервера:', data);
+          console.log('Сохраненный процент наценки:', data.information?.markupPercentage);
           setMessage('✅ Информация успешно сохранена!');
           setTimeout(() => setMessage(''), 3000);
         } else {
@@ -181,19 +183,15 @@ const SiteSettings = ({ onLogout }) => {
           
           <div style={{marginBottom: 0}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Процент наценки (%)</label>
-                         <input 
-               type="number"
-               min="0"
-               max="100"
-               value={information.markupPercentage} 
-               onChange={(e) => {
-                 const value = parseInt(e.target.value) || 0;
-                 console.log('Изменение процента наценки:', value);
-                 setInformation(prev => ({...prev, markupPercentage: value}));
-               }}
-               placeholder="20"
-               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
-             />
+            <input 
+              type="number"
+              min="0"
+              max="100"
+              value={information.markupPercentage} 
+              onChange={(e) => setInformation(prev => ({...prev, markupPercentage: parseInt(e.target.value) || 0}))}
+              placeholder="20"
+              style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
+            />
             <small style={{color: '#6c757d', fontSize: 12}}>Процент наценки при конвертации цен из USD в KZT (по умолчанию: 20%)</small>
           </div>
         </div>
