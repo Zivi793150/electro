@@ -203,6 +203,7 @@ const productGroupSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: String,
   baseProductId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+  coverImage: { type: String }, // URL обложки для группы вариаций
   variants: [{
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
     parameters: { type: Map, of: String }, // Динамические параметры (вольты, с регулятором и т.д.)
@@ -893,6 +894,7 @@ app.get('/api/product-groups/:id', async (req, res) => {
 app.post('/api/product-groups', async (req, res) => {
   try {
     console.log('Создание группы вариаций с данными:', req.body);
+    console.log('🖼️ CoverImage в запросе:', req.body.coverImage);
     const body = { ...req.body };
     // Нормализуем параметры, чтобы гарантировать сохранение falsy значений и корректных типов
     if (Array.isArray(body.parameters)) {
@@ -917,6 +919,7 @@ app.post('/api/product-groups', async (req, res) => {
       .populate('baseProductId')
       .populate('variants.productId');
     console.log('Группа создана:', populatedGroup);
+    console.log('🖼️ CoverImage в сохраненной группе:', populatedGroup.coverImage);
     
     // Очищаем кэш продуктов
     clearProductsCache();
@@ -931,6 +934,8 @@ app.post('/api/product-groups', async (req, res) => {
 // Обновить группу вариаций
 app.put('/api/product-groups/:id', async (req, res) => {
   try {
+    console.log('Обновление группы вариаций с данными:', req.body);
+    console.log('🖼️ CoverImage в запросе обновления:', req.body.coverImage);
     const body = { ...req.body, updatedAt: Date.now() };
     if (Array.isArray(body.parameters)) {
       body.parameters = body.parameters.map((p) => ({
@@ -955,6 +960,8 @@ app.put('/api/product-groups/:id', async (req, res) => {
     ).populate('baseProductId').populate('variants.productId');
     
     if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    
+    console.log('🖼️ CoverImage в обновленной группе:', group.coverImage);
     
     // Очищаем кэш продуктов
     clearProductsCache();

@@ -162,13 +162,16 @@ function ProductVariations() {
 
   const handleCreateGroup = () => {
     setEditingGroup(null);
-    setFormData({
+    const newFormData = {
       name: '',
       description: '',
       baseProductId: '',
+      coverImage: '',
       parameters: [],
       variants: []
-    });
+    };
+    console.log('🆕 Создаем новую группу с данными:', newFormData);
+    setFormData(newFormData);
     setShowForm(true);
   };
 
@@ -211,6 +214,9 @@ function ProductVariations() {
     
     console.log('Извлеченный baseProductId:', baseProductId);
     console.log('Обработанные вариации:', processedVariants);
+    
+    console.log('📥 Загружаем данные группы для редактирования:', group);
+    console.log('🖼️ CoverImage в загруженной группе:', group.coverImage);
     
     setFormData({
       name: group.name,
@@ -345,12 +351,13 @@ function ProductVariations() {
     }));
   };
 
-  const handleImageUpload = async (file) => {
-    if (!file) return;
+  const handleImageUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
     
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', files[0]);
       
       const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
         method: 'POST',
@@ -359,30 +366,64 @@ function ProductVariations() {
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка загрузки изображения');
+        throw new Error(errorData.error || 'Ошибка загрузки файла');
       }
       
       const result = await response.json();
       
-      // Используем WebP версию для лучшей производительности, если доступна
-      const imageUrl = result.webp ? result.webp.path : result.original.path;
-      
-      setFormData(prev => ({
-        ...prev,
-        coverImage: imageUrl
-      }));
-      
-      // Показываем уведомление об успешной загрузке
-      console.log('✅ Обложка загружена:', imageUrl);
-      console.log('📊 Полный ответ сервера:', result);
-      
-      setTimeout(() => {
-        alert(`✅ Обложка вариации успешно загружена!\n\nURL: ${imageUrl}`);
-      }, 100);
-      
+      if (result.webp) {
+        // Используем WebP версию для лучшей производительности
+        const imageUrl = result.webp.path;
+        
+        setFormData(prev => ({
+          ...prev,
+          coverImage: imageUrl
+        }));
+        
+        // Сохраняем варианты изображений для оптимизации
+        const imageVariants = {
+          original: result.original.path,
+          webp: result.webp.path,
+          thumb: result.variants?.thumb?.url || result.webp.path,
+          medium: result.variants?.medium?.url || result.webp.path,
+          large: result.variants?.large?.url || result.webp.path
+        };
+        
+        // Сохраняем варианты в localStorage для использования при сохранении продукта
+        localStorage.setItem('lastUploadedCoverImageVariants', JSON.stringify(imageVariants));
+        
+        console.log('✅ Обложка загружена:', imageUrl);
+        console.log('📊 Полный ответ сервера:', result);
+        
+        setTimeout(() => {
+          alert(`✅ Обложка вариации успешно загружена и оптимизирована!\n\n` +
+                `📁 Оригинал: ${result.original.filename}\n` +
+                `🎨 WebP: ${result.webp.filename}\n` +
+                `📏 Размер: ${Math.round(result.original.size / 1024)} KB\n` +
+                `🚀 Экономия: ~60-70% размера\n` +
+                `📱 Варианты: thumb, medium, large\n\n` +
+                `WebP URL автоматически добавлен в поле.`);
+        }, 100);
+      } else {
+        // Fallback на оригинальный файл
+        const imageUrl = result.original.path;
+        
+        setFormData(prev => ({
+          ...prev,
+          coverImage: imageUrl
+        }));
+        
+        console.log('✅ Обложка загружена (fallback):', imageUrl);
+        
+        setTimeout(() => {
+          alert(`✅ Обложка вариации успешно загружена!\n\nURL: ${imageUrl}`);
+        }, 100);
+      }
     } catch (error) {
       console.error('Ошибка загрузки изображения:', error);
       setError('Ошибка загрузки изображения: ' + error.message);
+    } finally {
+      event.target.value = '';
     }
   };
 
@@ -404,6 +445,7 @@ function ProductVariations() {
 
       console.log('📤 Отправляем данные на сервер:', submitData);
       console.log('🖼️ CoverImage в данных:', submitData.coverImage);
+      console.log('📊 Полная структура данных:', JSON.stringify(submitData, null, 2));
 
       const response = await fetch(
         editingGroup ? `${GROUPS_URL}/${editingGroup._id}` : GROUPS_URL,
@@ -646,13 +688,13 @@ function ProductVariations() {
                         </div>
                       ) : (
                         <div className="image-upload-placeholder">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e.target.files[0])}
-                            className="image-upload-input"
-                            id="group-cover-image"
-                          />
+                                                     <input
+                             type="file"
+                             accept="image/*"
+                             onChange={handleImageUpload}
+                             className="image-upload-input"
+                             id="group-cover-image"
+                           />
                           <label htmlFor="group-cover-image" className="image-upload-label">
                             <span className="upload-icon">📷</span>
                             <span>Загрузить обложку для вариации</span>
