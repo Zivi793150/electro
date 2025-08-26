@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import DeliveryInfo from '../components/DeliveryInfo';
 import { trackProductView, trackButtonClick } from '../utils/analytics';
+import { fetchWithCache } from '../utils/cache';
 import '../styles/Product.css';
 import '../styles/ProductVariations.css';
 
@@ -219,8 +220,7 @@ const Product = () => {
     const fetchProductAndGroup = async () => {
       try {
         // Загружаем товар
-        const productRes = await fetchWithRetry(`${API_URL}/${id}`);
-        const productData = await productRes.json();
+            const productData = await fetchWithCache(`${API_URL}/${id}`, {}, 5 * 60 * 1000); // Кэш на 5 минут
         
         if (productData.error) {
           setError(productData.error);
@@ -270,8 +270,7 @@ const Product = () => {
   }, [id]);
 
   useEffect(() => {
-    fetchWithRetry(`${API_URL}?limit=4`)
-      .then(res => res.json())
+    fetchWithCache(`${API_URL}?limit=4`, {}, 5 * 60 * 1000) // Кэш на 5 минут
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
       });
@@ -553,9 +552,7 @@ const Product = () => {
                     src={getAllImages()[activeImage]} 
                     alt={product.name} 
                     loading="lazy"
-                    width="400"
-                    height="400"
-                    style={{width: '100%', height: 'auto', maxWidth: '400px'}}
+                    style={{maxWidth: '100%', maxHeight: '100%', objectFit: 'contain'}}
                   />
                 </div>
                 {getAllImages().length > 1 && (
@@ -866,7 +863,7 @@ const Product = () => {
                   </picture>
                 </div>
                 <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
+                <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
                   <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '32px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                   <div style={{width:'100%', textAlign:'left', margin:'0 0 1px 0'}}>
                     <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
@@ -903,7 +900,7 @@ const Product = () => {
                   </picture>
                 </div>
                 <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
+                <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
                   <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '32px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                   <div style={{width:'100%', textAlign:'left', margin:'0 0 1px 0'}}>
                     <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>

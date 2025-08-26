@@ -3,6 +3,7 @@ import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { trackPageView } from '../utils/analytics';
+import { fetchWithCache } from '../utils/cache';
 import '../styles/Catalog.css';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -31,18 +32,88 @@ const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, t
 const Catalog = () => {
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
+    // Для каталога используем coverPhoto если есть, иначе обычное фото
+    const mainImage = product.coverPhoto || product.image;
+    
     if (product.imageVariants && product.imageVariants[preferredSize]) {
       return product.imageVariants[preferredSize];
     }
     if (product.imageVariants && product.imageVariants.webp) {
       return product.imageVariants.webp;
     }
-    return product.image || '/images/products/placeholder.png';
+    return mainImage || '/images/products/placeholder.png';
   };
 
-  // Статические категории для fallback
+  // Функция для преобразования кириллического названия категории в латинский ID
+  const categoryToId = (categoryName) => {
+    const categoryMap = {
+      'дрели': 'drills',
+      'болгарки': 'grinders',
+      'шуруповёрты': 'screwdrivers',
+      'перфораторы': 'hammers',
+      'лобзики': 'jigsaws',
+      'лазерные уровни': 'levels',
+      'генераторы': 'generators',
+      'измерители': 'measuring',
+      'дрель': 'drills',
+      'болгарка': 'grinders',
+      'шуруповёрт': 'screwdrivers',
+      'перфоратор': 'hammers',
+      'лобзик': 'jigsaws',
+      'лазерный уровень': 'levels',
+      'генератор': 'generators',
+      'измеритель': 'measuring'
+    };
+    
+    // Нормализуем название: убираем лишние пробелы, приводим к нижнему регистру
+    const normalizedName = categoryName.toLowerCase().trim().replace(/\s+/g, ' ');
+    
+    // Сначала ищем точное совпадение
+    if (categoryMap[normalizedName]) {
+      return categoryMap[normalizedName];
+    }
+    
+    // Если точного совпадения нет, ищем по частичному совпадению
+    for (const [key, value] of Object.entries(categoryMap)) {
+      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+        return value;
+      }
+    }
+    
+    // Если ничего не найдено, создаем ID из названия
+    return normalizedName.replace(/[^a-z0-9]/g, '-');
+  };
+
+  // Функция для получения названия категории по ID
+  const idToCategory = (categoryId) => {
+    const idMap = {
+      'drills': 'Дрели',
+      'grinders': 'Болгарки',
+      'screwdrivers': 'Шуруповёрты',
+      'hammers': 'Перфораторы',
+      'jigsaws': 'Лобзики',
+      'levels': 'Лазерные уровни',
+      'генераторы': 'Генераторы',
+      'measuring': 'Измерители'
+    };
+    
+    // Если есть точное совпадение в маппинге, возвращаем его
+    if (idMap[categoryId]) {
+      return idMap[categoryId];
+    }
+    
+    // Если нет точного совпадения, ищем по частичному совпадению
+    const foundCategory = categories.find(cat => cat.id === categoryId);
+    if (foundCategory) {
+      return foundCategory.name;
+    }
+    
+    // Если ничего не найдено, возвращаем ID как есть
+    return categoryId;
+  };
+
+  // Статические категории для fallback (без "Все товары")
   const staticCategories = [
-    { id: 'all', name: 'Все товары' },
     { id: 'drills', name: 'Дрели' },
     { id: 'grinders', name: 'Болгарки' },
     { id: 'screwdrivers', name: 'Шуруповёрты' },
@@ -55,8 +126,12 @@ const Catalog = () => {
 
   const location = useLocation();
   const getCategoryFromQuery = () => {
-    const params = new URLSearchParams(location.search);
-    return params.get('category') || 'all';
+    // Извлекаем категорию из URL пути
+    const pathParts = location.pathname.split('/');
+    if (pathParts.length > 2 && pathParts[1] === 'catalog') {
+      return pathParts[2]; // Возвращаем название категории из URL
+    }
+    return null; // По умолчанию не выбрана категория - показываем все
   };
   const [selectedCategory, setSelectedCategory] = useState(getCategoryFromQuery());
   const [products, setProducts] = useState([]);
@@ -68,9 +143,11 @@ const Catalog = () => {
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
 
+  // Отслеживаем изменения URL для определения активной категории
   useEffect(() => {
-    setSelectedCategory(getCategoryFromQuery());
-  }, [location.search]);
+    const categoryFromUrl = getCategoryFromQuery();
+    setSelectedCategory(categoryFromUrl);
+  }, [location.search, location.pathname]);
 
   // Закрытие выпадающего списка при клике вне его
   useEffect(() => {
@@ -91,12 +168,12 @@ const Catalog = () => {
 
           const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
-  // Загрузка товаров
+  // Загрузка товаров с кэшированием
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchWithRetry(API_URL)
-      .then(res => res.json())
+    
+    fetchWithCache(API_URL, {}, 10 * 60 * 1000) // Кэш на 10 минут
       .then(data => {
         setProducts(data);
         setLoading(false);
@@ -123,7 +200,7 @@ const Catalog = () => {
       products.forEach(product => {
         if (product.category) {
           // Нормализуем название категории: убираем лишние пробелы и приводим к нижнему регистру
-          const normalizedCategory = product.category.trim().toLowerCase();
+          const normalizedCategory = product.category.trim().toLowerCase().replace(/\s+/g, ' ');
           const originalCategory = product.category.trim();
           
           // Если такой нормализованной категории еще нет, добавляем её
@@ -136,15 +213,12 @@ const Catalog = () => {
       const uniqueCategories = Array.from(categoryMap.values()).sort();
       
       if (uniqueCategories.length > 0) {
-        // Добавляем категорию "Все товары" в начало
-        const allCategories = [
-          { id: 'all', name: 'Все товары' },
-          ...uniqueCategories.map(category => ({
-            id: category,
-            name: category
-          }))
-        ];
-        setCategories(allCategories);
+        // Убираем "Все товары" - показываем только реальные категории
+        const realCategories = uniqueCategories.map(category => ({
+          id: categoryToId(category),
+          name: category
+        }));
+        setCategories(realCategories);
       } else {
         // Если нет категорий в товарах, используем статические
         setCategories(staticCategories);
@@ -217,9 +291,14 @@ const Catalog = () => {
     };
   }, [products]);
 
-  const filteredProducts = selectedCategory === 'all'
-    ? products
-    : products.filter(product => product.category && product.category.trim() === selectedCategory);
+  // При загрузке /catalog показываем все товары, при выборе категории - фильтруем
+  const filteredProducts = selectedCategory
+    ? products.filter(product => {
+        if (!product.category) return false;
+        const productCategoryId = categoryToId(product.category.trim());
+        return productCategoryId === selectedCategory;
+      })
+    : products;
 
   // Пагинация
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -252,12 +331,13 @@ const Catalog = () => {
               <ul className="sidebar-categories">
                 {categories.map(category => (
                   <li key={category.id}>
-                    <button
+                    <Link
+                      to={`/catalog/${category.id}`}
                       className={`sidebar-category-btn${selectedCategory === category.id ? ' active' : ''}`}
-                      onClick={() => setSelectedCategory(category.id)}
+                      style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
                     >
                       {category.name}
-                    </button>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -274,7 +354,11 @@ const Catalog = () => {
                   <span>
                     {categoriesLoading 
                       ? 'Загрузка...' 
-                      : categories.find(cat => cat.id === selectedCategory)?.name || 'Все товары'
+                      : location.pathname === '/catalog'
+                        ? 'Каталог товаров'
+                        : selectedCategory 
+                          ? idToCategory(selectedCategory) || 'Каталог товаров'
+                          : 'Каталог товаров'
                     }
                   </span>
                   <span className="dropdown-arrow">▼</span>
@@ -282,16 +366,15 @@ const Catalog = () => {
                 {isDropdownOpen && !categoriesLoading && (
                   <div className="category-dropdown-menu">
                     {categories.map(category => (
-                      <button
+                      <Link
                         key={category.id}
+                        to={`/catalog/${category.id}`}
                         className={`category-dropdown-item${selectedCategory === category.id ? ' active' : ''}`}
-                        onClick={() => {
-                          setSelectedCategory(category.id);
-                          setIsDropdownOpen(false);
-                        }}
+                        style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
+                        onClick={() => setIsDropdownOpen(false)}
                       >
                         {category.name}
-                      </button>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -300,9 +383,11 @@ const Catalog = () => {
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               {categoriesLoading 
                 ? 'Каталог товаров' 
-                : selectedCategory === 'all' 
-                  ? 'Каталог товаров' 
-                  : categories.find(cat => cat.id === selectedCategory)?.name || 'Каталог товаров'
+                : location.pathname === '/catalog'
+                  ? 'Каталог товаров'
+                  : selectedCategory 
+                    ? idToCategory(selectedCategory) || 'Каталог товаров'
+                    : 'Каталог товаров'
               }
             </h1>
             {loading ? (
@@ -337,8 +422,8 @@ const Catalog = () => {
                         />
                       </picture>
                     </div>
-                    <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
-                    <div className="product-info" style={{padding: '6px 8px 8px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '80px'}}>
+                    <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 12px auto', alignSelf:'center'}}></div>
+                    <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '80px'}}>
                       <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '20px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                       <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
                         <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>

@@ -10,9 +10,23 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [category, setCategory] = useState(initialData?.category || '');
   const [article, setArticle] = useState(initialData?.article || '');
   const [image, setImage] = useState(initialData?.image || '');
-  const [photo1, setPhoto1] = useState(initialData?.images?.[0] || '');
-  const [photo2, setPhoto2] = useState(initialData?.images?.[1] || '');
-  const [photo3, setPhoto3] = useState(initialData?.images?.[2] || '');
+  const [coverPhoto, setCoverPhoto] = useState(initialData?.coverPhoto || '');
+  
+  // Динамические поля для фото
+  const [additionalPhotos, setAdditionalPhotos] = useState(() => {
+    if (initialData?.images && Array.isArray(initialData.images)) {
+      return initialData.images.map((photo, index) => ({
+        id: index,
+        url: photo || ''
+      }));
+    }
+    // Начальные поля
+    return [
+      { id: 0, url: '' },
+      { id: 1, url: '' },
+      { id: 2, url: '' }
+    ];
+  });
   const [description, setDescription] = useState(initialData?.description || '');
   const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
   const [characteristics, setCharacteristics] = useState(initialData?.characteristics || '');
@@ -57,6 +71,22 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         Итог для пользователя: ≈ {kzt.toLocaleString('ru-RU')} ₸ (курс {rate}, +{markupPercentage}%)
       </div>
     );
+  };
+  
+  // Функции для управления дополнительными фото
+  const addPhotoField = () => {
+    const newId = Math.max(...additionalPhotos.map(p => p.id), -1) + 1;
+    setAdditionalPhotos([...additionalPhotos, { id: newId, url: '' }]);
+  };
+
+  const removePhotoField = (id) => {
+    setAdditionalPhotos(additionalPhotos.filter(photo => photo.id !== id));
+  };
+
+  const updatePhotoField = (id, url) => {
+    setAdditionalPhotos(additionalPhotos.map(photo => 
+      photo.id === id ? { ...photo, url } : photo
+    ));
   };
   
   // Состояние для динамических характеристик
@@ -202,7 +232,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     parsedUSD = String(parsedUSD);
     
     // Собираем все фото в массив
-    const allPhotos = [photo1, photo2, photo3].filter(photo => photo.trim() !== '');
+    const allPhotos = additionalPhotos.map(photo => photo.url).filter(url => url.trim() !== '');
     
     // Получаем варианты изображений из localStorage
     const imageVariants = localStorage.getItem('lastUploadedImageVariants');
@@ -217,6 +247,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         images: allPhotos,
         images2: [],
         images3: [],
+        coverPhoto,
         description, 
         'Short description': shortDescription, 
         characteristics: formatCharacteristics(), 
@@ -324,31 +355,72 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             </div>
           </div>
           
+          {/* Динамические дополнительные фото */}
           <div style={{marginBottom:12}}>
-            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото 2</label>
-            <input value={photo1} onChange={e=>setPhoto1(e.target.value)} placeholder="URL второго изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
-            <div style={{display:'flex',gap:8,marginTop:6}}>
-              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto1)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto1('/images/products/drel.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
-            </div>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <label style={{fontWeight:500,color:'#333',fontSize:14}}>Дополнительные фото</label>
+              <button type="button" onClick={addPhotoField} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>+ Добавить фото</button>
           </div>
           
-          <div style={{marginBottom:12}}>
-            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото 3</label>
-            <input value={photo2} onChange={e=>setPhoto2(e.target.value)} placeholder="URL третьего изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            {additionalPhotos.map((photo, index) => (
+              <div key={photo.id} style={{marginBottom:12,position:'relative'}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+                  <label style={{fontWeight:500,color:'#333',fontSize:14}}>Фото {index + 2}</label>
+                  <button 
+                    type="button" 
+                    onClick={() => removePhotoField(photo.id)}
+                    style={{
+                      background:'#dc3545',
+                      color:'#fff',
+                      border:'none',
+                      borderRadius:4,
+                      padding:'4px 8px',
+                      fontSize:12,
+                      cursor:'pointer',
+                      minWidth:30
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <input 
+                  value={photo.url} 
+                  onChange={e => updatePhotoField(photo.id, e.target.value)} 
+                  placeholder={`URL ${index + 2}-го изображения`} 
+                  style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} 
+                />
             <div style={{display:'flex',gap:8,marginTop:6}}>
-              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto2)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto2('/images/products/perforator-bosch-gbh.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={(e) => {
+                      const setField = (url) => updatePhotoField(photo.id, url);
+                      handleFileUpload(e, setField);
+                    }} 
+                    style={{flex:1}} 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => updatePhotoField(photo.id, `/images/products/example-${index + 2}.jpg`)} 
+                    style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}
+                  >
+                    Пример
+                  </button>
             </div>
+              </div>
+            ))}
           </div>
           
           <div style={{marginBottom:0}}>
-            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото 4</label>
-            <input value={photo3} onChange={e=>setPhoto3(e.target.value)} placeholder="URL четвертого изображения" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Фото на обложку каталога</label>
+            <input value={coverPhoto} onChange={e=>setCoverPhoto(e.target.value)} placeholder="URL фото для обложки в каталоге" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <div style={{display:'flex',gap:8,marginTop:6}}>
-              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setPhoto3)} style={{flex:1}} />
-              <button type="button" onClick={()=>setPhoto3('/images/products/shurupovert-dewalt-18v.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
+              <input type="file" accept="image/*" onChange={(e)=>handleFileUpload(e, setCoverPhoto)} style={{flex:1}} />
+              <button type="button" onClick={()=>setCoverPhoto('/images/products/cover-example.jpg')} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'8px 12px',fontSize:12,cursor:'pointer'}}>Пример</button>
             </div>
+            <small style={{color:'#6c757d',fontSize:12,marginTop:4,display:'block'}}>
+              💡 Это фото будет показываться в каталоге для мастер-товара. Если не указано, используется главное фото.
+            </small>
           </div>
         </div>
 
@@ -530,6 +602,13 @@ const ProductList = ({ onLogout }) => {
   const [editProduct, setEditProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  
+  // Состояния для сортировки и фильтрации
+  const [sortBy, setSortBy] = useState('name'); // name, category, price, article
+  const [sortOrder, setSortOrder] = useState('asc'); // asc, desc
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterVariation, setFilterVariation] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
 
@@ -618,10 +697,67 @@ const ProductList = ({ onLogout }) => {
       setSelectedProducts([]);
       setSelectAll(false);
       fetchProducts();
-      alert(`Успешно удалено ${selectedProducts.length} товаров`);
     } catch (e) {
       alert('Ошибка при удалении товаров');
     }
+  };
+
+  // Функции для фильтрации и сортировки
+  const getFilteredAndSortedProducts = () => {
+    let filtered = [...products];
+
+    // Фильтрация по поиску
+    if (searchTerm) {
+      filtered = filtered.filter(product => 
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.article?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Фильтрация по категории
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(product => product.category === filterCategory);
+    }
+
+    // Фильтрация по вариациям
+    if (filterVariation !== 'all') {
+      if (filterVariation === 'variants') {
+        filtered = filtered.filter(product => isProductVariant(product._id));
+      } else if (filterVariation === 'masters') {
+        filtered = filtered.filter(product => !isProductVariant(product._id));
+      }
+    }
+
+    // Сортировка
+    filtered.sort((a, b) => {
+      let aValue = a[sortBy] || '';
+      let bValue = b[sortBy] || '';
+
+      // Для числовых значений
+      if (sortBy === 'price' || sortBy === 'priceUSD') {
+        aValue = parseFloat(aValue) || 0;
+        bValue = parseFloat(bValue) || 0;
+      } else {
+        // Для текстовых значений
+        aValue = String(aValue).toLowerCase();
+        bValue = String(bValue).toLowerCase();
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  };
+
+  // Получаем уникальные категории
+  const getUniqueCategories = () => {
+    const categories = products.map(p => p.category).filter(Boolean);
+    return [...new Set(categories)].sort();
   };
 
   // Функция для определения, является ли товар вариацией
@@ -712,6 +848,123 @@ const ProductList = ({ onLogout }) => {
           </div>
         </div>
         
+        {/* Элементы управления сортировкой и фильтрацией */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr 1fr',
+          gap: '12px',
+          marginBottom: '20px',
+          padding: '16px',
+          background: '#f8f9fa',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef'
+        }}>
+          {/* Поиск */}
+          <div>
+            <label style={{display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: '500', color: '#495057'}}>
+              🔍 Поиск
+            </label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Название, артикул, категория..."
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ced4da',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          {/* Фильтр по категории */}
+          <div>
+            <label style={{display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: '500', color: '#495057'}}>
+              📂 Категория
+            </label>
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ced4da',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            >
+              <option value="all">Все категории</option>
+              {getUniqueCategories().map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Фильтр по вариациям */}
+          <div>
+            <label style={{display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: '500', color: '#495057'}}>
+              🔄 Тип товара
+            </label>
+            <select
+              value={filterVariation}
+              onChange={(e) => setFilterVariation(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ced4da',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            >
+              <option value="all">Все товары</option>
+              <option value="masters">Мастер-товары</option>
+              <option value="variants">Вариации</option>
+            </select>
+          </div>
+
+          {/* Сортировка */}
+          <div>
+            <label style={{display: 'block', marginBottom: '4px', fontSize: '12px', fontWeight: '500', color: '#495057'}}>
+              📊 Сортировка
+            </label>
+            <div style={{display: 'flex', gap: '4px'}}>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  flex: '1',
+                  padding: '8px 12px',
+                  border: '1px solid #ced4da',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              >
+                <option value="name">По названию</option>
+                <option value="category">По категории</option>
+                <option value="price">По цене (₸)</option>
+                <option value="priceUSD">По цене ($)</option>
+                <option value="article">По артикулу</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ced4da',
+                  borderRadius: '4px',
+                  background: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+                title={sortOrder === 'asc' ? 'По возрастанию' : 'По убыванию'}
+              >
+                {sortOrder === 'asc' ? '↑' : '↓'}
+              </button>
+            </div>
+          </div>
+        </div>
+        
         {/* Информация о выбранных товарах */}
         {selectedProducts.length > 0 && (
           <div style={{
@@ -725,7 +978,7 @@ const ProductList = ({ onLogout }) => {
             alignItems: 'center'
           }}>
             <span style={{color: '#1976d2', fontWeight: 500}}>
-              Выбрано товаров: {selectedProducts.length} из {products.length}
+              Выбрано товаров: {selectedProducts.length} из {getFilteredAndSortedProducts().length}
             </span>
             <button 
               onClick={() => {setSelectedProducts([]); setSelectAll(false);}}
@@ -769,7 +1022,7 @@ const ProductList = ({ onLogout }) => {
             </tr>
           </thead>
           <tbody>
-            {products.filter(product => product && product._id).map(product => (
+            {getFilteredAndSortedProducts().filter(product => product && product._id).map(product => (
                 <tr key={product._id} style={{
                   borderBottom: '1px solid #e0e0e0',
                   backgroundColor: selectedProducts.includes(product._id) ? '#f8f9fa' : 'transparent'

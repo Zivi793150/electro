@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import AboutCompanySection from '../components/AboutCompanySection';
+import { fetchWithCache } from '../utils/cache';
 import '../styles/Home.css';
 
 // Надёжный fetch с повторами и таймаутом
@@ -47,8 +48,7 @@ const Home = () => {
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   useEffect(() => {
-    fetchWithRetry(`${API_URL}?limit=8`)
-      .then(res => res.json())
+    fetchWithCache(`${API_URL}?limit=8`, {}, 5 * 60 * 1000) // Кэш на 5 минут
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
       });
@@ -57,16 +57,42 @@ const Home = () => {
 
 
   const handleOpenModal = () => setIsModalOpen(true);
+  // Функция для преобразования кириллического названия категории в латинский ID
+  const categoryToId = (categoryName) => {
+    const categoryMap = {
+      'дрели': 'drills',
+      'болгарки': 'grinders',
+      'шуруповёрты': 'screwdrivers',
+      'перфораторы': 'hammers',
+      'лобзики': 'jigsaws',
+      'лазерные уровни': 'levels',
+      'генераторы': 'generators',
+      'измерители': 'measuring',
+      'дрель': 'drills',
+      'болгарка': 'grinders',
+      'шуруповёрт': 'screwdrivers',
+      'перфоратор': 'hammers',
+      'лобзик': 'jigsaws',
+      'лазерный уровень': 'levels',
+      'генератор': 'generators',
+      'измеритель': 'measuring'
+    };
+    
+    const normalizedName = categoryName.toLowerCase().trim();
+    return categoryMap[normalizedName] || normalizedName.replace(/[^a-z0-9]/g, '-');
+  };
+
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = () => {
     alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
   
-  // Функция для перехода в каталог с фильтром по категории
+  // Функция для перехода в каталог с фильтром по категории товара
   const handleProductClick = (product) => {
     if (product.category) {
-      // Переходим в каталог с фильтром по категории товара
-      navigate(`/catalog?category=${encodeURIComponent(product.category.trim())}`);
+      // Переходим на страницу конкретной категории с латинским ID
+      const categoryId = categoryToId(product.category.trim());
+      navigate(`/catalog/${categoryId}`);
     } else {
       // Если категории нет, переходим в общий каталог
       navigate('/catalog');
@@ -154,7 +180,7 @@ const Home = () => {
                     </picture>
                   </div>
                   <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
-                  <div className="product-info" style={{padding: '10px 12px 14px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
+                  <div className="product-info" style={{padding: '10px 12px 5px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
                     <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
                   </div>
                 </div>

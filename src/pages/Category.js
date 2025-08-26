@@ -1,72 +1,450 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import '../styles/Category.css';
+import { trackPageView } from '../utils/analytics';
+import { fetchWithCache } from '../utils/cache';
+import '../styles/Catalog.css';
 
 const Category = () => {
-  const categoryData = {
-    name: 'Болгарки',
-    description: 'Угловые шлифмашины для резки и шлифовки металла, плитки, кирпича',
-    image: 'https://via.placeholder.com/800x300?text=Болгарки',
-    products: [
-      { id: 1, name: 'Болгарка Makita 125мм', image: 'https://via.placeholder.com/300x200?text=Болгарка+Makita+125', price: '45 000 ₸', power: '1200 Вт', discSize: '125 мм' },
-      { id: 2, name: 'Болгарка DeWalt 230мм', image: 'https://via.placeholder.com/300x200?text=Болгарка+DeWalt+230', price: '85 000 ₸', power: '2000 Вт', discSize: '230 мм' },
-      { id: 3, name: 'Болгарка Интерскол 115мм', image: 'https://via.placeholder.com/300x200?text=Болгарка+Интерскол+115', price: '25 000 ₸', power: '900 Вт', discSize: '115 мм' },
-      { id: 4, name: 'Болгарка Bosch GWS 7-125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Bosch+GWS', price: '55 000 ₸', power: '720 Вт', discSize: '125 мм' },
-      { id: 5, name: 'Болгарка Metabo W 8-115', image: 'https://via.placeholder.com/300x200?text=Болгарка+Metabo+W8', price: '65 000 ₸', power: '800 Вт', discSize: '115 мм' },
-      { id: 6, name: 'Болгарка Hitachi G13SS', image: 'https://via.placeholder.com/300x200?text=Болгарка+Hitachi+G13', price: '35 000 ₸', power: '1300 Вт', discSize: '125 мм' },
-      { id: 7, name: 'Болгарка AEG WS 6-125', image: 'https://via.placeholder.com/300x200?text=Болгарка+AEG+WS6', price: '75 000 ₸', power: '600 Вт', discSize: '125 мм' },
-      { id: 8, name: 'Болгарка Milwaukee M18', image: 'https://via.placeholder.com/300x200?text=Болгарка+Milwaukee+M18', price: '120 000 ₸', power: 'Беспроводная', discSize: '125 мм' },
-      { id: 9, name: 'Болгарка Ryobi ONE+', image: 'https://via.placeholder.com/300x200?text=Болгарка+Ryobi+ONE', price: '95 000 ₸', power: 'Беспроводная', discSize: '115 мм' },
-      { id: 10, name: 'Болгарка Black+Decker KG115', image: 'https://via.placeholder.com/300x200?text=Болгарка+Black+Decker', price: '30 000 ₸', power: '850 Вт', discSize: '115 мм' },
-      { id: 11, name: 'Болгарка Einhell TE-AG 125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Einhell+TE', price: '40 000 ₸', power: '1100 Вт', discSize: '125 мм' },
-      { id: 12, name: 'Болгарка Sparky BOSCH 125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Sparky+BOSCH', price: '50 000 ₸', power: '1200 Вт', discSize: '125 мм' },
-      { id: 13, name: 'Болгарка Зубр ЗУБР-125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Зубр+ЗУБР', price: '28 000 ₸', power: '1100 Вт', discSize: '125 мм' },
-      { id: 14, name: 'Болгарка Калибр ЭУ-125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Калибр+ЭУ', price: '22 000 ₸', power: '1000 Вт', discSize: '125 мм' },
-      { id: 15, name: 'Болгарка Patriot AG 125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Patriot+AG', price: '32 000 ₸', power: '1200 Вт', discSize: '125 мм' },
-      { id: 16, name: 'Болгарка Вихрь УШМ-125', image: 'https://via.placeholder.com/300x200?text=Болгарка+Вихрь+УШМ', price: '26 000 ₸', power: '1100 Вт', discSize: '125 мм' }
-    ]
+  const { category } = useParams();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(24);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  // Функция для получения оптимального размера изображения
+  const getOptimalImage = (product, preferredSize = 'medium') => {
+    if (product.imageVariants && product.imageVariants[preferredSize]) {
+      return product.imageVariants[preferredSize];
+    }
+    if (product.imageVariants && product.imageVariants.webp) {
+      return product.imageVariants.webp;
+    }
+    return product.image || '/images/products/placeholder.png';
+  };
+
+  // Функция для преобразования кириллического названия категории в латинский ID
+  const categoryToId = (categoryName) => {
+    const categoryMap = {
+      'дрели': 'drills',
+      'болгарки': 'grinders',
+      'шуруповёрты': 'screwdrivers',
+      'перфораторы': 'hammers',
+      'лобзики': 'jigsaws',
+      'лазерные уровни': 'levels',
+      'генераторы': 'generators',
+      'измерители': 'measuring',
+      'дрель': 'drills',
+      'болгарка': 'grinders',
+      'шуруповёрт': 'screwdrivers',
+      'перфоратор': 'hammers',
+      'лобзик': 'jigsaws',
+      'лазерный уровень': 'levels',
+      'генератор': 'generators',
+      'измеритель': 'measuring'
+    };
+    
+    // Нормализуем название: убираем лишние пробелы, приводим к нижнему регистру
+    const normalizedName = categoryName.toLowerCase().trim().replace(/\s+/g, ' ');
+    
+    // Сначала ищем точное совпадение
+    if (categoryMap[normalizedName]) {
+      return categoryMap[normalizedName];
+    }
+    
+    // Если точного совпадения нет, ищем по частичному совпадению
+    for (const [key, value] of Object.entries(categoryMap)) {
+      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+        return value;
+      }
+    }
+    
+    // Если ничего не найдено, создаем ID из названия
+    return normalizedName.replace(/[^a-z0-9]/g, '-');
+  };
+
+  // Функция для получения названия категории по ID
+  const idToCategory = (categoryId) => {
+    const idMap = {
+      'drills': 'Дрели',
+      'grinders': 'Болгарки',
+      'screwdrivers': 'Шуруповёрты',
+      'hammers': 'Перфораторы',
+      'jigsaws': 'Лобзики',
+      'levels': 'Лазерные уровни',
+      'генераторы': 'Генераторы',
+      'measuring': 'Измерители'
+    };
+    
+    // Если есть точное совпадение в маппинге, возвращаем его
+    if (idMap[categoryId]) {
+      return idMap[categoryId];
+    }
+    
+    // Если нет точного совпадения, ищем по частичному совпадению
+    const foundCategory = categories.find(cat => cat.id === categoryId);
+    if (foundCategory) {
+      return foundCategory.name;
+    }
+    
+    // Если ничего не найдено, возвращаем ID как есть
+    return categoryId;
+  };
+
+  // Статические категории для fallback
+  const staticCategories = [
+    { id: 'drills', name: 'Дрели' },
+    { id: 'grinders', name: 'Болгарки' },
+    { id: 'screwdrivers', name: 'Шуруповёрты' },
+    { id: 'hammers', name: 'Перфораторы' },
+    { id: 'jigsaws', name: 'Лобзики' },
+    { id: 'levels', name: 'Лазерные уровни' },
+    { id: 'generators', name: 'Генераторы' },
+    { id: 'measuring', name: 'Измерители' }
+  ];
+
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+
+  // Загрузка товаров с кэшированием
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    
+    fetchWithCache(API_URL, {}, 10 * 60 * 1000) // Кэш на 10 минут
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError('Ошибка загрузки товаров');
+        setLoading(false);
+      });
+  }, []);
+
+  // Отслеживаем просмотр страницы категории
+  useEffect(() => {
+    trackPageView(`category_${category}`);
+  }, [category]);
+
+  // Извлечение категорий из товаров
+  useEffect(() => {
+    if (products.length > 0) {
+      setCategoriesLoading(true);
+      
+      // Извлекаем уникальные категории из товаров, нормализуем и сортируем их
+      const categoryMap = new Map();
+      
+      products.forEach(product => {
+        if (product.category) {
+          // Нормализуем название категории: убираем лишние пробелы и приводим к нижнему регистру
+          const normalizedCategory = product.category.trim().toLowerCase().replace(/\s+/g, ' ');
+          const originalCategory = product.category.trim();
+          
+          // Если такой нормализованной категории еще нет, добавляем её
+          if (!categoryMap.has(normalizedCategory)) {
+            categoryMap.set(normalizedCategory, originalCategory);
+          }
+        }
+      });
+      
+      const uniqueCategories = Array.from(categoryMap.values()).sort();
+      
+      if (uniqueCategories.length > 0) {
+        const realCategories = uniqueCategories.map(category => ({
+          id: categoryToId(category),
+          name: category
+        }));
+        setCategories(realCategories);
+      } else {
+        setCategories(staticCategories);
+      }
+      setCategoriesLoading(false);
+    }
+  }, [products]);
+
+  // Принудительное применение стилей для карточек
+  useEffect(() => {
+    const forceStyles = () => {
+      const grid = document.querySelector('.catalog-products-grid');
+      const cards = document.querySelectorAll('.product-card');
+      const images = document.querySelectorAll('.product-image');
+      const infos = document.querySelectorAll('.product-info');
+      
+      if (grid) {
+        grid.style.display = 'grid';
+        grid.style.gap = '0';
+        grid.style.margin = '0';
+        grid.style.padding = '0';
+        grid.style.borderCollapse = 'collapse';
+        grid.style.borderSpacing = '0';
+      }
+      
+      cards.forEach(card => {
+        card.style.margin = '-1px';
+        card.style.border = '1px solid #e3e6ea';
+        card.style.borderRadius = '0';
+        card.style.padding = '0';
+        card.style.background = '#fff';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.height = '100%';
+        card.style.position = 'relative';
+        card.style.overflow = 'hidden';
+        card.style.boxSizing = 'border-box';
+        card.style.minHeight = 'auto';
+      });
+      
+      images.forEach(img => {
+        img.style.height = '160px';
+        img.style.padding = '0';
+        img.style.margin = '0';
+      });
+      
+      infos.forEach(info => {
+        info.style.padding = '6px';
+        info.style.minHeight = '80px';
+      });
+    };
+
+    // Применяем стили сразу и после загрузки
+    forceStyles();
+    setTimeout(forceStyles, 50);
+    setTimeout(forceStyles, 100);
+    setTimeout(forceStyles, 200);
+    setTimeout(forceStyles, 500);
+    setTimeout(forceStyles, 1000);
+
+    // Применяем стили при изменении размера окна
+    const handleResize = () => {
+      setTimeout(forceStyles, 100);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [products]);
+
+  // Фильтруем товары по категории
+  const filteredProducts = products.filter(product => {
+    if (!product.category) return false;
+    const productCategoryId = categoryToId(product.category.trim());
+    return productCategoryId === category;
+  });
+
+  // Пагинация
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Сброс на первую страницу при смене категории
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category]);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Получаем название категории для отображения
+  const getCategoryDisplayName = () => {
+    return idToCategory(category);
   };
 
   return (
-    <div className="category">
+    <div className="catalog">
       <Header />
-      <main className="category-main">
-        <div className="container">
-          <div className="category-header">
-            <h1 className="category-title">{categoryData.name}</h1>
-            <p className="category-subtitle">{categoryData.description}</p>
+      <main className="catalog-main">
+        <div className="container catalog-layout">
+          <aside className="catalog-sidebar desktop-sidebar">
+            <h3 className="sidebar-title">Категории</h3>
+            {categoriesLoading ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                Загрузка категорий...
+              </div>
+            ) : (
+              <ul className="sidebar-categories">
+                {categories.map(cat => (
+                  <li key={cat.id}>
+                    <Link
+                      to={`/catalog/${cat.id}`}
+                      className={`sidebar-category-btn${cat.id === category ? ' active' : ''}`}
+                      style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </aside>
+          <div className="catalog-content">
+            <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
+              {categoriesLoading 
+                ? 'Каталог товаров' 
+                : getCategoryDisplayName()
+              }
+            </h1>
+            {loading ? (
+              <div style={{padding: 32}}>Загрузка...</div>
+            ) : error ? (
+              <div style={{color: 'red', padding: 32}}>{error}</div>
+            ) : filteredProducts.length === 0 ? (
+              <div style={{padding: 32, textAlign: 'center', color: '#666'}}>
+                <h2>Товары не найдены</h2>
+                <p>В данной категории пока нет товаров.</p>
+                <Link to="/catalog" style={{ color: '#007bff', textDecoration: 'none' }}>
+                  ← Вернуться в каталог
+                </Link>
           </div>
-          <div className="category-preview">
-            <img src={categoryData.image} alt={categoryData.name} loading="lazy" width="800" height="300" />
+            ) : (
+              <div className="catalog-products-grid" style={{gap: 0}}>
+                {currentProducts.map(product => (
+                  <Link
+                    to={`/product/${product._id}`}
+                    key={product._id}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    <div
+                      className="product-card kaspi-style mini-product-card"
+                      style={{ cursor: 'pointer', minHeight: 'auto', position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', border: '1px solid #e3e6ea', margin: '-1px' }}
+                    >
+                      <div className="product-image" style={{height: '160px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <picture style={{width: '100%', height: '100%'}}>
+                          <source 
+                            srcSet={getOptimalImage(product, 'webp')} 
+                            type="image/webp"
+                          />
+                          <img 
+                            src={getOptimalImage(product, 'medium')} 
+                            alt={product.name} 
+                            style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
+                            loading="lazy"
+                            width="260"
+                            height="160"
+                          />
+                        </picture>
           </div>
-          <div className="category-products">
-            <h2>Товары в категории "{categoryData.name}"</h2>
-            <div className="products-grid">
-              {categoryData.products.map(product => (
-                <div key={product.id} className="product-card">
-                  <div className="product-image">
-                    <img src={product.image} alt={product.name} loading="lazy" width="300" height="200" />
+                      <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 8px auto', alignSelf:'center'}}></div>
+                      <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '80px'}}>
+                        <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '20px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                        <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
+                          <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <div className="product-specs">
-                      <span className="spec">Мощность: {product.power}</span>
-                      <span className="spec">Диск: {product.discSize}</span>
+                        <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
+                          <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
+                          <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
                     </div>
-                    <div className="product-price">{product.price}</div>
-                    <button className="btn-details">Подробнее</button>
                   </div>
                 </div>
+                  </Link>
               ))}
             </div>
+            )}
+            
+            {/* Пагинация */}
+            {totalPages > 1 && (
+              <div className="pagination-container" style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '40px',
+                marginBottom: '20px',
+                gap: '8px'
+              }}>
+                {/* Кнопка "Предыдущая" */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #e3e6ea',
+                    background: currentPage === 1 ? '#f5f5f5' : '#fff',
+                    color: currentPage === 1 ? '#999' : '#333',
+                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  ← Назад
+                </button>
+                
+                {/* Номера страниц */}
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map(pageNumber => {
+                  // Показываем только первые 5 страниц, последние 5 и текущую с соседними
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        key={pageNumber}
+                        onClick={() => handlePageChange(pageNumber)}
+                        style={{
+                          padding: '8px 12px',
+                          border: '1px solid #e3e6ea',
+                          background: currentPage === pageNumber ? '#e86c0a' : '#fff',
+                          color: currentPage === pageNumber ? '#fff' : '#333',
+                          cursor: 'pointer',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          minWidth: '40px'
+                        }}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  } else if (
+                    pageNumber === currentPage - 2 ||
+                    pageNumber === currentPage + 2
+                  ) {
+                    return (
+                      <span
+                        key={pageNumber}
+                        style={{
+                          padding: '8px 4px',
+                          color: '#999',
+                          fontSize: '14px'
+                        }}
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+                  return null;
+                })}
+                
+                {/* Кнопка "Следующая" */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #e3e6ea',
+                    background: currentPage === totalPages ? '#f5f5f5' : '#fff',
+                    color: currentPage === totalPages ? '#999' : '#333',
+                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}
+                >
+                  Вперед →
+                </button>
+              </div>
+            )}
           </div>
-          <section className="seo-description">
-            <h2>Болгарки: обзор и особенности</h2>
-            <p>Болгарки (угловые шлифмашины) — универсальный инструмент, используемый в строительстве, ремонте, металлообработке. Мы предлагаем модели от мировых брендов и отечественных производителей по выгодным ценам. Вся продукция сертифицирована и имеет гарантию от 12 месяцев.</p>
-            <p>В нашем каталоге представлены болгарки различной мощности (от 600 до 2000 Вт) и диаметра диска (115, 125, 230 мм). Есть как сетевые, так и аккумуляторные модели. Все инструменты оснащены защитными кожухами и системой защиты от перегрузки.</p>
-            <p>При выборе болгарки учитывайте характер работ: для мелких работ подойдут модели 115-125 мм, для резки толстого металла — 230 мм. Мощность влияет на производительность и время работы без перегрева.</p>
-          </section>
         </div>
       </main>
       <Footer />

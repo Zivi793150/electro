@@ -1,8 +1,11 @@
+/* Шрифт Lato для админки */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,600;1,600&display=swap');
+
 .admin-analytics {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Lato', Arial, sans-serif;
 }
 
 .admin-analytics-header {

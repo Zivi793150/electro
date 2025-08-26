@@ -141,16 +141,16 @@ function ProductVariations() {
         throw new Error(`Ошибка загрузки групп: ${groupsRes.status} - ${errorText}`);
       }
 
-             const [productsData, groupsData] = await Promise.all([
-         productsRes.json(),
-         groupsRes.json()
-       ]);
+      const [productsData, groupsData] = await Promise.all([
+        productsRes.json(),
+        groupsRes.json()
+      ]);
 
        console.log('Загруженные товары:', productsData);
        console.log('Загруженные группы:', groupsData);
 
-       setProducts(productsData);
-       setGroups(groupsData);
+      setProducts(productsData);
+      setGroups(groupsData);
     } catch (err) {
       console.error('Ошибка загрузки данных:', err);
       setError(err.message);
@@ -192,9 +192,9 @@ function ProductVariations() {
       console.log('Извлеченный productId:', productId);
       
       return {
-        ...variant,
+      ...variant,
         productId: productId,
-        parameters: variant.parameters || {}
+      parameters: variant.parameters || {}
       };
     });
     
@@ -409,9 +409,9 @@ function ProductVariations() {
           </p>
         </div>
         <div className="header-actions">
-          <button onClick={handleCreateGroup} className="create-btn">
-            <span className="btn-icon">+</span>
-            Создать группу
+        <button onClick={handleCreateGroup} className="create-btn">
+          <span className="btn-icon">+</span>
+          Создать группу
           </button>
           <div className="admin-nav">
             <button onClick={() => navigate('/admin/products')} className="nav-btn nav-products">
@@ -425,7 +425,7 @@ function ProductVariations() {
             </button>
             <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn nav-pickup">
               🏬 Пункты самовывоза
-            </button>
+        </button>
           </div>
         </div>
       </div>
@@ -522,7 +522,7 @@ function ProductVariations() {
               </button>
             </div>
 
-                         <form onSubmit={handleSubmit} className="variations-form">
+            <form onSubmit={handleSubmit} className="variations-form">
                {/* Отладочная информация */}
                {process.env.NODE_ENV === 'development' && (
                  <div style={{background: '#f0f0f0', padding: '10px', marginBottom: '20px', fontSize: '12px'}}>
@@ -701,14 +701,14 @@ function ProductVariations() {
                 {formData.variants.map((variant, index) => (
                   <div key={index} className="variant-card">
                     <div className="variant-header">
-                      <div className="variant-inputs">
+                                             <div className="variant-inputs">
                         <SearchableProductSelect
                           products={products}
                           value={variant.productId || ''}
                           onChange={(id) => updateVariant(index, 'productId', id)}
                           placeholder="Выберите товар"
                         />
-                      </div>
+                       </div>
                       <div className="variant-options">
                         <label className="checkbox-label">
                           <input

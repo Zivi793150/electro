@@ -376,9 +376,29 @@ const SiteSettings = ({ onLogout }) => {
         </div>
 
         <div style={{textAlign: 'center', padding: 20, borderTop: '1px solid #e9ecef'}}>
-          <small style={{color: '#6c757d', fontSize: 12}}>
-            💡 Все изменения сохраняются автоматически и сразу отображаются на сайте
-          </small>
+          <button 
+            onClick={handleSave} 
+            disabled={saving} 
+            style={{
+              background: '#007bff',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 6,
+              padding: '12px 32px',
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: saving ? 'not-allowed' : 'pointer',
+              opacity: saving ? 0.7 : 1,
+              marginBottom: 16
+            }}
+          >
+            {saving ? '💾 Сохранение...' : '💾 Сохранить настройки'}
+          </button>
+          <div>
+            <small style={{color: '#6c757d', fontSize: 12}}>
+              💡 Нажмите кнопку "Сохранить настройки" чтобы применить изменения
+            </small>
+          </div>
         </div>
       </div>
     </div>
