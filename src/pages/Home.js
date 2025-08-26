@@ -36,6 +36,12 @@ const Home = () => {
 
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
+    // Сначала проверяем обложку вариации, если товар является базовым для группы
+    if (product.productGroup && product.productGroup.coverImage) {
+      return product.productGroup.coverImage;
+    }
+    
+    // Затем проверяем обычные изображения товара
     if (product.imageVariants && product.imageVariants[preferredSize]) {
       return product.imageVariants[preferredSize];
     }
@@ -152,16 +158,16 @@ const Home = () => {
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div style={{maxWidth: 1200, margin: '0 auto', width: '100%'}}>
-          <div className="home-products-grid" style={{gap: 0}}>
+          <div className="home-products-grid" style={{gap: 0, height: 'auto', minHeight: 'auto', maxHeight: 'none', alignItems: 'flex-start'}}>
             {miniProducts.map((product) => (
               <div
                 key={product._id}
                 onClick={() => handleProductClick(product)}
-                style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
+                style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer', height: 'auto', minHeight: 'auto', maxHeight: 'none', display: 'flex', flexDirection: 'column' }}
               >
                 <div
                   className="product-card kaspi-style mini-product-card"
-                  style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff' }}
+                  style={{ cursor: 'pointer', height: 'auto', minHeight: 'auto', maxHeight: 'none', position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', display: 'flex', flexDirection: 'column', flex: 'none', flexGrow: 0, flexShrink: 0 }}
                 >
                   <div className="product-image" style={{height: '170px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <picture style={{width: '100%', height: '100%'}}>
@@ -180,8 +186,8 @@ const Home = () => {
                     </picture>
                   </div>
                   <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
-                  <div className="product-info" style={{padding: '10px 12px 5px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:100}}>
-                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '40px', lineHeight: 1.18, marginBottom: 8, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                  <div className="product-info" style={{padding: '2px 8px 18px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, flex: 'none', height: '60px', minHeight: '60px', maxHeight: '60px', margin: 0, border: 'none', background: '#fff'}}>
+                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: '8px 0 0 0', padding: 0, lineHeight: 1.18, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%', minHeight: 'auto', maxHeight: 'none'}}>{product.name}</span>
                   </div>
                 </div>
               </div>

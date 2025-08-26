@@ -111,6 +111,7 @@ function ProductVariations() {
     name: '',
     description: '',
     baseProductId: '',
+    coverImage: '',
     parameters: [],
     variants: []
   });
@@ -192,9 +193,9 @@ function ProductVariations() {
       console.log('Извлеченный productId:', productId);
       
       return {
-      ...variant,
+        ...variant,
         productId: productId,
-      parameters: variant.parameters || {}
+        parameters: variant.parameters || {}
       };
     });
     
@@ -215,6 +216,7 @@ function ProductVariations() {
       name: group.name,
       description: group.description || '',
       baseProductId: baseProductId,
+      coverImage: group.coverImage || '',
       parameters: group.parameters || [],
       variants: processedVariants
     });
@@ -343,6 +345,47 @@ function ProductVariations() {
     }));
   };
 
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ошибка загрузки изображения');
+      }
+      
+      const result = await response.json();
+      
+      // Используем WebP версию для лучшей производительности, если доступна
+      const imageUrl = result.webp ? result.webp.path : result.original.path;
+      
+      setFormData(prev => ({
+        ...prev,
+        coverImage: imageUrl
+      }));
+      
+      // Показываем уведомление об успешной загрузке
+      console.log('✅ Обложка загружена:', imageUrl);
+      console.log('📊 Полный ответ сервера:', result);
+      
+      setTimeout(() => {
+        alert(`✅ Обложка вариации успешно загружена!\n\nURL: ${imageUrl}`);
+      }, 100);
+      
+    } catch (error) {
+      console.error('Ошибка загрузки изображения:', error);
+      setError('Ошибка загрузки изображения: ' + error.message);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -358,6 +401,9 @@ function ProductVariations() {
           parameters: variant.parameters || {}
         }))
       };
+
+      console.log('📤 Отправляем данные на сервер:', submitData);
+      console.log('🖼️ CoverImage в данных:', submitData.coverImage);
 
       const response = await fetch(
         editingGroup ? `${GROUPS_URL}/${editingGroup._id}` : GROUPS_URL,
@@ -578,6 +624,43 @@ function ProductVariations() {
                       ))}
                     </select>
                   </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Обложка вариации:</label>
+                    <div className="image-upload-section">
+                      {formData.coverImage ? (
+                        <div className="image-preview">
+                          <img 
+                            src={formData.coverImage} 
+                            alt="Обложка вариации" 
+                            className="preview-image"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, coverImage: '' }))}
+                            className="remove-image-btn"
+                            title="Удалить изображение"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="image-upload-placeholder">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e.target.files[0])}
+                            className="image-upload-input"
+                            id="group-cover-image"
+                          />
+                          <label htmlFor="group-cover-image" className="image-upload-label">
+                            <span className="upload-icon">📷</span>
+                            <span>Загрузить обложку для вариации</span>
+                          </label>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -701,14 +784,14 @@ function ProductVariations() {
                 {formData.variants.map((variant, index) => (
                   <div key={index} className="variant-card">
                     <div className="variant-header">
-                                             <div className="variant-inputs">
+                      <div className="variant-inputs">
                         <SearchableProductSelect
                           products={products}
                           value={variant.productId || ''}
                           onChange={(id) => updateVariant(index, 'productId', id)}
                           placeholder="Выберите товар"
                         />
-                       </div>
+                      </div>
                       <div className="variant-options">
                         <label className="checkbox-label">
                           <input
@@ -728,6 +811,8 @@ function ProductVariations() {
                         </button>
                       </div>
                     </div>
+
+                    
 
                     <div className="variant-parameters">
                       {formData.parameters.map((param, paramIndex) => (
@@ -1444,6 +1529,89 @@ function ProductVariations() {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        /* Стили для загрузки изображения обложки */
+        .variant-cover-image {
+          margin: 16px 0;
+          padding: 16px;
+          background: #f8f9fa;
+          border-radius: 8px;
+          border: 1px dashed #dee2e6;
+        }
+
+        .image-upload-section {
+          margin-top: 8px;
+        }
+
+        .image-preview {
+          position: relative;
+          display: inline-block;
+        }
+
+        .preview-image {
+          width: 120px;
+          height: 80px;
+          object-fit: cover;
+          border-radius: 6px;
+          border: 2px solid #e2e8f0;
+        }
+
+        .remove-image-btn {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          background: #e53e3e;
+          color: white;
+          border: none;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          font-size: 14px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+        }
+
+        .remove-image-btn:hover {
+          background: #c53030;
+        }
+
+        .image-upload-placeholder {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 80px;
+          border: 2px dashed #cbd5e0;
+          border-radius: 6px;
+          background: #f7fafc;
+          transition: all 0.2s ease;
+        }
+
+        .image-upload-placeholder:hover {
+          border-color: #667eea;
+          background: #ebf8ff;
+        }
+
+        .image-upload-input {
+          display: none;
+        }
+
+        .image-upload-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          color: #4a5568;
+          font-size: 14px;
+          padding: 16px;
+        }
+
+        .upload-icon {
+          font-size: 24px;
         }
 
         @media (max-width: 768px) {

@@ -516,6 +516,12 @@ const Product = () => {
 
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
+    // Сначала проверяем обложку вариации, если товар является базовым для группы
+    if (product.productGroup && product.productGroup.coverImage) {
+      return product.productGroup.coverImage;
+    }
+    
+    // Затем проверяем обычные изображения товара
     if (product.imageVariants && product.imageVariants[preferredSize]) {
       return product.imageVariants[preferredSize];
     }

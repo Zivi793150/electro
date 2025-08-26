@@ -258,6 +258,11 @@ const Information = mongoose.model('Information', informationSchema);
 let productsCache = { data: null, ts: 0 };
 const PRODUCTS_CACHE_TTL_MS = 60 * 1000; // 60s
 
+// Очищаем кэш при изменении групп вариаций
+const clearProductsCache = () => {
+  productsCache = { data: null, ts: 0 };
+};
+
 app.get('/api/products', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 0;
@@ -268,6 +273,14 @@ app.get('/api/products', async (req, res) => {
     
     // Получаем все группы вариаций
     const productGroups = await ProductGroup.find();
+    
+    // Создаем Map для быстрого поиска групп по baseProductId
+    const groupsByBaseProduct = new Map();
+    productGroups.forEach(group => {
+      if (group.baseProductId) {
+        groupsByBaseProduct.set(group.baseProductId.toString(), group);
+      }
+    });
     
     // Собираем ID всех товаров, которые являются вариациями
     const variantProductIds = new Set();
@@ -292,10 +305,30 @@ app.get('/api/products', async (req, res) => {
       ]
     }).limit(limit);
     
+    // Добавляем информацию о группах вариаций к товарам
+    const productsWithGroups = products.map(product => {
+      const productObj = product.toObject();
+      const group = groupsByBaseProduct.get(product._id.toString());
+      
+      if (group) {
+        // Если товар является базовым для группы вариаций, добавляем информацию о группе
+        productObj.productGroup = {
+          _id: group._id,
+          name: group.name,
+          description: group.description,
+          coverImage: group.coverImage,
+          parameters: group.parameters,
+          variantsCount: group.variants.length
+        };
+      }
+      
+      return productObj;
+    });
+    
     if (!limit) {
-      productsCache = { data: products, ts: now };
+      productsCache = { data: productsWithGroups, ts: now };
     }
-    res.json(products);
+    res.json(productsWithGroups);
   } catch (err) {
     console.error('Ошибка получения продуктов:', err);
     res.status(500).json({ error: 'Ошибка при получении продуктов' });
@@ -322,7 +355,23 @@ app.get('/api/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Товар не найден' });
-    res.json(product);
+    
+    // Проверяем, является ли товар базовым для группы вариаций
+    const productGroup = await ProductGroup.findOne({ baseProductId: req.params.id });
+    
+    const productObj = product.toObject();
+    if (productGroup) {
+      productObj.productGroup = {
+        _id: productGroup._id,
+        name: productGroup.name,
+        description: productGroup.description,
+        coverImage: productGroup.coverImage,
+        parameters: productGroup.parameters,
+        variantsCount: productGroup.variants.length
+      };
+    }
+    
+    res.json(productObj);
   } catch (err) {
     console.error('Ошибка получения продукта:', err);
     res.status(500).json({ error: 'Ошибка при получении товара' });
@@ -868,6 +917,10 @@ app.post('/api/product-groups', async (req, res) => {
       .populate('baseProductId')
       .populate('variants.productId');
     console.log('Группа создана:', populatedGroup);
+    
+    // Очищаем кэш продуктов
+    clearProductsCache();
+    
     res.status(201).json(populatedGroup);
   } catch (err) {
     console.error('Ошибка создания группы вариаций:', err);
@@ -902,6 +955,10 @@ app.put('/api/product-groups/:id', async (req, res) => {
     ).populate('baseProductId').populate('variants.productId');
     
     if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    
+    // Очищаем кэш продуктов
+    clearProductsCache();
+    
     res.json(group);
   } catch (err) {
     console.error('Ошибка обновления группы вариаций:', err);
@@ -914,6 +971,10 @@ app.delete('/api/product-groups/:id', async (req, res) => {
   try {
     const group = await ProductGroup.findByIdAndDelete(req.params.id);
     if (!group) return res.status(404).json({ error: 'Группа вариаций не найдена' });
+    
+    // Очищаем кэш продуктов
+    clearProductsCache();
+    
     res.json({ success: true, message: 'Группа вариаций удалена' });
   } catch (err) {
     console.error('Ошибка удаления группы вариаций:', err);

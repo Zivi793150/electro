@@ -32,7 +32,12 @@ const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, t
 const Catalog = () => {
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
-    // Для каталога используем coverPhoto если есть, иначе обычное фото
+    // Сначала проверяем обложку вариации, если товар является базовым для группы
+    if (product.productGroup && product.productGroup.coverImage) {
+      return product.productGroup.coverImage;
+    }
+    
+    // Затем проверяем coverPhoto или обычное фото
     const mainImage = product.coverPhoto || product.image;
     
     if (product.imageVariants && product.imageVariants[preferredSize]) {
