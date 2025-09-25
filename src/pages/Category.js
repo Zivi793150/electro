@@ -44,6 +44,10 @@ const Category = () => {
       'лобзики': 'jigsaws',
       'лазерные уровни': 'levels',
       'генераторы': 'generators',
+      'генераторы для дома': 'generators',
+      'дизельные генераторы': 'diesel-generators',
+      'дизельные генератор': 'diesel-generators',
+      'дизельный генератор': 'diesel-generators',
       'измерители': 'measuring',
       'дрель': 'drills',
       'болгарка': 'grinders',
@@ -63,9 +67,14 @@ const Category = () => {
       return categoryMap[normalizedName];
     }
     
-    // Если точного совпадения нет, ищем по частичному совпадению
-    for (const [key, value] of Object.entries(categoryMap)) {
-      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+    // Спец-правило: любые варианты с "дизель" + "генератор"
+    if (normalizedName.includes('дизель') && normalizedName.includes('генератор')) {
+      return 'diesel-generators';
+    }
+    // Если точного совпадения нет, ищем по частичному совпадению (более длинные ключи приоритетнее)
+    const entriesByLength = Object.entries(categoryMap).sort((a,b)=>b[0].length-a[0].length);
+    for (const [key, value] of entriesByLength) {
+      if (normalizedName.includes(key)) {
         return value;
       }
     }
@@ -83,7 +92,10 @@ const Category = () => {
       'hammers': 'Перфораторы',
       'jigsaws': 'Лобзики',
       'levels': 'Лазерные уровни',
-      'генераторы': 'Генераторы',
+      'generators': 'Генераторы',
+      'diesel-generators': 'Дизельные генераторы',
+      'peripheral-pump': 'Периферийный насос',
+      'centrifugal-pump': 'Центробежный насос',
       'measuring': 'Измерители'
     };
     
@@ -111,6 +123,9 @@ const Category = () => {
     { id: 'jigsaws', name: 'Лобзики' },
     { id: 'levels', name: 'Лазерные уровни' },
     { id: 'generators', name: 'Генераторы' },
+    { id: 'diesel-generators', name: 'Дизельные генераторы' },
+    { id: 'peripheral-pump', name: 'Периферийный насос' },
+    { id: 'centrifugal-pump', name: 'Центробежный насос' },
     { id: 'measuring', name: 'Измерители' }
   ];
 
@@ -241,7 +256,36 @@ const Category = () => {
   const filteredProducts = products.filter(product => {
     if (!product.category) return false;
     const productCategoryId = categoryToId(product.category.trim());
-    return productCategoryId === category;
+    
+    // Прямое сравнение ID категорий
+    if (productCategoryId === category) {
+      return true;
+    }
+    
+    // Дополнительная проверка: сравниваем оригинальное название категории с ID
+    const normalizedCategory = product.category.toLowerCase().trim();
+    const categoryMap = {
+      'дрели': 'drills',
+      'болгарки': 'grinders', 
+      'шуруповёрты': 'screwdrivers',
+      'перфораторы': 'hammers',
+      'лобзики': 'jigsaws',
+      'лазерные уровни': 'levels',
+      'генераторы': 'generators',
+      'генераторы для дома': 'generators',
+      'измерители': 'measuring',
+      'дрель': 'drills',
+      'болгарка': 'grinders',
+      'шуруповёрт': 'screwdrivers', 
+      'перфоратор': 'hammers',
+      'лобзик': 'jigsaws',
+      'лазерный уровень': 'levels',
+      'генератор': 'generators',
+      'измеритель': 'measuring'
+    };
+    
+    const directMatch = categoryMap[normalizedCategory];
+    return directMatch === category;
   });
 
   // Пагинация

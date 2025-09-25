@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { validateForm, sendToTelegram } from '../utils/telegram';
 import { trackFormSubmit } from '../utils/analytics';
 import '../styles/Modal.css';
 
 const Modal = ({ isOpen, onClose, onSubmit, product = null }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -47,11 +49,11 @@ const Modal = ({ isOpen, onClose, onSubmit, product = null }) => {
       if (result.success) {
         // Отслеживаем успешную отправку формы
         trackFormSubmit('contact_form', product?.id || null);
-        alert('Спасибо за вашу заявку! Менеджер обязательно ответит в течение 2 минут');
         onSubmit(formData);
         setFormData({ name: '', phone: '', message: '' });
         setErrors({});
         onClose();
+        navigate('/thanks');
       } else {
         alert('Ошибка отправки заявки. Попробуйте позже.');
       }

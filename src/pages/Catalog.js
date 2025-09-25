@@ -7,27 +7,7 @@ import { fetchWithCache } from '../utils/cache';
 import '../styles/Catalog.css';
 import { Link, useLocation } from 'react-router-dom';
 
-// Надёжный fetch с повторами и таймаутом
-const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: { 'Accept': 'application/json', ...(options.headers || {}) },
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (attempt === retries) throw error;
-      await new Promise(r => setTimeout(r, backoffMs * Math.pow(2, attempt)));
-    }
-  }
-};
+// fetchWithRetry не используется — удалено для тишины линтера
 
 const Catalog = () => {
   // Функция для получения оптимального размера изображения
@@ -59,6 +39,14 @@ const Catalog = () => {
       'лобзики': 'jigsaws',
       'лазерные уровни': 'levels',
       'генераторы': 'generators',
+      'генераторы для дома': 'generators',
+      'дизельные генераторы': 'diesel-generators',
+      'дизельные генератор': 'diesel-generators',
+      'дизельный генератор': 'diesel-generators',
+      'периферийные насосы': 'peripheral-pump',
+      'периферийный насос': 'peripheral-pump',
+      'центробежные насосы': 'centrifugal-pump',
+      'центробежный насос': 'centrifugal-pump',
       'измерители': 'measuring',
       'дрель': 'drills',
       'болгарка': 'grinders',
@@ -78,9 +66,15 @@ const Catalog = () => {
       return categoryMap[normalizedName];
     }
     
-    // Если точного совпадения нет, ищем по частичному совпадению
-    for (const [key, value] of Object.entries(categoryMap)) {
-      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+    // Спец-правило: любые варианты с "дизель" + "генератор"
+    if (normalizedName.includes('дизель') && normalizedName.includes('генератор')) {
+      return 'diesel-generators';
+    }
+    // Если точного совпадения нет, ищем по частичному совпадению, 
+    // предпочитая более длинные (более специфичные) ключи
+    const entriesByLength = Object.entries(categoryMap).sort((a, b) => b[0].length - a[0].length);
+    for (const [key, value] of entriesByLength) {
+      if (normalizedName.includes(key)) {
         return value;
       }
     }
@@ -98,7 +92,10 @@ const Catalog = () => {
       'hammers': 'Перфораторы',
       'jigsaws': 'Лобзики',
       'levels': 'Лазерные уровни',
-      'генераторы': 'Генераторы',
+      'generators': 'Генераторы',
+      'diesel-generators': 'Дизельные генераторы',
+      'peripheral-pump': 'Периферийный насос',
+      'centrifugal-pump': 'Центробежный насос',
       'measuring': 'Измерители'
     };
     
@@ -126,10 +123,17 @@ const Catalog = () => {
     { id: 'jigsaws', name: 'Лобзики' },
     { id: 'levels', name: 'Лазерные уровни' },
     { id: 'generators', name: 'Генераторы' },
+    { id: 'diesel-generators', name: 'Дизельные генераторы' },
+    { id: 'peripheral-pump', name: 'Периферийный насос' },
+    { id: 'centrifugal-pump', name: 'Центробежный насос' },
     { id: 'measuring', name: 'Измерители' }
   ];
 
   const location = useLocation();
+  // На мобильных при переходе иногда сохраняется старая позиция — принудительно поднимаем наверх
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
   const getCategoryFromQuery = () => {
     // Извлекаем категорию из URL пути
     const pathParts = location.pathname.split('/');
@@ -435,7 +439,8 @@ const Catalog = () => {
                       </div>
                       <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
                         <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                        <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
+                        <span style={{display:'inline-block', margin:'0 10px', borderLeft:'2px solid #bdbdbd', height:'1.6em'}}></span>
+                        <span style={{marginLeft:28, background:'#f5f7fa', color:'#222', border:'1px solid #e3e6ea', fontWeight:700, fontSize:'0.85rem', padding:'4px 12px', borderRadius:12, lineHeight:1, display:'inline-flex', alignItems:'center', justifyContent:'center'}}>В наличии</span>
                       </div>
                   </div>
                   </div>
@@ -539,11 +544,6 @@ const Catalog = () => {
               </div>
             )}
             
-            <section className="seo-description">
-              <h2>Электроинструменты: качество и надёжность</h2>
-              <p>Мы предлагаем широкий ассортимент профессиональных электроинструментов от ведущих мировых производителей. В нашем каталоге вы найдёте дрели, шуруповёрты, болгарки, перфораторы и многое другое. Вся продукция сертифицирована и имеет гарантию от производителя.</p>
-              <p>Работаем как с розничными, так и с оптовыми клиентами. Предоставляем техническую поддержку и консультации по выбору инструмента. Доставка по Алматы и области.</p>
-            </section>
           </div>
         </div>
       </main>

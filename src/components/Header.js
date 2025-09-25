@@ -92,7 +92,7 @@ const Header = () => {
         <div className="header-right-blocks desktop-contacts">
           <div className="header-right-col">
             <div className="top-bar-address">
-              {siteSettings.city || 'Алматы'}
+              {siteSettings.contactInfo?.address || 'Аймусина 1в'}
             </div>
             <a href={`https://mail.google.com/mail/?view=cm&fs=1&to=${siteSettings.contactInfo.email}`} className="top-bar-email" target="_blank" rel="noopener noreferrer">
               {siteSettings.contactInfo.email}
@@ -100,16 +100,16 @@ const Header = () => {
           </div>
           <div className="header-right-col">
             <div className="top-bar-socials">
-              <a href="#" className="top-bar-social" title="Instagram" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} style={{display:'block'}} />
-              </a>
               <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} style={{display:'block'}} />
               </a>
-              <a href="#" className="top-bar-social" title="Telegram" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/telegram.svg" alt="Telegram" width={24} height={24} style={{display:'block'}} />
+              <a href="https://www.instagram.com/eltok.kz_official" className="top-bar-social" title="Instagram" target="_blank" rel="noopener noreferrer">
+                <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} style={{display:'block'}} />
               </a>
-              <a href="#" className="top-bar-social" title="TikTok" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/profile.php?id=61580230661013" className="top-bar-social" title="Facebook" target="_blank" rel="noopener noreferrer">
+                <img src="/icons/facebook.svg" alt="Facebook" width={24} height={24} style={{display:'block'}} />
+              </a>
+              <a href="https://www.tiktok.com/@eltok.kz" className="top-bar-social" title="TikTok" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
@@ -151,7 +151,7 @@ const Header = () => {
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Адрес:</div>
               <div className="mobile-contact-value">
-                {siteSettings.city || 'Алматы'}
+                {siteSettings.contactInfo?.address || 'Аймусина 1в'}
               </div>
             </div>
             <div className="mobile-contact-item">
@@ -167,16 +167,16 @@ const Header = () => {
               </a>
             </div>
             <div className="mobile-socials">
-              <a href="#" className="mobile-social" title="Instagram" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} />
-              </a>
               <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} />
               </a>
-              <a href="#" className="mobile-social" title="Telegram" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/telegram.svg" alt="Telegram" width={24} height={24} />
+              <a href="https://www.instagram.com/eltok.kz_official" className="mobile-social" title="Instagram" target="_blank" rel="noopener noreferrer">
+                <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} />
               </a>
-              <a href="#" className="mobile-social" title="TikTok" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/profile.php?id=61580230661013" className="mobile-social" title="Facebook" target="_blank" rel="noopener noreferrer">
+                <img src="/icons/facebook.svg" alt="Facebook" width={24} height={24} />
+              </a>
+              <a href="https://www.tiktok.com/@eltok.kz" className="mobile-social" title="TikTok" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} />
               </a>
             </div>

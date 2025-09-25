@@ -1011,6 +1011,10 @@ app.get('/api/product-groups/by-product/:productId', async (req, res) => {
 const analyticsRoutes = require('./routes/analytics');
 app.use('/api/analytics', analyticsRoutes);
 
+// Роуты заказов
+const ordersRoutes = require('./routes/orders');
+app.use('/api/orders', ordersRoutes);
+
 mongoose.connection.once('open', () => {
   console.log('MongoDB подключена успешно');
 });

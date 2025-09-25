@@ -4,11 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
-import DeliveryInfo from '../components/DeliveryInfo';
+// import DeliveryInfo from '../components/DeliveryInfo';
 import { trackProductView, trackButtonClick } from '../utils/analytics';
 import { fetchWithCache } from '../utils/cache';
 import '../styles/Product.css';
 import '../styles/ProductVariations.css';
+import '../components/ImageModal.css';
 
 // Надёжный fetch с повторами и таймаутом
 const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
@@ -63,14 +64,11 @@ const Product = () => {
     }
   });
   
-  const [selectedCity, setSelectedCity] = useState(() => {
-    const savedCity = localStorage.getItem('selectedCity');
-    return savedCity || 'Алматы';
-  });
-  
-  const [selectedDelivery, setSelectedDelivery] = useState(null);
-  const [deliveryInfo, setDeliveryInfo] = useState(null);
-  const [isCityChanging, setIsCityChanging] = useState(false);
+  // Раздел доставки отключён по требованию — связанные состояния скрыты
+  const [selectedCity] = useState('Алматы');
+  const [selectedDelivery] = useState(null);
+  const [deliveryInfo] = useState(null);
+  const [isCityChanging] = useState(false);
   
   // Состояние для вариаций товара
   const [productGroup, setProductGroup] = useState(null);
@@ -82,49 +80,7 @@ const Product = () => {
   const [detectingCity, setDetectingCity] = useState(false);
   
   // Функция для автоматического определения города
-  const detectUserCity = () => {
-    if (navigator.geolocation) {
-      setDetectingCity(true);
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          
-          // Используем обратное геокодирование для определения города
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`)
-            .then(response => response.json())
-            .then(data => {
-              if (data.address && data.address.city) {
-                const detectedCity = data.address.city;
-                // Проверяем, есть ли этот город в нашем списке
-                if (cities.includes(detectedCity)) {
-                  setSelectedCity(detectedCity);
-                  localStorage.setItem('selectedCity', detectedCity);
-                }
-              }
-              setDetectingCity(false);
-            })
-            .catch(error => {
-              console.log('Ошибка определения города:', error);
-              setDetectingCity(false);
-            });
-        },
-        (error) => {
-          console.log('Ошибка получения геолокации:', error);
-          // Быстрый фолбэк на Алматы, чтобы не тормозить в регионах с ограничениями
-          if (!localStorage.getItem('selectedCity')) {
-            setSelectedCity('Алматы');
-            localStorage.setItem('selectedCity', 'Алматы');
-          }
-          setDetectingCity(false);
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 3000,
-          maximumAge: 600000 // 10 минут
-        }
-      );
-    }
-  };
+  const detectUserCity = () => {};
   
   // Список городов Казахстана
   const cities = [
@@ -291,17 +247,7 @@ const Product = () => {
   }, []);
   
   // Инициализируем выбранный город из localStorage и автоматически определяем город
-  useEffect(() => {
-    const savedCity = localStorage.getItem('selectedCity');
-    
-    // Если есть сохраненный город, используем его
-    if (savedCity) {
-      setSelectedCity(savedCity);
-    } else {
-      // Если нет сохраненного города, пытаемся определить автоматически
-      detectUserCity();
-    }
-  }, []);
+  // Блок определения города более не используется на странице товара
 
   // Сбрасываем активное изображение при смене товара
   useEffect(() => {
@@ -341,7 +287,6 @@ const Product = () => {
   const handleCloseModal = () => setIsModalOpen(false);
   const handleSubmitForm = (formData) => {
     console.log('Заявка на товар:', { ...formData, product: getCurrentProduct().name });
-    alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
   };
 
   const handleBuy = () => {
@@ -482,33 +427,9 @@ const Product = () => {
     });
   };
   
-  const handleCityChange = (e) => {
-    const newCity = e.target.value;
-    setIsCityChanging(true);
-    setSelectedCity(newCity);
-    localStorage.setItem('selectedCity', newCity);
-    // Сбрасываем выбранную доставку при смене города
-    setSelectedDelivery(null);
-    // Загружаем информацию о доставке для нового города
-    fetchDeliveryInfo(newCity);
-    
-    // Убираем анимацию через 500мс
-    setTimeout(() => {
-      setIsCityChanging(false);
-    }, 500);
-  };
+  const handleCityChange = () => {};
 
-  const fetchDeliveryInfo = async (cityName) => {
-    try {
-      const response = await fetch(`https://electro-1-vjdu.onrender.com/api/pickup-points/delivery/${encodeURIComponent(cityName)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setDeliveryInfo(data);
-      }
-    } catch (error) {
-      console.error('Ошибка загрузки информации о доставке:', error);
-    }
-  };
+  const fetchDeliveryInfo = async () => {};
   
 
 
@@ -584,14 +505,15 @@ const Product = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 6, wordBreak: 'break-word', marginTop: 28, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
-                <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 8, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
+                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 4, wordBreak: 'break-word', marginTop: 20, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
+                <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 6, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
                 <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{getCurrentProduct().subtitle}</div>
                 <div className="product-divider"></div>
                 {/* Компонент выбора вариаций */}
                 {productGroup && productGroup.parameters.length > 0 && (
                   <div className="product-variations" style={{
-                    marginBottom: '20px'
+                    marginTop: '4px',
+                    marginBottom: '4px'
                   }}>
                     {productGroup.parameters
                       .filter(param => {
@@ -652,10 +574,10 @@ const Product = () => {
                         : param.values;
                       
                       return (
-                        <div key={index} style={{ marginBottom: '15px' }}>
+                        <div key={index} style={{ marginBottom: '2px' }}>
                           <label style={{ 
                             display: 'block', 
-                            marginBottom: '8px', 
+                            marginBottom: '4px', 
                             fontWeight: '500',
                             color: '#333'
                           }}>
@@ -687,7 +609,7 @@ const Product = () => {
                           )}
                           
                           {param.type === 'radio' && (
-                            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                               {allValues.map((value, valueIndex) => (
                                 <label key={valueIndex} style={{ 
                                   display: 'flex', 
@@ -792,42 +714,7 @@ const Product = () => {
                   </div>
                 </div>
                 <div className="product-divider"></div>
-                <div style={{
-                  marginTop: 14, 
-                  background: '#fff', 
-                  border: 'none',
-                  borderRadius: 8, 
-                  padding: '10px 12px 8px 12px', 
-                  fontSize: '0.98rem', 
-                  color: '#222', 
-                  boxShadow: 'none', 
-                  maxWidth: 320,
-                  transition: 'all 0.3s ease',
-                  transform: isCityChanging ? 'scale(0.98)' : 'scale(1)',
-                  opacity: isCityChanging ? 0.8 : 1
-                }}>
-                  {/* Единый блок: выбор города + инфо по доставке */}
-                    <DeliveryInfo 
-                      city={selectedCity} 
-                    onCityChange={handleCityChange}
-                    cities={cities}
-                      onDeliverySelect={setSelectedDelivery}
-                      compact={true}
-                      selectedDelivery={selectedDelivery}
-                    />
-                  
-                  {false && selectedCity !== 'Алматы' && (
-                  <div style={{background:'#f0f1f4', borderRadius:7, padding:'7px 10px', marginTop:8, color:'#222', fontSize:'0.93rem', display:'flex', alignItems:'center', gap:6}}>
-                    <span style={{fontSize:15, color:'#888'}}>ⓘ</span>
-                    <span>
-                        {selectedDelivery 
-                          ? `Доставка в ${selectedCity} через ${selectedDelivery.name.toLowerCase()}. ${selectedDelivery.type === 'pickup' ? 'Самовывоз из наших пунктов' : selectedDelivery.type === 'indriver' ? 'В течение дня' : selectedDelivery.type === 'yandex' ? '1-2 дня' : selectedDelivery.type === 'kazpost' ? '3-5 дней' : selectedDelivery.type === 'cdek' ? '1-2 дня' : selectedDelivery.type === 'air' ? '1-3 дня' : '1-3 дня'}.`
-                          : `Доставка в ${selectedCity} осуществляется через курьерские службы. Срок доставки 1-3 дня.`
-                      }
-                    </span>
-                  </div>
-                  )}
-                </div>
+                {/* Блок доставки скрыт по требованию */}
               </>
             </div>
           </div>
@@ -868,15 +755,15 @@ const Product = () => {
                     />
                   </picture>
                 </div>
-                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
-                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '32px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  <div style={{width:'100%', textAlign:'left', margin:'0 0 1px 0'}}>
-                    <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
+                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto', alignSelf:'center'}}></div>
+                <div className="product-info" style={{padding: '0 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
+                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: '0 0 2px 0', lineHeight: 1.15, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                  <div style={{width:'100%', textAlign:'left', margin:0, lineHeight:1}}>
+                    <span style={{color:'#888', fontSize:'0.78rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
+                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:0, justifyContent:'flex-start', width:'100%', lineHeight:1}}>
                     <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                    <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
+                    <span style={{height:'1.2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 6px',verticalAlign:'middle'}}></span>
                   </div>
                 </div>
               </div>
@@ -905,15 +792,15 @@ const Product = () => {
                     />
                   </picture>
                 </div>
-                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight:60}}>
-                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '32px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  <div style={{width:'100%', textAlign:'left', margin:'0 0 1px 0'}}>
-                    <span style={{color:'#888', fontSize:'0.8rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
+                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto', alignSelf:'center'}}></div>
+                <div className="product-info" style={{padding: '0 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
+                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: '0 0 2px 0', lineHeight: 1.15, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
+                  <div style={{width:'100%', textAlign:'left', margin:0, lineHeight:1}}>
+                    <span style={{color:'#888', fontSize:'0.78rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:1, justifyContent:'flex-start', width:'100%'}}>
+                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:0, justifyContent:'flex-start', width:'100%', lineHeight:1}}>
                     <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                    <span style={{height:'2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 5px',verticalAlign:'middle'}}></span>
+                    <span style={{height:'1.2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 6px',verticalAlign:'middle'}}></span>
                   </div>
                 </div>
               </div>
@@ -922,71 +809,40 @@ const Product = () => {
         </div>
       </section>
       <Footer />
-    <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} product={getCurrentProduct().name} />
-    {/* Модальное окно для увеличенного фото */}
-    {showImageModal && (
-      <div className="image-modal-overlay" onClick={handleCloseImageModal} style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.55)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <div className="image-modal-content" style={{background:'#fff',padding:0,borderRadius:'8px',boxShadow:'0 8px 32px rgba(0,0,0,0.18)',position:'relative',maxWidth:'90vw',maxHeight:'90vh',display:'flex',flexDirection:'column',alignItems:'center'}} onClick={e=>e.stopPropagation()}>
-          <img src={getAllImages()[activeImage]} alt={getCurrentProduct().name} style={{maxWidth:'80vw',maxHeight:'80vh',objectFit:'contain',background:'#fff'}} width="800" height="600" />
-          {getAllImages().length > 1 && (
-            <>
-              <button 
-                onClick={handlePrevImage} 
-                style={{
-                  position: 'absolute',
-                  left: -25,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: 50,
-                  height: 50,
-                  fontSize: 24,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                  zIndex: 10,
-                  color: '#222'
-                }}
-              >
-                ‹
-              </button>
-              <button 
-                onClick={handleNextImage} 
-                style={{
-                  position: 'absolute',
-                  right: -25,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: 50,
-                  height: 50,
-                  fontSize: 24,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                  zIndex: 10,
-                  color: '#222'
-                }}
-              >
-                ›
-              </button>
-              <div style={{display:'flex',justifyContent:'center',gap:8,marginTop:12}}>
-                <span style={{color:'#666', fontSize:'14px'}}>{activeImage + 1} из {getAllImages().length}</span>
-              </div>
-            </>
-          )}
-          <button onClick={handleCloseImageModal} style={{position:'absolute',top:8,right:12,fontSize:32,background:'none',border:'none',color:'#222',cursor:'pointer',lineHeight:1}}>&times;</button>
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} onSubmit={handleSubmitForm} product={getCurrentProduct().name} />
+      {/* Модальное окно для увеличенного фото */}
+      {showImageModal && (
+        <div className="image-modal-overlay" onClick={handleCloseImageModal}>
+          <div className="image-modal-content" onClick={e=>e.stopPropagation()}>
+            <img 
+              src={getAllImages()[activeImage]} 
+              alt={getCurrentProduct().name} 
+              className="image-modal-img"
+              style={{objectFit:'contain'}}
+            />
+            {getAllImages().length > 1 && (
+              <>
+                <button 
+                  onClick={handlePrevImage} 
+                  className="image-modal-arrow left"
+                >
+                  ‹
+                </button>
+                <button 
+                  onClick={handleNextImage} 
+                  className="image-modal-arrow right"
+                >
+                  ›
+                </button>
+                <div style={{position:'absolute',bottom:'20px',left:'50%',transform:'translateX(-50%)',color:'#666',fontSize:'14px',background:'rgba(255,255,255,0.9)',padding:'4px 12px',borderRadius:'16px'}}>
+                  {activeImage + 1} из {getAllImages().length}
+                </div>
+              </>
+            )}
+            <button onClick={handleCloseImageModal} className="image-modal-close">&times;</button>
+          </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 };

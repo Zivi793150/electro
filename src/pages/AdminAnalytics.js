@@ -11,9 +11,10 @@ const AdminAnalytics = () => {
   const [filters, setFilters] = useState({});
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
+useEffect(() => {
     loadStats();
     loadEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, currentPage, filters]);
 
   const loadStats = async () => {

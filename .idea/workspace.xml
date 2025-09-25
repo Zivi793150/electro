@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="8481add4-cedb-4ca6-91e0-ac0e35890b98" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/build/asset-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/build/asset-manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/css/309.ea030a11.chunk.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/css/309.ea030a11.chunk.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/css/main.2f5e91af.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/css/main.2f5e91af.css.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/285.65738510.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/285.65738510.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/309.aff25da3.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/309.aff25da3.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/385.8ee2acca.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/385.8ee2acca.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/417.0e6c7290.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/417.0e6c7290.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/63.909b51d6.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/63.909b51d6.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/820.7a8ebd1b.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/820.7a8ebd1b.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/832.62aef812.chunk.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/832.62aef812.chunk.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/main.be9bccb3.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/main.be9bccb3.js.LICENSE.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/static/js/main.be9bccb3.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/AboutCompanySection.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/AboutCompanySection.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Modal.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Modal.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/About.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/About.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Catalog.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Catalog.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Checkout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Contacts.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Contacts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Cooperation.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Cooperation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Policy.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Policy.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Product.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Product.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/About.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/About.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/styles/Product.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/styles/Product.css" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="32T0RJsbdyqUQVqgy5FBlG3MAUa" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "D:/electro"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8481add4-cedb-4ca6-91e0-ac0e35890b98" name="Changes" comment="" />
+      <created>1757429245388</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1757429245388</updated>
+    </task>
+    <servers />
+  </component>
+</project>

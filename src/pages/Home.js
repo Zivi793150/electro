@@ -7,27 +7,7 @@ import AboutCompanySection from '../components/AboutCompanySection';
 import { fetchWithCache } from '../utils/cache';
 import '../styles/Home.css';
 
-// Надёжный fetch с повторами и таймаутом
-const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers: { 'Accept': 'application/json', ...(options.headers || {}) },
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (attempt === retries) throw error;
-      await new Promise(r => setTimeout(r, backoffMs * Math.pow(2, attempt)));
-    }
-  }
-};
+// Удалён неиспользуемый fetchWithRetry
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,6 +53,7 @@ const Home = () => {
       'лобзики': 'jigsaws',
       'лазерные уровни': 'levels',
       'генераторы': 'generators',
+      'генераторы для дома': 'generators',
       'измерители': 'measuring',
       'дрель': 'drills',
       'болгарка': 'grinders',
@@ -85,13 +66,24 @@ const Home = () => {
     };
     
     const normalizedName = categoryName.toLowerCase().trim();
-    return categoryMap[normalizedName] || normalizedName.replace(/[^a-z0-9]/g, '-');
+    
+    // Сначала ищем точное совпадение
+    if (categoryMap[normalizedName]) {
+      return categoryMap[normalizedName];
+    }
+    
+    // Если точного совпадения нет, ищем по частичному совпадению
+    for (const [key, value] of Object.entries(categoryMap)) {
+      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+        return value;
+      }
+    }
+    
+    return normalizedName.replace(/[^a-z0-9]/g, '-');
   };
 
   const handleCloseModal = () => setIsModalOpen(false);
-  const handleSubmitForm = () => {
-    alert('Спасибо! Ваша заявка отправлена. Мы свяжемся с вами в ближайшее время.');
-  };
+  const handleSubmitForm = () => {};
   
   // Функция для перехода в каталог с фильтром по категории товара
   const handleProductClick = (product) => {
@@ -106,10 +98,11 @@ const Home = () => {
   };
 
   const advantages = [
-    'Работаем с розничными и оптовыми клиентами (B2B)',
-    'Полный пакет документов для тендеров и госзакупок',
-    'Гарантийное и постгарантийное обслуживание',
-    'Быстрая доставка по всему Казахстану'
+    'Только оригинальная продукция',
+    'Гарантия 12 месяцев на весь ассортимент',
+    'Консультация, сервис и постгарантийное обслуживание',
+    'Быстрая доставка по всему Казахстану',
+    'Работа с розничными и оптовыми клиентами'
   ];
 
   return (
@@ -135,9 +128,9 @@ const Home = () => {
             </picture>
           </div>
           <div className="main-maket-right">
-            <h1 className="main-maket-title">Электроинструменты Tanker</h1>
-            <div className="main-maket-subtitle">Продажа и доставка оригинального электроинструмента Tanker по выгодным ценам.</div>
-            <div className="main-maket-text">Официальная продукция с гарантией 12 месяцев, консультации, поддержка, гибкие условия для оптовиков и компаний. Предлагаем полный спектр электроинструмента и аксессуаров, востребованных в строительстве, ремонте и производстве. Поставляем электроинструмент для частных клиентов, строительных организаций, снабженцев и тендерных закупок.</div>
+            <h1 className="main-maket-title">Электроинструменты и оборудование</h1>
+            <div className="main-maket-subtitle">Официальный поставщик электроинструментов и оборудования в Казахстане</div>
+            <div className="main-maket-text">Мы предлагаем полный спектр продукции, востребованной в строительстве, ремонте, производстве, а также для дома и фермерских хозяйств. Наш каталог охватывает всё: от электроинструментов и оборудования до кабельной и электротехнической продукции.</div>
             <ul className="main-maket-advantages">
               {advantages.map((adv, idx) => (
                 <li key={idx} className="main-maket-adv-item">

@@ -8,6 +8,7 @@ const SiteSettings = ({ onLogout }) => {
   const [information, setInformation] = useState({
     city: 'Алматы',
     markupPercentage: 20,
+    showPromoCode: false,
     deliveryInfo: {
       freeDelivery: 'Бесплатная доставка по городу',
       freeDeliveryNote: 'Сегодня — БЕСПЛАТНО',
@@ -181,7 +182,7 @@ const SiteSettings = ({ onLogout }) => {
             <small style={{color: '#6c757d', fontSize: 12}}>Отображается как "Ваш город: [название]"</small>
           </div>
           
-          <div style={{marginBottom: 0}}>
+          <div style={{marginBottom: 16}}>
             <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Процент наценки (%)</label>
             <input 
               type="number"
@@ -193,6 +194,19 @@ const SiteSettings = ({ onLogout }) => {
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
             />
             <small style={{color: '#6c757d', fontSize: 12}}>Процент наценки при конвертации цен из USD в KZT (по умолчанию: 20%)</small>
+          </div>
+          
+          <div style={{marginBottom: 0}}>
+            <label style={{display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500, color: '#333', fontSize: 14}}>
+              <input 
+                type="checkbox"
+                checked={information.showPromoCode} 
+                onChange={(e) => setInformation(prev => ({...prev, showPromoCode: e.target.checked}))}
+                style={{width: 16, height: 16}}
+              />
+              Показывать поле промокода на странице оформления заказа
+            </label>
+            <small style={{color: '#6c757d', fontSize: 12}}>Включите, чтобы пользователи могли вводить промокоды при оформлении заказа</small>
           </div>
         </div>
 

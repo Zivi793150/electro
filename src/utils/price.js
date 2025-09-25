@@ -43,7 +43,7 @@ export function normalizePriceToNumber(rawPrice) {
   }
 
   // If it's a decimal with a dot or comma (e.g., '12.5' or '12,5')
-  if (/^\d+[\.,]\d+$/.test(valueStr)) {
+  if (/^\d+[.,]\d+$/.test(valueStr)) {
     // Unify decimal separator to '.'
     const normalized = parseFloat(valueStr.replace(',', '.'));
     if (normalized < 1000) {

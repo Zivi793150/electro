@@ -61,7 +61,7 @@ const Footer = () => {
             </li>
             <li>
               <img src="/icons/map.svg" alt="Адрес" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
-              {siteSettings.city || 'Алматы'}
+              {siteSettings.contactInfo?.address || 'Аймусина 1в'}
             </li>
             <li>
               <img src="/icons/clock.svg" alt="Часы" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
@@ -77,6 +77,7 @@ const Footer = () => {
             <li><Link to="/policy">Условия использования</Link></li>
             <li><Link to="/policy">Условия доставки</Link></li>
             <li><Link to="/policy">Способы оплаты</Link></li>
+            {/* Social links removed by request */}
           </ul>
         </div>
         

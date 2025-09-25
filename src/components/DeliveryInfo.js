@@ -4,7 +4,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
   const [deliveryInfo, setDeliveryInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showAllOptions, setShowAllOptions] = useState(false);
+  // Убрано неиспользуемое состояние (опции отображения)
 
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/pickup-points';
 
@@ -100,22 +100,14 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
         border: 'none',
                 borderRadius: 6,
         background: '#fff',
-        padding: 12,
-        marginTop: 6
+        padding: 8,
+        marginTop: 2
       }}>
         {children}
       </div>
     );
 
-    const CitySelect = () => (
-      onCityChange && Array.isArray(cities) && cities.length > 0 ? (
-        <div style={{ marginBottom: 10 }}>
-          <select value={city} onChange={onCityChange} className="city-select" />
-          { /* Заполним options вручную ниже, так как React не может вставить опции после монтирования без них */ }
-          <noscript />
-        </div>
-      ) : null
-    );
+    // Удалён невостребованный внутренний компонент CitySelect (используем citySelectEl ниже)
 
     // Для корректной отрисовки options добавим их прямо здесь
     const citySelectEl = (onCityChange && Array.isArray(cities) && cities.length > 0) ? (
@@ -132,7 +124,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
       return (
         <Container>
           {citySelectEl}
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div style={{ display: 'grid', gap: 6 }}>
             <div>
               <div style={{ fontWeight: 600 }}>Бесплатная доставка по городу</div>
               <div style={{ fontSize: 13, color: '#1976d2' }}>Сегодня — БЕСПЛАТНО</div>
@@ -149,7 +141,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
               border: 'none',
               background: '#f9fafb',
               borderRadius: 6,
-              padding: 10,
+              padding: 6,
               color: '#333'
             }}>
               <div>
@@ -167,7 +159,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
     return (
       <Container>
         {citySelectEl}
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 4 }}>
           <label style={{
             display: 'block',
             fontSize: '0.9rem',

@@ -4,16 +4,24 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
-  align-items: start;
+  align-items: start; /* выравниваем по верху */
 }
 
 .checkout-products {
   /* Левая колонка с продуктами */
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  gap: 16px;
 }
 
 .checkout-form {
   /* Правая колонка с формой */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
+
 
 .checkout-product-card {
   width: 100%;
@@ -26,6 +34,7 @@
   align-items: center;
   gap: 18px;
   box-shadow: 0 2px 12px rgba(30,40,90,0.06);
+  margin-bottom: 16px;
 }
 
 .checkout-form-container {
@@ -36,6 +45,11 @@
   border-radius: 12px;
   padding: 28px;
   box-shadow: 0 4px 18px rgba(30,40,90,0.06);
+}
+
+/* Кнопка оформления всегда прижата к низу правой колонки */
+.checkout-form form .submit-button {
+  margin-top: auto;
 }
 
 .payment-methods {
@@ -109,6 +123,12 @@
     grid-template-columns: 1fr;
     gap: 20px;
     padding: 0 16px;
+  }
+  
+  .checkout-products,
+  .checkout-form {
+    min-height: auto; /* на мобильных высоты под контент */
+    gap: 12px;
   }
   
   .delivery-methods {

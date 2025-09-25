@@ -148,6 +148,24 @@ body, html {
   flex-shrink: 0 !important;
   flex-grow: 1 !important;
 }
+/* Бейдж наличия */
+.in-stock-badge {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  background: #3c3f44; /* в стиле сайта — тёмно-серый */
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  z-index: 3;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+@media (max-width: 600px) {
+  .in-stock-badge { font-size: 0.8rem; padding: 4px 8px; left: 8px; top: 8px; }
+}
 .product-card:hover { 
   box-shadow: none !important; 
   transform: none !important; 

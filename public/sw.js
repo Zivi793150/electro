@@ -1,6 +1,6 @@
-const CACHE_NAME = 'electro-cache-v1';
-const STATIC_CACHE = 'electro-static-v1';
-const API_CACHE = 'electro-api-v1';
+const CACHE_NAME = 'electro-cache-v2';
+const STATIC_CACHE = 'electro-static-v2';
+const API_CACHE = 'electro-api-v2';
 
 // Файлы для кэширования
 const STATIC_FILES = [
@@ -23,6 +23,7 @@ const API_ENDPOINTS = [
 // Установка Service Worker
 self.addEventListener('install', (event) => {
   console.log('🚀 Service Worker установлен');
+  self.skipWaiting();
   
   event.waitUntil(
     Promise.all([
@@ -55,7 +56,7 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 

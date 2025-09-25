@@ -7,13 +7,13 @@ const AboutCompanySection = () => (
       <div className="about-company-content">
         <div className="about-company-header">
           <div className="header-line"></div>
-          <h1 className="about-company-title">Tanker</h1>
+          <h1 className="about-company-title">Eltok.kz</h1>
           <div className="header-line"></div>
         </div>
         <div className="about-company-subtitle">
-          инструмент, которому<br/>
-          доверяют мастера и<br/>
-          компании.
+          ваш поставщик<br/>
+          электроинструментов и оборудования<br/>
+          для дома и производства.
         </div>
       </div>
     </div>

@@ -11,12 +11,12 @@ const About = () => (
           <h1 className="about-title">О компании</h1>
           <section className="about-hero">
             <div className="about-hero-content">
-              <h2>ТОО "Танкер Тулс"</h2>
-            <p className="about-subtitle">Ведущий поставщик профессиональных электроинструментов в Казахстане</p>
-            <p>Мы специализируемся на поставке качественных электроинструментов от мировых производителей. Наша миссия — обеспечить профессионалов и любителей надёжным инструментом для любых задач.</p>
+              <p className="about-subtitle">Ведущий поставщик профессиональных электроинструментов и оборудования в Казахстане</p>
+              <p>Мы предлагаем широкий ассортимент продукции для дома, офиса, дачи и фермерских хозяйств. Мы собрали в одном каталоге надёжные инструменты и оборудование, чтобы наши клиенты могли решать задачи любой сложности от домашних до промышленных.</p>
+              <p>Мы работаем только с проверенными мировыми производителями и гарантируем качество и надёжность каждого товара. Наша цель обеспечить вас инструментами и оборудованием, которые помогут решать любые задачи быстро, удобно и эффективно.</p>
             </div>
             <div className="about-hero-image">
-            <img src="https://via.placeholder.com/500x300?text=О+компании" alt="О компании Танкер Тулс" loading="lazy" width="500" height="300" />
+              <img src="/logo.webp" alt="Логотип ТОО Танкер Тулс" loading="lazy" width="500" height="300" />
             </div>
           </section>
           <section className="about-experience">
@@ -28,42 +28,12 @@ const About = () => (
             <div className="experience-item"><div className="experience-number">24/7</div><div className="experience-text">Поддержка клиентов</div></div>
             </div>
           </section>
-          <section className="about-advantages">
-            <h2>Наши преимущества</h2>
-            <div className="advantages-grid">
-            <div className="advantage-item"><div className="advantage-icon"><img src="/icons/factory.svg" alt="Завод" width={32} height={32} /></div><h3>Прямые поставки</h3><p>Работаем напрямую с производителями, что позволяет предлагать лучшие цены</p></div>
-            <div className="advantage-item"><div className="advantage-icon"><img src="/icons/check-mark.svg" alt="Гарантия" width={32} height={32} /></div><h3>Гарантия качества</h3><p>Вся продукция сертифицирована и имеет официальную гарантию</p></div>
-            <div className="advantage-item"><div className="advantage-icon"><img src="/icons/truck.svg" alt="Доставка" width={32} height={32} /></div><h3>Быстрая доставка</h3><p>Доставляем по Алматы в день заказа, по области — на следующий день</p></div>
-            <div className="advantage-item"><div className="advantage-icon"><img src="/icons/wrench.svg" alt="Техподдержка" width={32} height={32} /></div><h3>Техподдержка</h3><p>Консультации по выбору инструмента и техническая поддержка</p></div>
-            <div className="advantage-item"><div className="advantage-icon"><img src="/icons/checklist.svg" alt="Документы" width={32} height={32} /></div><h3>Тендерные документы</h3><p>Предоставляем все необходимые документы для участия в тендерах</p></div>
-            <div className="advantage-item"><div className="advantage-icon"><img src="/icons/gui-price-tag.svg" alt="Цены" width={32} height={32} /></div><h3>Гибкие цены</h3><p>Специальные условия для оптовых клиентов и постоянных партнёров</p></div>
-            </div>
-          </section>
           <section className="about-history">
             <h2>История компании</h2>
             <div className="history-content">
-            <p>Компания "Танкер Тулс" была основана в 2014 году группой профессионалов, имеющих многолетний опыт работы в сфере строительства и промышленности. Начав с небольшого склада в Алматы, мы выросли до одного из ведущих поставщиков электроинструментов в Казахстане.</p>
-            <p>За годы работы мы наладили партнёрские отношения с ведущими мировыми производителями: Makita, DeWalt, Bosch, Hitachi, Metabo и многими другими. Наша команда постоянно расширяется, а ассортимент пополняется новыми моделями инструментов.</p>
-            <p>Сегодня мы обслуживаем как крупные строительные компании и промышленные предприятия, так и индивидуальных мастеров и домашних умельцев. Наша репутация — это доверие клиентов и качество обслуживания.</p>
-            </div>
-          </section>
-          <section className="about-partners">
-            <h2>Наши партнёры</h2>
-            <div className="partners-grid">
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Makita" alt="Makita" loading="lazy" width="150" height="80" /><h4>Makita</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=DeWalt" alt="DeWalt" loading="lazy" width="150" height="80" /><h4>DeWalt</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Bosch" alt="Bosch" loading="lazy" width="150" height="80" /><h4>Bosch</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Hitachi" alt="Hitachi" loading="lazy" width="150" height="80" /><h4>Hitachi</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Metabo" alt="Metabo" loading="lazy" width="150" height="80" /><h4>Metabo</h4></div>
-            <div className="partner-item"><img src="https://via.placeholder.com/150x80?text=Milwaukee" alt="Milwaukee" loading="lazy" width="150" height="80" /><h4>Milwaukee</h4></div>
-            </div>
-          </section>
-          <section className="about-team">
-            <h2>Наша команда</h2>
-            <div className="team-grid">
-            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Директор" alt="Директор" loading="lazy" width="200" height="200" /><h3>Александр Петров</h3><p>Генеральный директор</p><p>15 лет опыта в сфере поставок электроинструментов</p></div>
-            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Менеджер" alt="Менеджер" loading="lazy" width="200" height="200" /><h3>Мария Сидорова</h3><p>Менеджер по продажам</p><p>Специалист по работе с корпоративными клиентами</p></div>
-            <div className="team-item"><img src="https://via.placeholder.com/200x200?text=Техник" alt="Техник" loading="lazy" width="200" height="200" /><h3>Дмитрий Козлов</h3><p>Технический специалист</p><p>Консультации по выбору и обслуживанию инструмента</p></div>
+            <p>Компания Eltok.kz была основана в 2014 году, начав свою историю с бренда Танкер. С небольшого склада в Алматы мы выросли в одного из ведущих поставщиков электроинструментов и оборудования в Казахстане.</p>
+            <p>С первых дней мы делаем ставку на качество продукции и высокий уровень сервиса. Постепенно расширяя ассортимент, мы сформировали комплексное предложение от профессиональных электроинструментов и оборудования до электротехнической продукции для различных сфер применения.</p>
+            <p>Сегодня Eltok.kz обслуживает как крупные строительные компании и промышленные предприятия, так и индивидуальных мастеров. Репутация компании строится на доверии клиентов, надёжности и профессиональном подходе.</p>
             </div>
           </section>
         </div>
