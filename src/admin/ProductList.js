@@ -841,6 +841,7 @@ const ProductList = ({ onLogout }) => {
               </button>
             )}
             <button onClick={() => navigate('/admin/variations')} className="nav-btn nav-variations">🔄 Вариации</button>
+            <button onClick={() => navigate('/admin/orders')} className="nav-btn" style={{background:'#1e88e5'}}>🧾 Заказы</button>
             <button onClick={() => navigate('/admin/settings')} className="nav-btn nav-settings">⚙️ Настройки</button>
             <button onClick={() => navigate('/admin/analytics')} className="nav-btn nav-analytics">📊 Аналитика</button>
             <button onClick={() => navigate('/admin/pickup-points')} className="nav-btn nav-pickup">🏬 Пункты самовывоза</button>

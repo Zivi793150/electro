@@ -17,6 +17,12 @@ router.post('/', async (req, res) => {
       paymentMethod: data.paymentMethod,
       total: data.total,
       clientSessionId: data.clientSessionId,
+      status: 'new', // Инициализируем статус как "новый заказ"
+      statusHistory: [{
+        status: 'new',
+        changedAt: new Date(),
+        changedBy: 'system'
+      }]
     });
     res.json({ success: true, order });
   } catch (err) {
@@ -33,6 +39,72 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Ошибка получения заказов:', err);
     res.status(500).json({ success: false, error: 'Ошибка получения заказов' });
+  }
+});
+
+// Обновить статус заказа
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, changedBy = 'admin' } = req.body;
+
+    // Валидация статуса
+    const validStatuses = [
+      'new', 'confirmed', 'pending_payment', 'partially_paid', 'paid',
+      'ordered', 'processing', 'assembling', 'assembled', 'ready_to_ship',
+      'shipped', 'in_transit', 'delivered', 'completed', 'cancelled', 'returned'
+    ];
+
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Недопустимый статус заказа' 
+      });
+    }
+
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Заказ не найден' 
+      });
+    }
+
+    // Добавляем запись в историю статусов
+    const statusHistoryEntry = {
+      status: order.status,
+      changedAt: new Date(),
+      changedBy: changedBy
+    };
+
+    // Обновляем заказ
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id,
+      { 
+        status: status,
+        $push: { statusHistory: statusHistoryEntry }
+      },
+      { new: true }
+    );
+
+    res.json({ success: true, order: updatedOrder });
+  } catch (err) {
+    console.error('Ошибка обновления статуса заказа:', err);
+    res.status(500).json({ success: false, error: 'Ошибка обновления статуса заказа' });
+  }
+});
+
+// Получить заказ по ID
+router.get('/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Заказ не найден' });
+    }
+    res.json({ success: true, order });
+  } catch (err) {
+    console.error('Ошибка получения заказа:', err);
+    res.status(500).json({ success: false, error: 'Ошибка получения заказа' });
   }
 });
 

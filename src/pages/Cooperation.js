@@ -41,11 +41,10 @@ const Cooperation = () => {
                 </div>
                 <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
 								<a
-									href="/price-list.pdf"
-									target="_blank"
-									rel="noopener noreferrer"
+									href={encodeURI('/price/tanker-price.pdf')}
+									download="Прайс-лист Танкер.pdf"
 									className="main-maket-btn"
-                    style={{ background: '#2d3748', width: 220, textAlign: 'center', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', whiteSpace: 'nowrap' }}
+									style={{ background: '#2d3748', width: 220, textAlign: 'center', display: 'inline-flex', justifyContent: 'center', alignItems: 'center', whiteSpace: 'nowrap' }}
 									onClick={() => trackButtonClick('Скачать прайс-лист', 'cooperation_page')}
 								>
                     Скачайте прайс-лист
@@ -66,6 +65,7 @@ const Cooperation = () => {
         <style>{`
           @media (max-width: 900px) {
             .cooperation .main-maket-right { grid-template-columns: 1fr !important; }
+            .cooperation .main-maket-right > div:last-child { display: none !important; }
           }
         `}</style>
     </main>

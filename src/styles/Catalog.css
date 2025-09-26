@@ -259,9 +259,11 @@ body, html {
   .catalog-products-grid {
     grid-template-columns: repeat(1, 1fr) !important;
     gap: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     margin-bottom: 20px;
+    max-width: 400px !important;
+    justify-content: center !important;
   }
   .product-card {
     margin: -1px !important;
@@ -1097,7 +1099,7 @@ body, html {
     padding: 4px 8px;
     min-width: 60px;
     height: 28px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -1118,7 +1120,7 @@ body, html {
     padding: 3px 6px;
     min-width: 50px;
     height: 24px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
   }
 }
 
@@ -1139,7 +1141,7 @@ body, html {
     padding: 2px 4px;
     min-width: 45px;
     height: 22px;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -1160,12 +1162,12 @@ body, html {
     padding: 2px 3px;
     min-width: 40px;
     height: 20px;
-    font-size: 0.65rem;
+    font-size: 0.75rem;
   }
 }
 .catalog-sidebar {
-  width: 220px;
-  min-width: 180px;
+  width: 280px;
+  min-width: 250px;
   background: #fff;
   border: none;
   border-radius: 0;
@@ -1186,7 +1188,7 @@ body, html {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
 }
 .sidebar-category-btn {
   width: 100%;
@@ -1195,7 +1197,7 @@ body, html {
   text-align: left;
   font-size: 1.04rem;
   color: #222;
-  padding: 8px 6px;
+  padding: 6px 6px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
@@ -1243,11 +1245,12 @@ body, html {
 @media (max-width: 900px) {
   .catalog-products-grid {
     gap: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    justify-items: center !important;
   }
   .product-card {
-    margin: -1px !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     border: 1px solid #e3e6ea !important;
     border-radius: 0 !important;
@@ -1257,11 +1260,12 @@ body, html {
 @media (max-width: 600px) {
   .catalog-products-grid {
     gap: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    justify-items: center !important;
   }
   .product-card {
-    margin: -1px !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     border: 1px solid #e3e6ea !important;
     border-radius: 0 !important;
@@ -1271,11 +1275,12 @@ body, html {
 @media (max-width: 480px) {
   .catalog-products-grid {
     gap: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    justify-items: center !important;
   }
   .product-card {
-    margin: -1px !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     border: 1px solid #e3e6ea !important;
     border-radius: 0 !important;
@@ -1285,11 +1290,12 @@ body, html {
 @media (max-width: 320px) {
   .catalog-products-grid {
     gap: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    justify-items: center !important;
   }
   .product-card {
-    margin: -1px !important;
+    margin: 0 auto !important;
     padding: 0 !important;
     border: 1px solid #e3e6ea !important;
     border-radius: 0 !important;
@@ -1347,8 +1353,10 @@ body, html {
   .catalog .catalog-content .catalog-products-grid {
     grid-template-columns: repeat(1, 1fr) !important;
     gap: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     padding: 0 !important;
+    max-width: 400px !important;
+    justify-content: center !important;
   }
   
   /* Скрываем вертикальный список категорий на мобильных */
@@ -1387,6 +1395,13 @@ body, html {
     min-height: 16px !important;
     line-height: 1.1 !important;
     margin-bottom: 2px !important;
+  }
+}
+
+/* Исправление левого сдвига из-за отрицательных отступов в более специфичном селекторе */
+@media (max-width: 900px) {
+  .catalog .catalog-content .catalog-products-grid .product-card {
+    margin: 0 auto !important;
   }
 }
 

@@ -48,6 +48,21 @@ const Category = () => {
       'дизельные генераторы': 'diesel-generators',
       'дизельные генератор': 'diesel-generators',
       'дизельный генератор': 'diesel-generators',
+      'периферийный насос': 'peripheral-pump',
+      'центробежный насос': 'centrifugal-pump',
+      'аргонно-дуговая сварка': 'argon-arc-welding',
+      'бензиновый триммер': 'gasoline-trimmer',
+      'глубинный насос': 'deep-pump',
+      'отбойный молоток': 'jackhammer',
+      'плазморезы': 'plasma-cutter',
+      'редукционный клапан': 'reduction-valve',
+      'сварочный аппарат': 'welding',
+      'сварочный аппараты': 'welding',
+      'струйный насос': 'jet-pump',
+      'струйный самовсасывающий насос': 'jet-pump',
+      'точильный станок': 'bench-grinder',
+      'ударная дрель': 'impact-drill',
+      'фекальный насос': 'fecal-pump',
       'измерители': 'measuring',
       'дрель': 'drills',
       'болгарка': 'grinders',
@@ -56,7 +71,21 @@ const Category = () => {
       'лобзик': 'jigsaws',
       'лазерный уровень': 'levels',
       'генератор': 'generators',
-      'измеритель': 'measuring'
+      'измеритель': 'measuring',
+      // Новые категории
+      'гайковерт ударный': 'impact-wrench',
+      'кусторезы': 'hedge-trimmers',
+      'миксеры': 'mixers',
+      'наборный электроинструмент': 'power-tool-sets',
+      'ножовки': 'hacksaws',
+      'пила': 'saws',
+      'пила цепная': 'chainsaws',
+      'полировальные машины': 'polishing-machines',
+      'пчёлки': 'bees',
+      'сабельная пила': 'reciprocating-saws',
+      'секаторы': 'pruners',
+      'фрезер': 'routers',
+      'электрорубанок': 'electric-planers'
     };
     
     // Нормализуем название: убираем лишние пробелы, приводим к нижнему регистру
@@ -94,9 +123,34 @@ const Category = () => {
       'levels': 'Лазерные уровни',
       'generators': 'Генераторы',
       'diesel-generators': 'Дизельные генераторы',
+      'argon-arc-welding': 'Аргонно-дуговая сварка',
+      'gasoline-trimmer': 'Бензиновый триммер',
+      'deep-pump': 'Глубинный насос',
+      'jackhammer': 'Отбойный молоток',
+      'plasma-cutter': 'Плазморезы',
+      'reduction-valve': 'Редукционный клапан',
+      'welding': 'Сварочные аппараты',
+      'jet-pump': 'Струйный насос',
+      'bench-grinder': 'Точильный станок',
+      'impact-drill': 'Ударная дрель',
+      'fecal-pump': 'Фекальный насос',
       'peripheral-pump': 'Периферийный насос',
       'centrifugal-pump': 'Центробежный насос',
-      'measuring': 'Измерители'
+      'measuring': 'Измерители',
+      // Новые категории
+      'impact-wrench': 'Гайковерт ударный',
+      'hedge-trimmers': 'Кусторезы',
+      'mixers': 'Миксеры',
+      'power-tool-sets': 'Наборный электроинструмент',
+      'hacksaws': 'Ножовки',
+      'saws': 'Пила',
+      'chainsaws': 'Пила цепная',
+      'polishing-machines': 'Полировальные машины',
+      'bees': 'Пчёлки',
+      'reciprocating-saws': 'Сабельная пила',
+      'pruners': 'Секаторы',
+      'routers': 'Фрезер',
+      'electric-planers': 'Электрорубанок'
     };
     
     // Если есть точное совпадение в маппинге, возвращаем его
@@ -126,7 +180,21 @@ const Category = () => {
     { id: 'diesel-generators', name: 'Дизельные генераторы' },
     { id: 'peripheral-pump', name: 'Периферийный насос' },
     { id: 'centrifugal-pump', name: 'Центробежный насос' },
-    { id: 'measuring', name: 'Измерители' }
+    { id: 'measuring', name: 'Измерители' },
+    // Новые категории
+    { id: 'impact-wrench', name: 'Гайковерт ударный' },
+    { id: 'hedge-trimmers', name: 'Кусторезы' },
+    { id: 'mixers', name: 'Миксеры' },
+    { id: 'power-tool-sets', name: 'Наборный электроинструмент' },
+    { id: 'hacksaws', name: 'Ножовки' },
+    { id: 'saws', name: 'Пила' },
+    { id: 'chainsaws', name: 'Пила цепная' },
+    { id: 'polishing-machines', name: 'Полировальные машины' },
+    { id: 'bees', name: 'Пчёлки' },
+    { id: 'reciprocating-saws', name: 'Сабельная пила' },
+    { id: 'pruners', name: 'Секаторы' },
+    { id: 'routers', name: 'Фрезер' },
+    { id: 'electric-planers', name: 'Электрорубанок' }
   ];
 
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
@@ -257,35 +325,23 @@ const Category = () => {
     if (!product.category) return false;
     const productCategoryId = categoryToId(product.category.trim());
     
-    // Прямое сравнение ID категорий
-    if (productCategoryId === category) {
-      return true;
+    // Отладочная информация (можно убрать после тестирования)
+    if (category === 'drills' && product.category.toLowerCase().includes('дрел')) {
+      console.log(`Debug: product.category="${product.category}", productCategoryId="${productCategoryId}", target category="${category}"`);
     }
     
-    // Дополнительная проверка: сравниваем оригинальное название категории с ID
-    const normalizedCategory = product.category.toLowerCase().trim();
-    const categoryMap = {
-      'дрели': 'drills',
-      'болгарки': 'grinders', 
-      'шуруповёрты': 'screwdrivers',
-      'перфораторы': 'hammers',
-      'лобзики': 'jigsaws',
-      'лазерные уровни': 'levels',
-      'генераторы': 'generators',
-      'генераторы для дома': 'generators',
-      'измерители': 'measuring',
-      'дрель': 'drills',
-      'болгарка': 'grinders',
-      'шуруповёрт': 'screwdrivers', 
-      'перфоратор': 'hammers',
-      'лобзик': 'jigsaws',
-      'лазерный уровень': 'levels',
-      'генератор': 'generators',
-      'измеритель': 'measuring'
-    };
-    
-    const directMatch = categoryMap[normalizedCategory];
-    return directMatch === category;
+    // Спец-обработка для насосов: жёстко делим периферийные/центробежные
+    if (category === 'peripheral-pump') {
+      const t = product.category.toLowerCase();
+      return t.includes('перифер') && !t.includes('центробеж');
+    }
+    if (category === 'centrifugal-pump') {
+      const t = product.category.toLowerCase();
+      return t.includes('центробеж');
+    }
+
+    // Прямое сравнение ID категорий
+    return productCategoryId === category;
   });
 
   // Пагинация

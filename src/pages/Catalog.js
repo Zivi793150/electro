@@ -43,6 +43,19 @@ const Catalog = () => {
       'дизельные генераторы': 'diesel-generators',
       'дизельные генератор': 'diesel-generators',
       'дизельный генератор': 'diesel-generators',
+      'аргонно-дуговая сварка': 'argon-arc-welding',
+      'бензиновый триммер': 'gasoline-trimmer',
+      'глубинный насос': 'deep-pump',
+      'отбойный молоток': 'jackhammer',
+      'плазморезы': 'plasma-cutter',
+      'редукционный клапан': 'reduction-valve',
+      'сварочный аппарат': 'welding',
+      'сварочный аппараты': 'welding',
+      'струйный насос': 'jet-pump',
+      'струйный самовсасывающий насос': 'jet-pump',
+      'точильный станок': 'bench-grinder',
+      'ударная дрель': 'impact-drill',
+      'фекальный насос': 'fecal-pump',
       'периферийные насосы': 'peripheral-pump',
       'периферийный насос': 'peripheral-pump',
       'центробежные насосы': 'centrifugal-pump',
@@ -55,7 +68,21 @@ const Catalog = () => {
       'лобзик': 'jigsaws',
       'лазерный уровень': 'levels',
       'генератор': 'generators',
-      'измеритель': 'measuring'
+      'измеритель': 'measuring',
+      // Новые категории
+      'гайковерт ударный': 'impact-wrench',
+      'кусторезы': 'hedge-trimmers',
+      'миксеры': 'mixers',
+      'наборный электроинструмент': 'power-tool-sets',
+      'ножовки': 'hacksaws',
+      'пила': 'saws',
+      'пила цепная': 'chainsaws',
+      'полировальные машины': 'polishing-machines',
+      'пчёлки': 'bees',
+      'сабельная пила': 'reciprocating-saws',
+      'секаторы': 'pruners',
+      'фрезер': 'routers',
+      'электрорубанок': 'electric-planers'
     };
     
     // Нормализуем название: убираем лишние пробелы, приводим к нижнему регистру
@@ -94,9 +121,34 @@ const Catalog = () => {
       'levels': 'Лазерные уровни',
       'generators': 'Генераторы',
       'diesel-generators': 'Дизельные генераторы',
+      'argon-arc-welding': 'Аргонно-дуговая сварка',
+      'gasoline-trimmer': 'Бензиновый триммер',
+      'deep-pump': 'Глубинный насос',
+      'jackhammer': 'Отбойный молоток',
+      'plasma-cutter': 'Плазморезы',
+      'reduction-valve': 'Редукционный клапан',
+      'welding': 'Сварочные аппараты',
+      'jet-pump': 'Струйный насос',
+      'bench-grinder': 'Точильный станок',
+      'impact-drill': 'Ударная дрель',
+      'fecal-pump': 'Фекальный насос',
       'peripheral-pump': 'Периферийный насос',
       'centrifugal-pump': 'Центробежный насос',
-      'measuring': 'Измерители'
+      'measuring': 'Измерители',
+      // Новые категории
+      'impact-wrench': 'Гайковерт ударный',
+      'hedge-trimmers': 'Кусторезы',
+      'mixers': 'Миксеры',
+      'power-tool-sets': 'Наборный электроинструмент',
+      'hacksaws': 'Ножовки',
+      'saws': 'Пила',
+      'chainsaws': 'Пила цепная',
+      'polishing-machines': 'Полировальные машины',
+      'bees': 'Пчёлки',
+      'reciprocating-saws': 'Сабельная пила',
+      'pruners': 'Секаторы',
+      'routers': 'Фрезер',
+      'electric-planers': 'Электрорубанок'
     };
     
     // Если есть точное совпадение в маппинге, возвращаем его
@@ -126,7 +178,21 @@ const Catalog = () => {
     { id: 'diesel-generators', name: 'Дизельные генераторы' },
     { id: 'peripheral-pump', name: 'Периферийный насос' },
     { id: 'centrifugal-pump', name: 'Центробежный насос' },
-    { id: 'measuring', name: 'Измерители' }
+    { id: 'measuring', name: 'Измерители' },
+    // Новые категории
+    { id: 'impact-wrench', name: 'Гайковерт ударный' },
+    { id: 'hedge-trimmers', name: 'Кусторезы' },
+    { id: 'mixers', name: 'Миксеры' },
+    { id: 'power-tool-sets', name: 'Наборный электроинструмент' },
+    { id: 'hacksaws', name: 'Ножовки' },
+    { id: 'saws', name: 'Пила' },
+    { id: 'chainsaws', name: 'Пила цепная' },
+    { id: 'polishing-machines', name: 'Полировальные машины' },
+    { id: 'bees', name: 'Пчёлки' },
+    { id: 'reciprocating-saws', name: 'Сабельная пила' },
+    { id: 'pruners', name: 'Секаторы' },
+    { id: 'routers', name: 'Фрезер' },
+    { id: 'electric-planers', name: 'Электрорубанок' }
   ];
 
   const location = useLocation();

@@ -12,6 +12,7 @@ import '../styles/Home.css';
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
+  const [slideIndex, setSlideIndex] = useState(0);
   const navigate = useNavigate();
 
   // Функция для получения оптимального размера изображения
@@ -34,11 +35,25 @@ const Home = () => {
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   useEffect(() => {
-    fetchWithCache(`${API_URL}?limit=8`, {}, 5 * 60 * 1000) // Кэш на 5 минут
+    fetchWithCache(`${API_URL}?limit=16`, {}, 5 * 60 * 1000) // кэш на 5 минут, заберём до 16 позиций
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
       });
   }, []);
+
+  // Автопрокрутка каждые 10 секунд
+  useEffect(() => {
+    if (!miniProducts || miniProducts.length <= 8) return;
+    const id = setInterval(() => {
+      setSlideIndex(prev => (prev + 1) % 2);
+    }, 10000);
+    return () => clearInterval(id);
+  }, [miniProducts]);
+
+  const nextSlide = () => setSlideIndex(prev => (prev + 1) % 2);
+  const prevSlide = () => setSlideIndex(prev => (prev - 1 + 2) % 2);
+
+  const visibleProducts = miniProducts.slice(slideIndex * 8, slideIndex * 8 + 8);
 
 
 
@@ -54,6 +69,26 @@ const Home = () => {
       'лазерные уровни': 'levels',
       'генераторы': 'generators',
       'генераторы для дома': 'generators',
+      'дизельные генераторы': 'diesel-generators',
+      'дизельные генератор': 'diesel-generators',
+      'дизельный генератор': 'diesel-generators',
+      'аргонно-дуговая сварка': 'argon-arc-welding',
+      'бензиновый триммер': 'gasoline-trimmer',
+      'глубинный насос': 'deep-pump',
+      'отбойный молоток': 'jackhammer',
+      'плазморезы': 'plasma-cutter',
+      'редукционный клапан': 'reduction-valve',
+      'сварочный аппарат': 'welding',
+      'сварочный аппараты': 'welding',
+      'струйный насос': 'jet-pump',
+      'струйный самовсасывающий насос': 'jet-pump',
+      'точильный станок': 'bench-grinder',
+      'ударная дрель': 'impact-drill',
+      'фекальный насос': 'fecal-pump',
+      'периферийные насосы': 'peripheral-pump',
+      'периферийный насос': 'peripheral-pump',
+      'центробежные насосы': 'centrifugal-pump',
+      'центробежный насос': 'centrifugal-pump',
       'измерители': 'measuring',
       'дрель': 'drills',
       'болгарка': 'grinders',
@@ -62,19 +97,40 @@ const Home = () => {
       'лобзик': 'jigsaws',
       'лазерный уровень': 'levels',
       'генератор': 'generators',
-      'измеритель': 'measuring'
+      'измеритель': 'measuring',
+      // Новые категории
+      'гайковерт ударный': 'impact-wrench',
+      'кусторезы': 'hedge-trimmers',
+      'миксеры': 'mixers',
+      'наборный электроинструмент': 'power-tool-sets',
+      'ножовки': 'hacksaws',
+      'пила': 'saws',
+      'пила цепная': 'chainsaws',
+      'полировальные машины': 'polishing-machines',
+      'пчёлки': 'bees',
+      'сабельная пила': 'reciprocating-saws',
+      'секаторы': 'pruners',
+      'фрезер': 'routers',
+      'электрорубанок': 'electric-planers'
     };
     
-    const normalizedName = categoryName.toLowerCase().trim();
+    const normalizedName = categoryName.toLowerCase().trim().replace(/\s+/g, ' ');
     
     // Сначала ищем точное совпадение
     if (categoryMap[normalizedName]) {
       return categoryMap[normalizedName];
     }
     
-    // Если точного совпадения нет, ищем по частичному совпадению
-    for (const [key, value] of Object.entries(categoryMap)) {
-      if (normalizedName.includes(key) || key.includes(normalizedName)) {
+    // Спец-правило: любые варианты с "дизель" + "генератор"
+    if (normalizedName.includes('дизель') && normalizedName.includes('генератор')) {
+      return 'diesel-generators';
+    }
+    
+    // Если точного совпадения нет, ищем по частичному совпадению, 
+    // предпочитая более длинные (более специфичные) ключи
+    const entriesByLength = Object.entries(categoryMap).sort((a, b) => b[0].length - a[0].length);
+    for (const [key, value] of entriesByLength) {
+      if (normalizedName.includes(key)) {
         return value;
       }
     }
@@ -90,6 +146,7 @@ const Home = () => {
     if (product.category) {
       // Переходим на страницу конкретной категории с латинским ID
       const categoryId = categoryToId(product.category.trim());
+      console.log(`Home: product.category="${product.category}", categoryId="${categoryId}"`);
       navigate(`/catalog/${categoryId}`);
     } else {
       // Если категории нет, переходим в общий каталог
@@ -150,9 +207,16 @@ const Home = () => {
           <h2>Каталог товаров</h2>
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
-        <div style={{maxWidth: 1200, margin: '0 auto', width: '100%'}}>
+        <div style={{maxWidth: 1200, margin: '0 auto', width: '100%', position: 'relative'}}>
+          {/* Навигация по слайдам */}
+          {miniProducts.length > 8 && (
+            <>
+              <button aria-label="prev" onClick={prevSlide} style={{position:'absolute',left:-40,top:'45%',transform:'translateY(-50%)',background:'#fff',border:'1px solid #e3e6ea',borderRadius:6,padding:'6px 10px',cursor:'pointer',zIndex:2}}>{'‹'}</button>
+              <button aria-label="next" onClick={nextSlide} style={{position:'absolute',right:-40,top:'45%',transform:'translateY(-50%)',background:'#fff',border:'1px solid #e3e6ea',borderRadius:6,padding:'6px 10px',cursor:'pointer',zIndex:2}}>{'›'}</button>
+            </>
+          )}
           <div className="home-products-grid" style={{gap: 0, height: 'auto', minHeight: 'auto', maxHeight: 'none', alignItems: 'flex-start'}}>
-            {miniProducts.map((product) => (
+            {visibleProducts.map((product) => (
               <div
                 key={product._id}
                 onClick={() => handleProductClick(product)}

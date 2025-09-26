@@ -21,6 +21,33 @@ const OrderSchema = new mongoose.Schema(
     paymentMethod: { type: String, enum: ['remote', 'qr', 'transfer', null], default: 'remote' },
     total: { type: Number, required: true },
     clientSessionId: { type: String },
+    status: { 
+      type: String, 
+      enum: [
+        'new',           // Новый заказ / Черновик
+        'confirmed',     // Оформлено
+        'pending_payment', // Ожидает оплаты (Не оплачено)
+        'partially_paid',  // Частично оплачено
+        'paid',          // Оплачено
+        'ordered',       // Заказано у поставщика
+        'processing',    // В обработке
+        'assembling',    // Собирается
+        'assembled',     // Собрано
+        'ready_to_ship', // Готов к отгрузке
+        'shipped',       // Отправлено / Передано в доставку
+        'in_transit',    // Доставляется
+        'delivered',     // Доставлено
+        'completed',     // Выполнено / Завершено
+        'cancelled',     // Отменено
+        'returned'       // Возврат / Возврат средств
+      ],
+      default: 'new'
+    },
+    statusHistory: [{
+      status: { type: String },
+      changedAt: { type: Date, default: Date.now },
+      changedBy: { type: String, default: 'system' }
+    }]
   },
   { timestamps: true }
 );
