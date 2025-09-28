@@ -119,7 +119,7 @@ const Orders = ({ onLogout }) => {
 
   return (
     <div className="admin-container" style={{minHeight:'100vh',background:'#f5f7fa',padding:'32px 0'}}>
-      <div style={{maxWidth:1100,margin:'0 auto',background:'#fff',borderRadius:10,border:'1.5px solid #e0e0e0',padding:24}}>
+      <div style={{maxWidth:1400,margin:'0 auto',background:'#fff',borderRadius:10,border:'1.5px solid #e0e0e0',padding:24}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:18}}>
           <h2 style={{fontWeight:700,fontSize:24,color:'#1a2236',margin:0}}>Заказы</h2>
           <div className="admin-nav">

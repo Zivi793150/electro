@@ -35,7 +35,7 @@ const Home = () => {
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   useEffect(() => {
-    fetchWithCache(`${API_URL}?limit=16`, {}, 5 * 60 * 1000) // кэш на 5 минут, заберём до 16 позиций
+    fetchWithCache(API_URL, {}, 5 * 60 * 1000) // кэш на 5 минут, загружаем все товары
       .then(data => {
         if (Array.isArray(data)) setMiniProducts(data);
       });
@@ -44,14 +44,16 @@ const Home = () => {
   // Автопрокрутка каждые 10 секунд
   useEffect(() => {
     if (!miniProducts || miniProducts.length <= 8) return;
+    const totalSlides = Math.ceil(miniProducts.length / 8);
     const id = setInterval(() => {
-      setSlideIndex(prev => (prev + 1) % 2);
+      setSlideIndex(prev => (prev + 1) % totalSlides);
     }, 10000);
     return () => clearInterval(id);
   }, [miniProducts]);
 
-  const nextSlide = () => setSlideIndex(prev => (prev + 1) % 2);
-  const prevSlide = () => setSlideIndex(prev => (prev - 1 + 2) % 2);
+  const totalSlides = Math.ceil(miniProducts.length / 8);
+  const nextSlide = () => setSlideIndex(prev => (prev + 1) % totalSlides);
+  const prevSlide = () => setSlideIndex(prev => (prev - 1 + totalSlides) % totalSlides);
 
   const visibleProducts = miniProducts.slice(slideIndex * 8, slideIndex * 8 + 8);
 
@@ -208,8 +210,8 @@ const Home = () => {
           <a href="/catalog" className="mini-catalog-link">Смотреть все</a>
         </div>
         <div style={{maxWidth: 1200, margin: '0 auto', width: '100%', position: 'relative'}}>
-          {/* Навигация по слайдам */}
-          {miniProducts.length > 8 && (
+           {/* Навигация по слайдам */}
+           {totalSlides > 1 && (
             <>
               <button aria-label="prev" onClick={prevSlide} style={{position:'absolute',left:-40,top:'45%',transform:'translateY(-50%)',background:'#fff',border:'1px solid #e3e6ea',borderRadius:6,padding:'6px 10px',cursor:'pointer',zIndex:2}}>{'‹'}</button>
               <button aria-label="next" onClick={nextSlide} style={{position:'absolute',right:-40,top:'45%',transform:'translateY(-50%)',background:'#fff',border:'1px solid #e3e6ea',borderRadius:6,padding:'6px 10px',cursor:'pointer',zIndex:2}}>{'›'}</button>
