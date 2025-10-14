@@ -887,6 +887,7 @@ function Tabs({product}) {
         <button className={tab==='desc'?'active':''} onClick={()=>setTab('desc')}>Описание</button>
         <button className={tab==='specs'?'active':''} onClick={()=>setTab('specs')}>Характеристики</button>
         <button className={tab==='equip'?'active':''} onClick={()=>setTab('equip')}>Комплектация</button>
+        <button className={tab==='warranty'?'active':''} onClick={()=>setTab('warranty')}>Гарантия</button>
       </div>
       <div className="product-tabs-content">
         {tab==='desc' && (
@@ -929,6 +930,106 @@ function Tabs({product}) {
             ) : (
               <div style={{color: '#888', fontStyle: 'italic'}}>Информация о комплектации отсутствует</div>
             )}
+          </div>
+        )}
+        {tab==='warranty' && (
+          <div className="product-desc-kaspi-block">
+            <div className="warranty-content">
+              <h3 style={{fontSize: '1.1rem', fontWeight: '700', margin: '0 0 16px 0', color: '#111827'}}>Гарантия</h3>
+              
+              <div style={{marginBottom: '20px'}}>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Срок гарантии</h4>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Гарантийный срок составляет 12 месяцев с момента покупки товара
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Гарантия распространяется на все компоненты и узлы изделия
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Гарантийный срок может быть продлен при покупке дополнительной гарантии
+                </p>
+              </div>
+
+              <div style={{marginBottom: '20px'}}>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Условия гарантии</h4>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Гарантия действует только при соблюдении правил эксплуатации
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Товар должен использоваться по назначению и в соответствии с инструкцией
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Гарантия не распространяется на расходные материалы и естественный износ
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • При обнаружении дефекта необходимо обратиться в сервисный центр
+                </p>
+              </div>
+
+              <div style={{marginBottom: '20px'}}>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Гарантийные обязательства</h4>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Бесплатный ремонт или замена неисправных деталей
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Возврат товара в случае невозможности ремонта
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Замена товара на аналогичный при наличии на складе
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Возмещение стоимости товара при отсутствии аналогов
+                </p>
+              </div>
+
+              <div style={{marginBottom: '20px'}}>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Исключения из гарантии</h4>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Механические повреждения, полученные в результате неправильной эксплуатации
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Повреждения, вызванные воздействием влаги, пыли или агрессивных сред
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Повреждения, полученные в результате несанкционированного ремонта
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Естественный износ деталей и расходных материалов
+                </p>
+              </div>
+
+              <div style={{marginBottom: '20px'}}>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Порядок обращения по гарантии</h4>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Обратитесь в наш сервисный центр с товаром и документами
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Предоставьте чек или другой документ, подтверждающий покупку
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Опишите обнаруженную неисправность
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Срок рассмотрения заявления составляет до 10 рабочих дней
+                </p>
+              </div>
+
+              <div style={{marginBottom: '0'}}>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Контактная информация</h4>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Телефон сервисного центра: +7 (727) 123-45-67
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Email: service@electro.kz
+                </p>
+                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Адрес: г. Алматы, ул. Толе би 216Б
+                </p>
+                <p style={{margin: '0 0 0 0', lineHeight: '1.6', color: '#4b5563'}}>
+                  • Время работы: пн-пт с 9:00 до 18:00, сб с 10:00 до 16:00
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>
