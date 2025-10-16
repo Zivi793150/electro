@@ -391,6 +391,17 @@ const Catalog = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Определяем целевую ссылку для карточки товара в каталоге
+  const getCardLink = (product) => {
+    const catId = product && product.category ? categoryToId(String(product.category).trim()) : '';
+    // Для всех товаров из каталога ведём на страницу соответствующей категории,
+    // а если категория не распознана — на страницу товара
+    if (catId) {
+      return `/catalog/${catId}`;
+    }
+    return `/product/${product._id}`;
+  };
+
   return (
     <div className="catalog">
       <Header />
@@ -455,6 +466,18 @@ const Catalog = () => {
                 )}
               </div>
             </div>
+            {/* Хлебные крошки как на странице продукта */}
+            <nav className="breadcrumbs" style={{paddingBottom: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
+              <a href="/">Главная</a>
+              <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+              <a href="/catalog">Каталог</a>
+              {selectedCategory && (
+                <>
+                  <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+                  <span style={{color:'#1a2236', fontWeight:500}}>{idToCategory(selectedCategory)}</span>
+                </>
+              )}
+            </nav>
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               {categoriesLoading 
                 ? 'Каталог товаров' 
@@ -473,7 +496,7 @@ const Catalog = () => {
             <div className="catalog-products-grid" style={{gap: 0}}>
               {currentProducts.map(product => (
                 <Link
-                  to={`/product/${product._id}`}
+                  to={getCardLink(product)}
                   key={product._id}
                   style={{ textDecoration: 'none', color: 'inherit' }}
                 >

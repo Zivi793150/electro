@@ -45,7 +45,7 @@ const categories = [
 ];
 
 const Product = () => {
-  const { id } = useParams();
+  const { id, slug } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -175,8 +175,14 @@ const Product = () => {
     
     const fetchProductAndGroup = async () => {
       try {
-        // Загружаем товар
-            const productData = await fetchWithCache(`${API_URL}/${id}`, {}, 5 * 60 * 1000); // Кэш на 5 минут
+        // Загружаем товар: по id или по slug
+        let productData;
+        if (id) {
+          productData = await fetchWithCache(`${API_URL}/${id}`, {}, 5 * 60 * 1000);
+        } else if (slug) {
+          // поддержка запроса по slug через отдельный endpoint /api/products/by-slug/:slug
+          productData = await fetchWithCache(`${API_URL}/by-slug/${encodeURIComponent(slug)}`, {}, 5 * 60 * 1000);
+        }
         
         if (productData.error) {
           setError(productData.error);
@@ -223,7 +229,7 @@ const Product = () => {
     };
     
     fetchProductAndGroup();
-  }, [id]);
+  }, [id, slug]);
 
   useEffect(() => {
     fetchWithCache(`${API_URL}?limit=4`, {}, 5 * 60 * 1000) // Кэш на 5 минут
@@ -935,99 +941,76 @@ function Tabs({product}) {
         {tab==='warranty' && (
           <div className="product-desc-kaspi-block">
             <div className="warranty-content">
-              <h3 style={{fontSize: '1.1rem', fontWeight: '700', margin: '0 0 16px 0', color: '#111827'}}>Гарантия</h3>
+              <p style={{margin: '0 0 20px 0', lineHeight: '1.6', color: '#4b5563', fontSize: '1.05rem'}}>
+                Мы уверены в качестве каждого инструмента, который продаём. Поэтому предоставляем
+                официальную гарантию на 12 месяцев со дня покупки без скрытых условий и мелкого шрифта.
+                Если ваш электроинструмент перестал работать не по вашей вине, вы защищены: мы вернём деньги,
+                отремонтируем бесплатно или заменим на новый.
+              </p>
+              
+              <div className="warranty-divider"></div>
               
               <div style={{marginBottom: '20px'}}>
-                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Срок гарантии</h4>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Что покрывает гарантия?</h4>
                 <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Гарантийный срок составляет 12 месяцев с момента покупки товара
+                  Гарантия распространяется на все случаи, когда неисправность возникла по вине производителя —
+                  из-за заводского брака или скрытых дефектов.
                 </p>
                 <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Гарантия распространяется на все компоненты и узлы изделия
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Гарантийный срок может быть продлен при покупке дополнительной гарантии
-                </p>
-              </div>
-
-              <div style={{marginBottom: '20px'}}>
-                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Условия гарантии</h4>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Гарантия действует только при соблюдении правил эксплуатации
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Товар должен использоваться по назначению и в соответствии с инструкцией
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Гарантия не распространяется на расходные материалы и естественный износ
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • При обнаружении дефекта необходимо обратиться в сервисный центр
+                  Она действует на протяжении всего года после покупки, включая 11-й и последний месяц. До
+                  последнего дня срока вы можете рассчитывать на нашу поддержку и полное выполнение
+                  обязательств.
                 </p>
               </div>
 
-              <div style={{marginBottom: '20px'}}>
-                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Гарантийные обязательства</h4>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Бесплатный ремонт или замена неисправных деталей
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Возврат товара в случае невозможности ремонта
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Замена товара на аналогичный при наличии на складе
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Возмещение стоимости товара при отсутствии аналогов
-                </p>
-              </div>
+              <div className="warranty-divider"></div>
 
               <div style={{marginBottom: '20px'}}>
-                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Исключения из гарантии</h4>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Условия гарантийного обслуживания</h4>
                 <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Механические повреждения, полученные в результате неправильной эксплуатации
+                  Чтобы воспользоваться гарантией, необходимо:
                 </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Повреждения, вызванные воздействием влаги, пыли или агрессивных сред
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Повреждения, полученные в результате несанкционированного ремонта
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Естественный износ деталей и расходных материалов
-                </p>
+                <ol style={{margin: '0 0 8px 0', paddingLeft: '20px', lineHeight: '1.6', color: '#4b5563'}}>
+                  <li style={{marginBottom: '6px'}}>Сохранить товарный вид, комплектность и упаковку изделия.</li>
+                  <li style={{marginBottom: '6px'}}>Убедиться в отсутствии следов неправильной эксплуатации, падений или вскрытия корпуса.</li>
+                  <li style={{marginBottom: '6px'}}>Подтвердить, что неисправность возникла по причине заводского дефекта.</li>
+                  <li style={{marginBottom: '6px'}}>Иметь документ, подтверждающий покупку (чек или накладную).</li>
+                  <li style={{marginBottom: '6px'}}>Обратиться в течение 12 месяцев с момента покупки.</li>
+                </ol>
               </div>
+
+              <div className="warranty-divider"></div>
 
               <div style={{marginBottom: '20px'}}>
                 <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Порядок обращения по гарантии</h4>
+                <ol style={{margin: '0 0 8px 0', paddingLeft: '20px', lineHeight: '1.6', color: '#4b5563'}}>
+                  <li style={{marginBottom: '6px'}}>Сообщите о неисправности любым удобным способом.</li>
+                  <li style={{marginBottom: '6px'}}>Мы проведём диагностику — по фото, видео или при осмотре изделия.</li>
+                  <li style={{marginBottom: '6px'}}>Если случай подтверждён как гарантийный, предоставляем одно из решений:</li>
+                </ol>
+                <ul style={{margin: '0 0 8px 0', paddingLeft: '40px', lineHeight: '1.6', color: '#4b5563'}}>
+                  <li style={{marginBottom: '4px'}}>возврат денежных средств в полном объёме;</li>
+                  <li style={{marginBottom: '4px'}}>бесплатный ремонт в сервисном отделе;</li>
+                  <li style={{marginBottom: '4px'}}>замену товара на новый аналогичной модели.</li>
+                </ul>
                 <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Обратитесь в наш сервисный центр с товаром и документами
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Предоставьте чек или другой документ, подтверждающий покупку
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Опишите обнаруженную неисправность
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Срок рассмотрения заявления составляет до 10 рабочих дней
+                  Все процессы прозрачны и без лишней бюрократии — мы ценим ваше время и доверие.
                 </p>
               </div>
 
+              <div className="warranty-divider"></div>
+
               <div style={{marginBottom: '0'}}>
-                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Контактная информация</h4>
+                <h4 style={{fontSize: '1rem', fontWeight: '600', margin: '0 0 12px 0', color: '#374151'}}>Когда гарантия не действует</h4>
                 <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Телефон сервисного центра: +7 (727) 123-45-67
+                  Гарантия не распространяется на:
                 </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Email: service@electro.kz
-                </p>
-                <p style={{margin: '0 0 8px 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Адрес: г. Алматы, ул. Толе би 216Б
-                </p>
-                <p style={{margin: '0 0 0 0', lineHeight: '1.6', color: '#4b5563'}}>
-                  • Время работы: пн-пт с 9:00 до 18:00, сб с 10:00 до 16:00
-                </p>
+                <ul style={{margin: '0 0 0 0', paddingLeft: '20px', lineHeight: '1.6', color: '#4b5563'}}>
+                  <li style={{marginBottom: '6px'}}>механические повреждения, удары, падения, перегрузку или попадание влаги;</li>
+                  <li style={{marginBottom: '6px'}}>неисправности, возникшие из-за неправильного подключения или нарушения правил эксплуатации;</li>
+                  <li style={{marginBottom: '6px'}}>случаи самостоятельного вскрытия или ремонта;</li>
+                  <li style={{marginBottom: '6px'}}>естественный износ деталей и расходных материалов (щётки, кабели, патроны, аккумуляторы и т. д.).</li>
+                </ul>
               </div>
             </div>
           </div>

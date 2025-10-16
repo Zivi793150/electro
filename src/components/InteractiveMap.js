@@ -19,6 +19,7 @@ const InteractiveMap = ({
       const load2GISWidget = () => {
         const mapContainer = mapRef.current;
         if (mapContainer) {
+          const ts = Date.now();
           mapContainer.innerHTML = `
             <div style="
               width: 100%; 
@@ -28,7 +29,7 @@ const InteractiveMap = ({
               overflow: hidden;
             ">
               <!-- Основная карта 2GIS -->
-              <div id="main-map-${Date.now()}" style="width: 100%; height: 100%; position: relative;">
+              <div id="main-map-${ts}" style="width: 100%; height: 100%; position: relative;">
                 <iframe
                   src="https://widgets.2gis.com/widget?type=firmsonmap&options=%7B%22pos%22%3A%7B%22lat%22%3A${latitude}%2C%22lon%22%3A${longitude}%7D%2C%22zoom%22%3A${zoom}%2C%22city%22%3A%22almaty%22%7D"
                   width="100%"
@@ -55,7 +56,7 @@ const InteractiveMap = ({
                 z-index: 1000;
               ">
                 <button 
-                  onclick="switchTo2GIS_${Date.now()}()" 
+                  onclick="switchTo2GIS_${ts}()" 
                   style="
                     padding: 6px 12px;
                     border: 1px solid #ddd;
@@ -72,7 +73,7 @@ const InteractiveMap = ({
                   2GIS
                 </button>
                 <button 
-                  onclick="switchToGoogle_${Date.now()}()" 
+                  onclick="switchToGoogle_${ts}()" 
                   style="
                     padding: 6px 12px;
                     border: 1px solid #ddd;
@@ -89,7 +90,7 @@ const InteractiveMap = ({
                   Google
                 </button>
                 <button 
-                  onclick="openInNewWindow_${Date.now()}()" 
+                  onclick="openInNewWindow_${ts}()" 
                   style="
                     padding: 6px 12px;
                     border: 1px solid #ddd;
@@ -133,7 +134,7 @@ const InteractiveMap = ({
           `;
           
           // Добавляем функции переключения карт с уникальными именами
-          const timestamp = Date.now();
+          const timestamp = ts;
           window[`switchTo2GIS_${timestamp}`] = () => {
             const mainMap = document.getElementById(`main-map-${timestamp}`);
             if (mainMap) {
@@ -170,7 +171,7 @@ const InteractiveMap = ({
             }
           };
           
-                     window[`openInNewWindow_${timestamp}`] = () => {
+          window[`openInNewWindow_${timestamp}`] = () => {
              const choice = window.confirm('Выберите карту:\nOK - 2GIS\nОтмена - Google Maps');
              if (choice) {
                window.open(`https://2gis.kz/almaty/search/${latitude}%2C${longitude}`, '_blank');
@@ -186,125 +187,28 @@ const InteractiveMap = ({
       // Загружаем карту
       load2GISWidget();
       
-      // Fallback через 5 секунд
+      // Fallback через 2.5 секунды: если 2GIS не прогрузился, показываем Google Maps
       const fallbackTimer = setTimeout(() => {
         if (!mapLoaded) {
           setMapError(true);
-          createFallbackMap();
+          createGoogleEmbed();
         }
-      }, 5000);
+      }, 2500);
 
-      const createFallbackMap = () => {
+      const createGoogleEmbed = () => {
         const mapContainer = mapRef.current;
         if (mapContainer) {
           mapContainer.innerHTML = `
-            <div style="
-              width: 100%; 
-              height: 100%; 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              border-radius: 8px;
-              position: relative;
-              overflow: hidden;
-            ">
-              <div style="
-                background: rgba(255,255,255,0.95);
-                padding: 40px;
-                border-radius: 16px;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-                text-align: center;
-                max-width: 450px;
-                margin: 20px;
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255,255,255,0.2);
-              ">
-                <div style="
-                  width: 60px;
-                  height: 60px;
-                  background: linear-gradient(135deg, #2E7D32, #4CAF50);
-                  border-radius: 50%;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  margin: 0 auto 20px;
-                  font-size: 24px;
-                  box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
-                ">
-                  📍
-                </div>
-                
-                <h3 style="margin-bottom: 15px; color: #333; font-size: 20px; font-weight: 600;">
-                  ${companyName}
-                </h3>
-                <p style="margin-bottom: 25px; color: #666; line-height: 1.6; font-size: 16px;">
-                  ${address}
-                </p>
-                
-                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                  <a 
-                    href="https://2gis.kz/almaty/search/${latitude}%2C${longitude}" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style="
-                      display: inline-flex;
-                      align-items: center;
-                      gap: 8px;
-                      padding: 14px 28px;
-                      background: linear-gradient(135deg, #2E7D32, #4CAF50);
-                      color: white;
-                      text-decoration: none;
-                      border-radius: 8px;
-                      font-weight: 600;
-                      font-size: 14px;
-                      transition: all 0.3s ease;
-                      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
-                    "
-                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(46, 125, 50, 0.4)'"
-                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(46, 125, 50, 0.3)'"
-                  >
-                    🗺️ 2GIS
-                  </a>
-                  <a 
-                    href="https://www.google.com/maps?q=${latitude},${longitude}" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style="
-                      display: inline-flex;
-                      align-items: center;
-                      gap: 8px;
-                      padding: 14px 28px;
-                      background: linear-gradient(135deg, #1976D2, #42A5F5);
-                      color: white;
-                      text-decoration: none;
-                      border-radius: 8px;
-                      font-weight: 600;
-                      font-size: 14px;
-                      transition: all 0.3s ease;
-                      box-shadow: 0 4px 15px rgba(25, 118, 210, 0.3);
-                    "
-                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(25, 118, 210, 0.4)'"
-                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(25, 118, 210, 0.3)'"
-                  >
-                    🗺️ Google Maps
-                  </a>
-                </div>
-                
-                <div style="
-                  background: rgba(0,0,0,0.05);
-                  padding: 12px;
-                  border-radius: 8px;
-                  font-size: 13px;
-                  color: #666;
-                  border-left: 3px solid #2E7D32;
-                ">
-                  <strong>Координаты:</strong> ${latitude}, ${longitude}<br>
-                  <strong>Статус:</strong> Карта временно недоступна
-                </div>
-              </div>
-            </div>
+            <iframe
+              src="https://www.google.com/maps?q=${latitude},${longitude}&z=${zoom}&output=embed"
+              width="100%"
+              height="100%"
+              style="border:0; border-radius:8px;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Карта ${companyName} - Google Maps"
+            ></iframe>
           `;
         }
       };
@@ -322,7 +226,7 @@ const InteractiveMap = ({
       ref={mapRef}
       style={{ 
         width: '100%', 
-        height: '450px',
+        height: '420px',
         border: '1px solid #ddd',
         borderRadius: '8px'
       }}

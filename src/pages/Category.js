@@ -393,6 +393,14 @@ const Category = () => {
             )}
           </aside>
           <div className="catalog-content">
+            {/* Хлебные крошки как на странице продукта */}
+            <nav className="breadcrumbs" style={{paddingBottom: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
+              <a href="/">Главная</a>
+              <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+              <a href="/catalog">Каталог</a>
+              <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+              <span style={{color:'#1a2236', fontWeight:500}}>{getCategoryDisplayName()}</span>
+            </nav>
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               {categoriesLoading 
                 ? 'Каталог товаров' 

@@ -31,6 +31,8 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
   const [characteristics, setCharacteristics] = useState(initialData?.characteristics || '');
   const [equipment, setEquipment] = useState(initialData?.equipment || '');
+  const [slug, setSlug] = useState(initialData?.slug || '');
+  const [categorySlug, setCategorySlug] = useState(initialData?.categorySlug || '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -208,11 +210,84 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   };
 
   // Преобразование характеристик в строку для сохранения
+  // Генерация slug из строки
+  const transliterate = (str) => {
+    const map = {
+      'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'
+    };
+    return String(str || '')
+      .toLowerCase()
+      .replace(/[а-яё]/g, ch => map[ch] ?? ch)
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g,'-')
+      .replace(/^-+|-+$/g,'');
+  };
+
+  const generateSlugs = () => {
+    const genSlug = transliterate(name);
+    const genCat = transliterate(category);
+    if (!slug) setSlug(genSlug);
+    if (!categorySlug) setCategorySlug(genCat);
+  };
   const formatCharacteristics = () => {
     return characteristicFields
       .filter(field => field.parameter.trim() && field.value.trim())
       .map(field => `${field.parameter}: ${field.value}`)
       .join('\n');
+  };
+
+  // Копирование характеристик в буфер обмена
+  const copyCharacteristicsToClipboard = async () => {
+    try {
+      const textToCopy = formatCharacteristics();
+      if (!textToCopy) {
+        alert('Нет заполненных характеристик для копирования');
+        return;
+      }
+      await navigator.clipboard.writeText(textToCopy);
+      alert('Характеристики скопированы в буфер обмена');
+    } catch (err) {
+      try {
+        // Фолбэк через временное textarea
+        const temp = document.createElement('textarea');
+        temp.value = formatCharacteristics();
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        alert('Характеристики скопированы в буфер обмена');
+      } catch (_) {
+        alert('Не удалось скопировать характеристики');
+      }
+    }
+  };
+
+  // Вставка характеристик из буфера обмена с парсингом
+  const pasteCharacteristicsFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) {
+        alert('Буфер обмена пуст');
+        return;
+      }
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        alert('Не найдено строк для вставки');
+        return;
+      }
+      const parsed = lines.map(line => {
+        const idx = line.indexOf(':');
+        if (idx === -1) return { parameter: line, value: '' };
+        const parameter = line.slice(0, idx).trim();
+        const value = line.slice(idx + 1).trim();
+        return { parameter, value };
+      });
+      setCharacteristicFields(parsed);
+      alert('Характеристики вставлены из буфера обмена');
+    } catch (err) {
+      alert('Не удалось прочитать данные из буфера обмена');
+    }
   };
 
   const isEdit = Boolean(initialData && initialData._id);
@@ -252,7 +327,9 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         'Short description': shortDescription, 
         characteristics: formatCharacteristics(), 
         equipment, 
-        article 
+        article,
+        slug: slug || transliterate(name),
+        categorySlug: categorySlug || transliterate(category)
       };
       
       // Добавляем варианты изображений, если они есть
@@ -280,8 +357,8 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   };
 
   return (
-    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:10,padding:28,minWidth:700,maxWidth:1000,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto',position:'relative'}}>
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.22)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'12px'}}>
+      <form onSubmit={handleSubmit} style={{background:'#fff',borderRadius:12,padding:28,minWidth:820,maxWidth:1200,width:'100%',boxShadow:'0 4px 20px rgba(30,40,90,0.14)',maxHeight:'92vh',overflowY:'auto',position:'relative'}}>
         <button 
           type="button" 
           onClick={onClose}
@@ -313,24 +390,24 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         >
           ✕
         </button>
-        <h3 style={{marginTop:0,marginBottom:20,fontWeight:700,fontSize:22,color:'#333',paddingRight:40}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
+        <h3 style={{marginTop:0,marginBottom:20,fontWeight:700,fontSize:24,color:'#333',paddingRight:40}}>{isEdit ? 'Редактировать товар' : 'Добавить товар'}</h3>
         
         {/* Основная информация */}
-        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:10,padding:16,marginBottom:16}}>
           <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>📋 Основная информация</h4>
           
-          <div style={{marginBottom:12}}>
+          <div style={{marginBottom:10}}>
             <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Название товара *</label>
             <input required value={name} onChange={e=>setName(e.target.value)} placeholder="Введите название товара" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
           </div>
           
-          <div style={{marginBottom:12}}>
+          <div style={{marginBottom:10}}>
             <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Цена (USD) *</label>
             <input required type="text" value={priceUSD} onChange={e=>setPriceUSD(e.target.value)} placeholder="Например: 199.99" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <AdminPriceHint usd={priceUSD} />
           </div>
           
-          <div style={{marginBottom:12}}>
+          <div style={{marginBottom:10}}>
             <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Категория</label>
             <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Например: Электроинструменты" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
           </div>
@@ -343,7 +420,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         </div>
 
         {/* Изображения */}
-        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:10,padding:16,marginBottom:16}}>
           <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>📸 Изображения</h4>
           
           <div style={{marginBottom:12}}>
@@ -445,9 +522,13 @@ function ProductForm({ onClose, onSuccess, initialData }) {
           <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>⚙️ Характеристики и комплектация</h4>
           
           <div style={{marginBottom:16}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12,gap:8}}>
               <label style={{fontWeight:500,color:'#333',fontSize:14}}>Технические характеристики</label>
-              <button type="button" onClick={addCharacteristic} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>+ Добавить</button>
+              <div style={{display:'flex',gap:8}}>
+                <button type="button" onClick={copyCharacteristicsToClipboard} title="Скопировать характеристики" style={{background:'#fff',color:'#495057',border:'1px solid #ced4da',borderRadius:4,padding:'6px 10px',fontSize:12,cursor:'pointer'}}>📋 Скопировать</button>
+                <button type="button" onClick={pasteCharacteristicsFromClipboard} title="Вставить из буфера обмена" style={{background:'#fff',color:'#495057',border:'1px solid #ced4da',borderRadius:4,padding:'6px 10px',fontSize:12,cursor:'pointer'}}>📥 Вставить</button>
+                <button type="button" onClick={addCharacteristic} style={{background:'#28a745',color:'#fff',border:'none',borderRadius:4,padding:'6px 12px',fontSize:12,cursor:'pointer'}}>+ Добавить</button>
+              </div>
             </div>
             
             <div style={{maxHeight:300,overflowY:'auto',border:'1px solid #ced4da',borderRadius:6,padding:8,background:'#fff'}}>
@@ -487,6 +568,25 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <textarea value={equipment} onChange={e=>setEquipment(e.target.value)} placeholder="• Основной инструмент&#10;• Защитный кожух&#10;• Ключ для замены диска&#10;• Инструкция по эксплуатации" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14,minHeight:80,resize:'vertical'}} />
             <small style={{color:'#6c757d',fontSize:12}}>Что входит в комплект поставки</small>
           </div>
+        </div>
+
+        {/* SEO ссылки */}
+        <div style={{background:'#f8f9fa',border:'1px solid #e9ecef',borderRadius:8,padding:16,marginBottom:20}}>
+          <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#495057'}}>🔗 SEO ссылки</h4>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr auto',gap:12,alignItems:'end'}}>
+            <div>
+              <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>ЧПУ (slug)</label>
+              <input value={slug} onChange={e=>setSlug(e.target.value)} placeholder="uglovaya-shlifmashina-tanker-tk12011-125mm" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            </div>
+            <div>
+              <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>ЧПУ категории (categorySlug)</label>
+              <input value={categorySlug} onChange={e=>setCategorySlug(e.target.value)} placeholder="grinders" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
+            </div>
+            <div>
+              <button type="button" onClick={generateSlugs} style={{background:'#1e88e5',color:'#fff',border:'none',borderRadius:6,padding:'10px 14px',fontWeight:600,cursor:'pointer'}}>Сгенерировать</button>
+            </div>
+          </div>
+          <small style={{color:'#6c757d',fontSize:12,display:'block',marginTop:8}}>Итоговая ссылка: /catalog/{categorySlug || 'category'}/{slug || 'slug'}</small>
         </div>
 
         {error && <div style={{color:'#dc3545',marginBottom:16,padding:12,background:'#f8d7da',border:'1px solid #f5c6cb',borderRadius:6}}>{error}</div>}
@@ -555,8 +655,8 @@ function DuplicateProductModal({ product, onClose, onSuccess }) {
   };
 
   return (
-    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.18)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <form onSubmit={handleCreate} style={{background:'#fff',borderRadius:10,padding:24,minWidth:620,maxWidth:900,boxShadow:'0 2px 16px rgba(30,40,90,0.10)',maxHeight:'90vh',overflowY:'auto',position:'relative'}}>
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.22)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'12px'}}>
+      <form onSubmit={handleCreate} style={{background:'#fff',borderRadius:12,padding:24,minWidth:720,maxWidth:1100,width:'100%',boxShadow:'0 4px 20px rgba(30,40,90,0.14)',maxHeight:'92vh',overflowY:'auto',position:'relative'}}>
         <button type="button" onClick={onClose} style={{position:'absolute',top:12,right:12,background:'none',border:'none',fontSize:22,color:'#666',cursor:'pointer'}}>✕</button>
         <h3 style={{margin:'0 0 16px 0',fontWeight:700,fontSize:20,color:'#333'}}>Дублировать товар</h3>
 
