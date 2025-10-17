@@ -180,8 +180,16 @@ const Product = () => {
         if (id) {
           productData = await fetchWithCache(`${API_URL}/${id}`, {}, 5 * 60 * 1000);
         } else if (slug) {
-          // поддержка запроса по slug через отдельный endpoint /api/products/by-slug/:slug
-          productData = await fetchWithCache(`${API_URL}/by-slug/${encodeURIComponent(slug)}`, {}, 5 * 60 * 1000);
+          // Временный workaround: загружаем все товары и ищем по slug
+          try {
+            const allProducts = await fetchWithCache(`${API_URL}`, {}, 5 * 60 * 1000);
+            productData = allProducts.find(p => p.slug === slug);
+            if (!productData) {
+              productData = { error: 'Товар не найден' };
+            }
+          } catch (error) {
+            productData = { error: 'Ошибка при загрузке товара' };
+          }
         }
         
         if (productData.error) {
