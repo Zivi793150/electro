@@ -393,14 +393,10 @@ const Catalog = () => {
 
   // Определяем целевую ссылку для карточки товара в каталоге
   const getCardLink = (product) => {
-    // Если в документе уже есть slug и categorySlug — ведём сразу на SEO‑URL
-    if (product && product.slug && product.categorySlug) {
-      return `/catalog/${product.categorySlug}/${product.slug}`;
-    }
-    // Иначе — минимум ведём на категорию (как было), либо на товар по id
+    // Ведём на категорию товара (как в мини-каталоге на главной)
     const catId = product && product.category ? categoryToId(String(product.category).trim()) : '';
     if (catId) return `/catalog/${catId}`;
-    return `/product/${product._id}`;
+    return `/catalog`; // Если категории нет, ведём в общий каталог
   };
 
   return (
