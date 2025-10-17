@@ -180,7 +180,7 @@ const Product = () => {
         if (id) {
           productData = await fetchWithCache(`${API_URL}/${id}`, {}, 5 * 60 * 1000);
         } else if (slug) {
-          // Временный workaround: загружаем все товары и ищем по slug
+          // Загружаем все товары и ищем по slug
           try {
             const allProducts = await fetchWithCache(`${API_URL}`, {}, 5 * 60 * 1000);
             productData = allProducts.find(p => p.slug === slug);

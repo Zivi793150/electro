@@ -293,9 +293,21 @@ app.use('/images', express.static(path.join(__dirname, '../public/images'), {
   }
 }));
 
-// Тестовый endpoint
-app.get('/', (req, res) => {
-  res.json({ message: 'API работает!', timestamp: new Date().toISOString() });
+// Поддержка React Router - все остальные запросы направляем на index.html
+app.get('*', (req, res) => {
+  // Проверяем, что это не API запрос
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint не найден' });
+  }
+  
+  // Проверяем, что это не статический файл
+  const ext = path.extname(req.path).toLowerCase();
+  if (ext && ext !== '.html') {
+    return res.status(404).json({ error: 'Файл не найден' });
+  }
+  
+  // Отправляем index.html для всех остальных запросов (React Router)
+  res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 app.listen(PORT, () => {
