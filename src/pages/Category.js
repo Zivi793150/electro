@@ -423,7 +423,7 @@ const Category = () => {
               <div className="catalog-products-grid" style={{gap: 0}}>
                 {currentProducts.map(product => (
                   <Link
-                    to={`/product/${product._id}`}
+                    to={product.slug ? `/catalog/${category}/${product.slug}` : `/product/${product._id}`}
                     key={product._id}
                     style={{ textDecoration: 'none', color: 'inherit' }}
                   >

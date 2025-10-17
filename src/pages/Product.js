@@ -194,17 +194,17 @@ const Product = () => {
         setProduct(productData);
         
         // Отслеживаем просмотр товара
-        trackProductView(id, productData.name);
+        trackProductView(productData._id, productData.name);
         
         // Загружаем группу вариаций для этого товара
         try {
-         const groupRes = await fetchWithRetry(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${id}`);
+         const groupRes = await fetchWithRetry(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${productData._id}`);
           if (groupRes.ok) {
             const groupData = await groupRes.json();
             setProductGroup(groupData);
             
              // Инициализация выбранной вариации
-            if (groupData.baseProductId?._id === id) {
+            if (groupData.baseProductId?._id === productData._id) {
                // Открыли страницу базового товара
                setSelectedVariant(null);
                setSelectedParameters({});
