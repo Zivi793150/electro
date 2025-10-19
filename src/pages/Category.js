@@ -59,6 +59,10 @@ const Category = () => {
       'сварочный аппарат': 'welding',
       'сварочный аппараты': 'welding',
       'струйный насос': 'jet-pump',
+      'насосы': 'nasosy',
+      'насос': 'nasosy',
+      'насосы': 'nasosy',
+      'насос': 'nasosy',
       'струйный самовсасывающий насос': 'jet-pump',
       'точильный станок': 'bench-grinder',
       'ударная дрель': 'impact-drill',
@@ -134,6 +138,8 @@ const Category = () => {
       'bench-grinder': 'Точильный станок',
       'impact-drill': 'Ударная дрель',
       'fecal-pump': 'Фекальный насос',
+      'nasosy': 'Насосы',
+      'nasosy': 'Нasosы',
       'peripheral-pump': 'Периферийный насос',
       'centrifugal-pump': 'Центробежный насос',
       'measuring': 'Измерители',
@@ -338,6 +344,12 @@ const Category = () => {
     if (category === 'centrifugal-pump') {
       const t = product.category.toLowerCase();
       return t.includes('центробеж');
+    }
+
+    // Общая группа «насосы»: включаем все товары, где в человеко-читаемой категории встречается «насос»
+    if (category === 'nasosy') {
+      const t = product.category.toLowerCase();
+      return t.includes('насос');
     }
 
     // Прямое сравнение ID категорий

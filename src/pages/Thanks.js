@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const Thanks = () => {
+  // На мобильных при переходе через history иногда остаётся предыдущая прокрутка
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
   return (
     <div className="thanks-page" style={{minHeight:'100vh',display:'flex',flexDirection:'column',background:'#fff'}}>
       <Header />
