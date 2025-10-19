@@ -393,7 +393,11 @@ const Catalog = () => {
 
   // Определяем целевую ссылку для карточки товара в каталоге
   const getCardLink = (product) => {
-    // Ведём на категорию товара (как в мини-каталоге на главной)
+    // Ведём на категорию товара. Если есть categorySlug в документе — используем его,
+    // иначе маппим текст категории в id (как в мини-каталоге на главной)
+    if (product && product.categorySlug) {
+      return `/catalog/${product.categorySlug}`;
+    }
     const catId = product && product.category ? categoryToId(String(product.category).trim()) : '';
     if (catId) return `/catalog/${catId}`;
     return `/catalog`; // Если категории нет, ведём в общий каталог
