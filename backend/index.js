@@ -130,12 +130,13 @@ app.post('/api/send-telegram', async (req, res) => {
     const { name, phone, message, product } = req.body;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-    if (!botToken) return res.status(500).json({ error: 'Telegram bot не настроен' });
-         const text = `\nНовая заявка с сайта!\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> ${phone}\n<b>Сообщение:</b> ${message || 'Не указано'}\n${product ? `<b>Товар:</b> ${product}` : ''}\n<b>Время:</b> ${new Date().toLocaleString('ru-RU')}`;
-    // Если CHAT_ID не задан, просто логируем (чтобы не падать 500)
-    if (!chatId) {
-      console.log('TG message (no CHAT_ID):', text);
-      return res.json({ success: true, note: 'No CHAT_ID, message logged' });
+    const text = `\nНовая заявка с сайта!\n\n<b>Имя:</b> ${name}\n<b>Телефон:</b> ${phone}\n<b>Сообщение:</b> ${message || 'Не указано'}\n${product ? `<b>Товар:</b> ${product}` : ''}\n<b>Время:</b> ${new Date().toLocaleString('ru-RU')}`;
+
+    // Если токен или chatId не настроены, не падаем 500 — логируем и отвечаем success=true,
+    // чтобы фронт мог показать страницу благодарности
+    if (!botToken || !chatId) {
+      console.log('TG message (no BOT_TOKEN or CHAT_ID):', text);
+      return res.json({ success: true, note: 'Telegram is not fully configured' });
     }
 
     const tgResp = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -415,6 +416,22 @@ app.post('/api/upload', upload, convertToWebP, createImageSizes, uploadToPleskMi
 app.post('/api/products', async (req, res) => {
   try {
     const doc = { ...req.body };
+    // Генерация slug и categorySlug при создании, если они не переданы или некорректны
+    const toSlug = (str = '') => String(str)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[а-яё]/g, (ch) => ({
+        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'
+      })[ch] || ch)
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const isValid = (s) => typeof s === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+    if (!isValid(doc.slug)) doc.slug = toSlug(doc.name || '');
+    if (!isValid(doc.categorySlug)) doc.categorySlug = toSlug(doc.category || '');
+    if (doc.slugHistory && !Array.isArray(doc.slugHistory)) delete doc.slugHistory;
     // Если админ прислал цену в долларах, конвертируем и сохраняем обе
     if (doc.priceUSD !== undefined && doc.priceUSD !== null && doc.priceUSD !== '') {
       const usd = parseFloat(String(doc.priceUSD).replace(',', '.'));
@@ -449,6 +466,21 @@ app.post('/api/products', async (req, res) => {
 app.put('/api/products/:id', async (req, res) => {
   try {
     const doc = { ...req.body };
+    // Автогенерация slug/categorySlug при обновлении, если пришли пустыми
+    const toSlug = (str = '') => String(str)
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[а-яё]/g, (ch) => ({
+        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'
+      })[ch] || ch)
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const isValid = (s) => typeof s === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+    if (!isValid(doc.slug) && (doc.name || doc.slug === '')) doc.slug = toSlug(doc.name || '');
+    if (!isValid(doc.categorySlug) && (doc.category || doc.categorySlug === '')) doc.categorySlug = toSlug(doc.category || '');
     if (doc.priceUSD !== undefined && doc.priceUSD !== null && doc.priceUSD !== '') {
       const usd = parseFloat(String(doc.priceUSD).replace(',', '.'));
       const rate = await fetchUsdKztRate();
