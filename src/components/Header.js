@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { trackSocialClick, trackPhoneClick } from '../utils/analytics';
 import '../styles/Header.css';
 
 const Header = () => {
@@ -100,20 +101,52 @@ const Header = () => {
           </div>
           <div className="header-right-col">
             <div className="top-bar-socials">
-              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+              <a 
+                href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+                className="top-bar-social" 
+                title="WhatsApp" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('WhatsApp', 'header_desktop', `https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`)}
+              >
                 <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} style={{display:'block'}} />
               </a>
-              <a href="https://www.instagram.com/eltok.kz_official" className="top-bar-social" title="Instagram" target="_blank" rel="noopener noreferrer">
+              <a 
+                href="https://www.instagram.com/eltok.kz_official" 
+                className="top-bar-social" 
+                title="Instagram" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('Instagram', 'header_desktop', 'https://www.instagram.com/eltok.kz_official')}
+              >
                 <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} style={{display:'block'}} />
               </a>
-              <a href="https://www.facebook.com/profile.php?id=61580230661013" className="top-bar-social" title="Facebook" target="_blank" rel="noopener noreferrer">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61580230661013" 
+                className="top-bar-social" 
+                title="Facebook" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('Facebook', 'header_desktop', 'https://www.facebook.com/profile.php?id=61580230661013')}
+              >
                 <img src="/icons/facebook.svg" alt="Facebook" width={24} height={24} style={{display:'block'}} />
               </a>
-              <a href="https://www.tiktok.com/@eltok.kz" className="top-bar-social" title="TikTok" target="_blank" rel="noopener noreferrer">
+              <a 
+                href="https://www.tiktok.com/@eltok.kz" 
+                className="top-bar-social" 
+                title="TikTok" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('TikTok', 'header_desktop', 'https://www.tiktok.com/@eltok.kz')}
+              >
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} style={{display:'block'}} />
               </a>
             </div>
-            <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="top-bar-phone">
+            <a 
+              href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+              className="top-bar-phone"
+              onClick={() => trackPhoneClick(siteSettings.contactInfo.phone, 'header_desktop')}
+            >
               {siteSettings.contactInfo.phone}
             </a>
           </div>
@@ -162,21 +195,53 @@ const Header = () => {
             </div>
             <div className="mobile-contact-item">
               <div className="mobile-contact-label">Телефон:</div>
-              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-contact-value">
+              <a 
+                href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+                className="mobile-contact-value"
+                onClick={() => trackPhoneClick(siteSettings.contactInfo.phone, 'header_mobile')}
+              >
                 {siteSettings.contactInfo.phone}
               </a>
             </div>
             <div className="mobile-socials">
-              <a href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} className="mobile-social" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+              <a 
+                href={`https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+                className="mobile-social" 
+                title="WhatsApp" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('WhatsApp', 'header_mobile', `https://web.whatsapp.com/send?phone=${siteSettings.contactInfo.phone.replace(/\s/g, '')}`)}
+              >
                 <img src="/icons/whatsapp-whats-app.svg" alt="WhatsApp" width={24} height={24} />
               </a>
-              <a href="https://www.instagram.com/eltok.kz_official" className="mobile-social" title="Instagram" target="_blank" rel="noopener noreferrer">
+              <a 
+                href="https://www.instagram.com/eltok.kz_official" 
+                className="mobile-social" 
+                title="Instagram" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('Instagram', 'header_mobile', 'https://www.instagram.com/eltok.kz_official')}
+              >
                 <img src="/icons/instagram.svg" alt="Instagram" width={24} height={24} />
               </a>
-              <a href="https://www.facebook.com/profile.php?id=61580230661013" className="mobile-social" title="Facebook" target="_blank" rel="noopener noreferrer">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61580230661013" 
+                className="mobile-social" 
+                title="Facebook" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('Facebook', 'header_mobile', 'https://www.facebook.com/profile.php?id=61580230661013')}
+              >
                 <img src="/icons/facebook.svg" alt="Facebook" width={24} height={24} />
               </a>
-              <a href="https://www.tiktok.com/@eltok.kz" className="mobile-social" title="TikTok" target="_blank" rel="noopener noreferrer">
+              <a 
+                href="https://www.tiktok.com/@eltok.kz" 
+                className="mobile-social" 
+                title="TikTok" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackSocialClick('TikTok', 'header_mobile', 'https://www.tiktok.com/@eltok.kz')}
+              >
                 <img src="/icons/tictok.svg" alt="TikTok" width={24} height={24} />
               </a>
             </div>

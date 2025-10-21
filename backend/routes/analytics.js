@@ -300,6 +300,27 @@ router.get('/stats', async (req, res) => {
       { $limit: 10 }
     ]);
 
+    // Статистика по социальным сетям
+    const socialClicksStats = await Analytics.aggregate([
+      { $match: { ...dateFilter, eventType: 'social_click' } },
+      {
+        $group: {
+          _id: { platform: '$eventData.platform', context: '$eventData.context' },
+          count: { $sum: 1 },
+          uniqueSessions: { $addToSet: { $ifNull: ['$clientSessionId', '$sessionId'] } }
+        }
+      },
+      {
+        $project: {
+          platform: '$_id.platform',
+          context: '$_id.context',
+          count: 1,
+          uniqueSessions: { $size: '$uniqueSessions' }
+        }
+      },
+      { $sort: { count: -1 } }
+    ]);
+
     // Статистика по страницам
     const pageStats = await Analytics.aggregate([
       { $match: { ...dateFilter, page: { $exists: true } } },
@@ -347,6 +368,7 @@ router.get('/stats', async (req, res) => {
         deviceStats,
         phoneClicksByPage,
         buttonClicksStats,
+        socialClicksStats,
         topProducts,
         pageStats,
         funnelTotals,

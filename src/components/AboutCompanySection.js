@@ -11,9 +11,8 @@ const AboutCompanySection = () => (
           <div className="header-line"></div>
         </div>
         <div className="about-company-subtitle">
-          ваш поставщик<br/>
-          электроинструментов и оборудования<br/>
-          для дома и производства.
+          Когда товар качественный,<br/>
+          не нужно объяснять цену
         </div>
       </div>
     </div>

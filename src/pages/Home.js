@@ -64,7 +64,7 @@ const Home = () => {
   const categoryToId = (categoryName) => {
     const categoryMap = {
       'дрели': 'drills',
-      'болгарки': 'grinders',
+      'болгарки': 'bolgarki',
       'шуруповёрты': 'screwdrivers',
       'перфораторы': 'hammers',
       'лобзики': 'jigsaws',
@@ -87,13 +87,15 @@ const Home = () => {
       'точильный станок': 'bench-grinder',
       'ударная дрель': 'impact-drill',
       'фекальный насос': 'fecal-pump',
-      'периферийные насосы': 'peripheral-pump',
       'периферийный насос': 'peripheral-pump',
-      'центробежные насосы': 'centrifugal-pump',
       'центробежный насос': 'centrifugal-pump',
+      'насосы': 'nasosy',
+      'насос': 'nasosy',
       'измерители': 'measuring',
       'дрель': 'drills',
-      'болгарка': 'grinders',
+      'дрель-шуруповёрты': 'drills',
+      'дрели-шуруповёрты': 'drills',
+      'болгарка': 'bolgarki',
       'шуруповёрт': 'screwdrivers',
       'перфоратор': 'hammers',
       'лобзик': 'jigsaws',
@@ -145,8 +147,12 @@ const Home = () => {
   
   // Функция для перехода в каталог с фильтром по категории товара
   const handleProductClick = (product) => {
-    if (product.category) {
-      // Переходим на страницу конкретной категории с латинским ID
+    if (product.categorySlug) {
+      // Используем готовый categorySlug из MongoDB
+      console.log(`Home: product.categorySlug="${product.categorySlug}"`);
+      navigate(`/catalog/${product.categorySlug}`);
+    } else if (product.category) {
+      // Fallback: используем старую логику
       const categoryId = categoryToId(product.category.trim());
       console.log(`Home: product.category="${product.category}", categoryId="${categoryId}"`);
       navigate(`/catalog/${categoryId}`);

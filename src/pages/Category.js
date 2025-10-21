@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { trackPageView } from '../utils/analytics';
+import { trackPageView, trackCategoryView } from '../utils/analytics';
 import { fetchWithCache } from '../utils/cache';
 import '../styles/Catalog.css';
 
@@ -38,7 +38,7 @@ const Category = () => {
   const categoryToId = (categoryName) => {
     const categoryMap = {
       'дрели': 'drills',
-      'болгарки': 'grinders',
+      'болгарки': 'bolgarki',
       'шуруповёрты': 'screwdrivers',
       'перфораторы': 'hammers',
       'лобзики': 'jigsaws',
@@ -61,15 +61,15 @@ const Category = () => {
       'струйный насос': 'jet-pump',
       'насосы': 'nasosy',
       'насос': 'nasosy',
-      'насосы': 'nasosy',
-      'насос': 'nasosy',
       'струйный самовсасывающий насос': 'jet-pump',
       'точильный станок': 'bench-grinder',
       'ударная дрель': 'impact-drill',
       'фекальный насос': 'fecal-pump',
       'измерители': 'measuring',
       'дрель': 'drills',
-      'болгарка': 'grinders',
+      'дрель-шуруповёрты': 'drills',
+      'дрели-шуруповёрты': 'drills',
+      'болгарка': 'bolgarki',
       'шуруповёрт': 'screwdrivers',
       'перфоратор': 'hammers',
       'лобзик': 'jigsaws',
@@ -120,7 +120,7 @@ const Category = () => {
   const idToCategory = (categoryId) => {
     const idMap = {
       'drills': 'Дрели',
-      'grinders': 'Болгарки',
+      'bolgarki': 'Болгарки',
       'screwdrivers': 'Шуруповёрты',
       'hammers': 'Перфораторы',
       'jigsaws': 'Лобзики',
@@ -139,7 +139,6 @@ const Category = () => {
       'impact-drill': 'Ударная дрель',
       'fecal-pump': 'Фекальный насос',
       'nasosy': 'Насосы',
-      'nasosy': 'Нasosы',
       'peripheral-pump': 'Периферийный насос',
       'centrifugal-pump': 'Центробежный насос',
       'measuring': 'Измерители',
@@ -177,13 +176,14 @@ const Category = () => {
   // Статические категории для fallback
   const staticCategories = [
     { id: 'drills', name: 'Дрели' },
-    { id: 'grinders', name: 'Болгарки' },
+    { id: 'bolgarki', name: 'Болгарки' },
     { id: 'screwdrivers', name: 'Шуруповёрты' },
     { id: 'hammers', name: 'Перфораторы' },
     { id: 'jigsaws', name: 'Лобзики' },
     { id: 'levels', name: 'Лазерные уровни' },
     { id: 'generators', name: 'Генераторы' },
     { id: 'diesel-generators', name: 'Дизельные генераторы' },
+    { id: 'nasosy', name: 'Насосы' },
     { id: 'peripheral-pump', name: 'Периферийный насос' },
     { id: 'centrifugal-pump', name: 'Центробежный насос' },
     { id: 'measuring', name: 'Измерители' },
@@ -224,39 +224,68 @@ const Category = () => {
   // Отслеживаем просмотр страницы категории
   useEffect(() => {
     trackPageView(`category_${category}`);
-  }, [category]);
+    
+    // Отслеживаем просмотр категории с количеством товаров
+    if (filteredProducts.length > 0) {
+      const categoryName = categories.find(cat => cat.id === category)?.name || idToCategory(category);
+      trackCategoryView(categoryName, category, filteredProducts.length);
+    }
+  }, [category, filteredProducts.length, categories]);
 
   // Извлечение категорий из товаров
   useEffect(() => {
     if (products.length > 0) {
       setCategoriesLoading(true);
       
-      // Извлекаем уникальные категории из товаров, нормализуем и сортируем их
+      // Извлекаем уникальные категории из товаров, используя готовые categorySlug
       const categoryMap = new Map();
       
       products.forEach(product => {
-        if (product.category) {
-          // Нормализуем название категории: убираем лишние пробелы и приводим к нижнему регистру
-          const normalizedCategory = product.category.trim().toLowerCase().replace(/\s+/g, ' ');
+        if (product.categorySlug && product.category) {
+          // Используем готовый categorySlug как ID и оригинальное название категории
+          const categorySlug = product.categorySlug.trim();
           const originalCategory = product.category.trim();
           
-          // Если такой нормализованной категории еще нет, добавляем её
-          if (!categoryMap.has(normalizedCategory)) {
-            categoryMap.set(normalizedCategory, originalCategory);
+          // Если такой categorySlug еще нет, добавляем её
+          if (!categoryMap.has(categorySlug)) {
+            categoryMap.set(categorySlug, originalCategory);
           }
         }
       });
       
-      const uniqueCategories = Array.from(categoryMap.values()).sort();
+      const uniqueCategories = Array.from(categoryMap.entries()).map(([slug, name]) => ({
+        id: slug,
+        name: name
+      })).sort((a, b) => a.name.localeCompare(b.name, 'ru'));
       
       if (uniqueCategories.length > 0) {
-        const realCategories = uniqueCategories.map(category => ({
-          id: categoryToId(category),
-          name: category
-        }));
-        setCategories(realCategories);
+        setCategories(uniqueCategories);
       } else {
-        setCategories(staticCategories);
+        // Fallback: если нет categorySlug, используем старую логику
+        const categoryMapOld = new Map();
+        
+        products.forEach(product => {
+          if (product.category) {
+            const normalizedCategory = product.category.trim().toLowerCase().replace(/\s+/g, ' ');
+            const originalCategory = product.category.trim();
+            
+            if (!categoryMapOld.has(normalizedCategory)) {
+              categoryMapOld.set(normalizedCategory, originalCategory);
+            }
+          }
+        });
+        
+        const uniqueCategoriesOld = Array.from(categoryMapOld.values()).sort();
+        
+        if (uniqueCategoriesOld.length > 0) {
+          const realCategories = uniqueCategoriesOld.map(category => ({
+            id: categoryToId(category),
+            name: category
+          }));
+          setCategories(realCategories);
+        } else {
+          setCategories(staticCategories);
+        }
       }
       setCategoriesLoading(false);
     }
@@ -328,6 +357,12 @@ const Category = () => {
 
   // Фильтруем товары по категории
   const filteredProducts = products.filter(product => {
+    // Сначала проверяем готовый categorySlug из MongoDB
+    if (product.categorySlug) {
+      return product.categorySlug === category;
+    }
+    
+    // Fallback: если categorySlug нет, используем старую логику
     if (!product.category) return false;
     const productCategoryId = categoryToId(product.category.trim());
     
@@ -372,8 +407,31 @@ const Category = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Функция для получения названия товара с приоритетом: productGroup -> category -> product name
+  const getProductDisplayName = (product) => {
+    // 1. Проверяем мастер-товар (productGroup)
+    if (product.productGroup && product.productGroup.name) {
+      return product.productGroup.name;
+    }
+    
+    // 2. Проверяем название категории
+    if (product.category) {
+      return product.category;
+    }
+    
+    // 3. Используем название продукта
+    return product.name;
+  };
+
   // Получаем название категории для отображения
   const getCategoryDisplayName = () => {
+    // Сначала ищем в списке категорий из товаров
+    const foundCategory = categories.find(cat => cat.id === category);
+    if (foundCategory) {
+      return foundCategory.name;
+    }
+    
+    // Fallback: используем старую логику
     return idToCategory(category);
   };
 
@@ -459,17 +517,12 @@ const Category = () => {
                           />
                         </picture>
           </div>
-                      <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 8px auto', alignSelf:'center'}}></div>
-                      <div className="product-info" style={{padding: '6px 8px 3px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '80px'}}>
-                        <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: 0, minHeight: '20px', lineHeight: 1.2, marginBottom: 4, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                        <div style={{width:'100%', textAlign:'left', margin:'0 0 2px 0'}}>
-                          <span style={{color:'#888', fontSize:'0.98rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
-                  </div>
-                        <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:2, justifyContent:'flex-start', width:'100%'}}>
-                          <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1.25rem',letterSpacing:0.5}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                          <span style={{height:'2.7em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 7px',verticalAlign:'middle'}}></span>
-                    </div>
-                  </div>
+                      <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
+                      <div className="product-info" style={{padding: '0 8px 6px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: 'auto'}}>
+                        <span style={{fontSize: '1rem', fontWeight: 700, color: '#1a2236', margin: 0, lineHeight: 1.2, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>
+                          {getProductDisplayName(product)}
+                        </span>
+                      </div>
                 </div>
                   </Link>
               ))}

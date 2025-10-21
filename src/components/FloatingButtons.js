@@ -1,19 +1,19 @@
 import React from 'react';
-import { trackButtonClick } from '../utils/analytics';
+import { trackButtonClick, trackSocialClick, trackPhoneClick } from '../utils/analytics';
 import '../styles/FloatingButtons.css';
 
 const FloatingButtons = () => {
   const handleWhatsAppClick = () => {
-    trackButtonClick('WhatsApp', 'floating_button');
-    const phoneNumber = '+77474777989';
+    const phoneNumber = '+77075177385';
     const message = 'Здравствуйте! Хочу получить консультацию по электроинструментам Tanker.';
     const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\s/g, '')}?text=${encodeURIComponent(message)}`;
+    trackSocialClick('WhatsApp', 'floating_button', whatsappUrl);
     window.open(whatsappUrl, '_blank');
   };
 
   const handlePhoneClick = () => {
-    trackButtonClick('Позвонить', 'floating_button');
-    const phoneNumber = '+77474777989';
+    const phoneNumber = '+77075177385';
+    trackPhoneClick(phoneNumber, 'floating_button');
     window.location.href = `tel:${phoneNumber}`;
   };
 

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { formatTenge } from '../utils/price';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { trackPageView } from '../utils/analytics';
-import { fetchWithCache } from '../utils/cache';
-import '../styles/Catalog.css';
-import { Link, useLocation } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import { trackPageView, trackCategoryView } from '../../utils/analytics';
+import { fetchWithCache } from '../../utils/cache';
+import '../../styles/Catalog.css';
 
-// fetchWithRetry не используется — удалено для тишины линтера
+const OptCategory = () => {
+  const { category } = useParams();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(24);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-const Catalog = () => {
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
     // Сначала проверяем обложку вариации, если товар является базовым для группы
@@ -17,16 +23,14 @@ const Catalog = () => {
       return product.productGroup.coverImage;
     }
     
-    // Затем проверяем coverPhoto или обычное фото
-    const mainImage = product.coverPhoto || product.image;
-    
+    // Затем проверяем обычные изображения товара
     if (product.imageVariants && product.imageVariants[preferredSize]) {
       return product.imageVariants[preferredSize];
     }
     if (product.imageVariants && product.imageVariants.webp) {
-      return product.imageVariants.webp;
+      return product.imageVariants[preferredSize];
     }
-    return mainImage || '/images/products/placeholder.png';
+    return product.image || '/images/products/placeholder.png';
   };
 
   // Функция для преобразования кириллического названия категории в латинский ID
@@ -43,6 +47,8 @@ const Catalog = () => {
       'дизельные генераторы': 'diesel-generators',
       'дизельные генератор': 'diesel-generators',
       'дизельный генератор': 'diesel-generators',
+      'периферийный насос': 'peripheral-pump',
+      'центробежный насос': 'centrifugal-pump',
       'аргонно-дуговая сварка': 'argon-arc-welding',
       'бензиновый триммер': 'gasoline-trimmer',
       'глубинный насос': 'deep-pump',
@@ -52,14 +58,12 @@ const Catalog = () => {
       'сварочный аппарат': 'welding',
       'сварочный аппараты': 'welding',
       'струйный насос': 'jet-pump',
+      'насосы': 'nasosy',
+      'насос': 'nasosy',
       'струйный самовсасывающий насос': 'jet-pump',
       'точильный станок': 'bench-grinder',
       'ударная дрель': 'impact-drill',
       'фекальный насос': 'fecal-pump',
-      'периферийный насос': 'peripheral-pump',
-      'центробежный насос': 'centrifugal-pump',
-      'насосы': 'nasosy',
-      'насос': 'nasosy',
       'измерители': 'measuring',
       'дрель': 'drills',
       'дрель-шуруповёрты': 'drills',
@@ -99,9 +103,8 @@ const Catalog = () => {
     if (normalizedName.includes('дизель') && normalizedName.includes('генератор')) {
       return 'diesel-generators';
     }
-    // Если точного совпадения нет, ищем по частичному совпадению, 
-    // предпочитая более длинные (более специфичные) ключи
-    const entriesByLength = Object.entries(categoryMap).sort((a, b) => b[0].length - a[0].length);
+    // Если точного совпадения нет, ищем по частичному совпадению (более длинные ключи приоритетнее)
+    const entriesByLength = Object.entries(categoryMap).sort((a,b)=>b[0].length-a[0].length);
     for (const [key, value] of entriesByLength) {
       if (normalizedName.includes(key)) {
         return value;
@@ -116,7 +119,7 @@ const Catalog = () => {
   const idToCategory = (categoryId) => {
     const idMap = {
       'drills': 'Дрели',
-      'grinders': 'Болгарки',
+      'bolgarki': 'Болгарки',
       'screwdrivers': 'Шуруповёрты',
       'hammers': 'Перфораторы',
       'jigsaws': 'Лобзики',
@@ -169,10 +172,10 @@ const Catalog = () => {
     return categoryId;
   };
 
-  // Статические категории для fallback (без "Все товары")
+  // Статические категории для fallback
   const staticCategories = [
     { id: 'drills', name: 'Дрели' },
-    { id: 'grinders', name: 'Болгарки' },
+    { id: 'bolgarki', name: 'Болгарки' },
     { id: 'screwdrivers', name: 'Шуруповёрты' },
     { id: 'hammers', name: 'Перфораторы' },
     { id: 'jigsaws', name: 'Лобзики' },
@@ -180,6 +183,8 @@ const Catalog = () => {
     { id: 'generators', name: 'Генераторы' },
     { id: 'diesel-generators', name: 'Дизельные генераторы' },
     { id: 'nasosy', name: 'Насосы' },
+    { id: 'peripheral-pump', name: 'Периферийный насос' },
+    { id: 'centrifugal-pump', name: 'Центробежный насос' },
     { id: 'measuring', name: 'Измерители' },
     // Новые категории
     { id: 'impact-wrench', name: 'Гайковерт ударный' },
@@ -197,53 +202,7 @@ const Catalog = () => {
     { id: 'electric-planers', name: 'Электрорубанок' }
   ];
 
-  const location = useLocation();
-  // На мобильных при переходе иногда сохраняется старая позиция — принудительно поднимаем наверх
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, []);
-  const getCategoryFromQuery = () => {
-    // Извлекаем категорию из URL пути
-    const pathParts = location.pathname.split('/');
-    if (pathParts.length > 2 && pathParts[1] === 'catalog') {
-      return pathParts[2]; // Возвращаем название категории из URL
-    }
-    return null; // По умолчанию не выбрана категория - показываем все
-  };
-  const [selectedCategory, setSelectedCategory] = useState(getCategoryFromQuery());
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(24);
-  const [categories, setCategories] = useState([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-
-  // Отслеживаем изменения URL для определения активной категории
-  useEffect(() => {
-    const categoryFromUrl = getCategoryFromQuery();
-    setSelectedCategory(categoryFromUrl);
-  }, [location.search, location.pathname]);
-
-  // Закрытие выпадающего списка при клике вне его
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.category-dropdown')) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isDropdownOpen]);
-
-          const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   // Загрузка товаров с кэшированием
   useEffect(() => {
@@ -261,10 +220,16 @@ const Catalog = () => {
       });
   }, []);
 
-  // Отслеживаем просмотр страницы каталога
+  // Отслеживаем просмотр страницы категории
   useEffect(() => {
-    trackPageView('catalog');
-  }, []);
+    trackPageView(`opt_category_${category}`);
+    
+    // Отслеживаем просмотр категории с количеством товаров
+    if (filteredProducts.length > 0) {
+      const categoryName = categories.find(cat => cat.id === category)?.name || idToCategory(category);
+      trackCategoryView(categoryName + ' (Опт)', category, filteredProducts.length);
+    }
+  }, [category, filteredProducts.length, categories]);
 
   // Извлечение категорий из товаров
   useEffect(() => {
@@ -364,8 +329,8 @@ const Catalog = () => {
       });
       
       infos.forEach(info => {
-        info.style.padding = '0 8px 4px';
-        info.style.minHeight = 'auto';
+        info.style.padding = '6px';
+        info.style.minHeight = '80px';
       });
     };
 
@@ -389,55 +354,41 @@ const Catalog = () => {
     };
   }, [products]);
 
-  // Функция для группировки товаров по категориям (убираем дубликаты)
-  const getGroupedProducts = (productList) => {
-    if (selectedCategory) {
-      // Если выбрана категория, показываем все товары этой категории
-      return productList.filter(product => {
-        // Сначала проверяем готовый categorySlug из MongoDB
-        if (product.categorySlug) {
-          return product.categorySlug === selectedCategory;
-        }
-        
-        // Fallback: если categorySlug нет, используем старую логику
-        if (!product.category) return false;
-        const productCategoryId = categoryToId(product.category.trim());
-        return productCategoryId === selectedCategory;
-      });
-    } else {
-      // Если категория не выбрана, группируем товары по категориям
-      const categoryMap = new Map();
-      
-      productList.forEach(product => {
-        let categoryKey;
-        
-        // Определяем ключ категории
-        if (product.categorySlug) {
-          categoryKey = product.categorySlug;
-        } else if (product.category) {
-          categoryKey = categoryToId(product.category.trim());
-        } else {
-          categoryKey = 'other';
-        }
-        
-        // Если категории еще нет в мапе, добавляем товар
-        if (!categoryMap.has(categoryKey)) {
-          categoryMap.set(categoryKey, product);
-        } else {
-          // Если категория уже есть, выбираем товар с productGroup (приоритет мастер-товарам)
-          const existingProduct = categoryMap.get(categoryKey);
-          if (product.productGroup && !existingProduct.productGroup) {
-            categoryMap.set(categoryKey, product);
-          }
-        }
-      });
-      
-      return Array.from(categoryMap.values());
+  // Фильтруем товары по категории
+  const filteredProducts = products.filter(product => {
+    // Сначала проверяем готовый categorySlug из MongoDB
+    if (product.categorySlug) {
+      return product.categorySlug === category;
     }
-  };
+    
+    // Fallback: если categorySlug нет, используем старую логику
+    if (!product.category) return false;
+    const productCategoryId = categoryToId(product.category.trim());
+    
+    // Отладочная информация (можно убрать после тестирования)
+    if (category === 'drills' && product.category.toLowerCase().includes('дрел')) {
+      console.log(`Debug: product.category="${product.category}", productCategoryId="${productCategoryId}", target category="${category}"`);
+    }
+    
+    // Спец-обработка для насосов: жёстко делим периферийные/центробежные
+    if (category === 'peripheral-pump') {
+      const t = product.category.toLowerCase();
+      return t.includes('перифер') && !t.includes('центробеж');
+    }
+    if (category === 'centrifugal-pump') {
+      const t = product.category.toLowerCase();
+      return t.includes('центробеж');
+    }
 
-  // При загрузке /catalog показываем сгруппированные товары, при выборе категории - все товары
-  const filteredProducts = getGroupedProducts(products);
+    // Общая группа «насосы»: включаем все товары, где в человеко-читаемой категории встречается «насос»
+    if (category === 'nasosy') {
+      const t = product.category.toLowerCase();
+      return t.includes('насос');
+    }
+
+    // Прямое сравнение ID категорий
+    return productCategoryId === category;
+  });
 
   // Пагинация
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -448,7 +399,7 @@ const Catalog = () => {
   // Сброс на первую страницу при смене категории
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory]);
+  }, [category]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -471,16 +422,16 @@ const Catalog = () => {
     return product.name;
   };
 
-  // Определяем целевую ссылку для карточки товара в каталоге
-  const getCardLink = (product) => {
-    // Ведём на категорию товара. Если есть categorySlug в документе — используем его,
-    // иначе маппим текст категории в id (как в мини-каталоге на главной)
-    if (product && product.categorySlug) {
-      return `/catalog/${product.categorySlug}`;
+  // Получаем название категории для отображения
+  const getCategoryDisplayName = () => {
+    // Сначала ищем в списке категорий из товаров
+    const foundCategory = categories.find(cat => cat.id === category);
+    if (foundCategory) {
+      return foundCategory.name;
     }
-    const catId = product && product.category ? categoryToId(String(product.category).trim()) : '';
-    if (catId) return `/catalog/${catId}`;
-    return `/catalog`; // Если категории нет, ведём в общий каталог
+    
+    // Fallback: используем старую логику
+    return idToCategory(category);
   };
 
   return (
@@ -496,14 +447,14 @@ const Catalog = () => {
               </div>
             ) : (
               <ul className="sidebar-categories">
-                {categories.map(category => (
-                  <li key={category.id}>
+                {categories.map(cat => (
+                  <li key={cat.id}>
                     <Link
-                      to={`/catalog/${category.id}`}
-                      className={`sidebar-category-btn${selectedCategory === category.id ? ' active' : ''}`}
+                      to={`/opt/catalog/${cat.id}`}
+                      className={`sidebar-category-btn${cat.id === category ? ' active' : ''}`}
                       style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
                     >
-                      {category.name}
+                      {cat.name}
                     </Link>
                   </li>
                 ))}
@@ -511,104 +462,66 @@ const Catalog = () => {
             )}
           </aside>
           <div className="catalog-content">
-            <div className="category-dropdown-container mobile-dropdown">
-              <div className={`category-dropdown ${isDropdownOpen ? 'open' : ''}`}>
-                <button 
-                  className="category-dropdown-btn"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  disabled={categoriesLoading}
-                >
-                  <span>
-                    {categoriesLoading 
-                      ? 'Загрузка...' 
-                      : location.pathname === '/catalog'
-                        ? 'Каталог товаров'
-                        : selectedCategory 
-                          ? (categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory) || 'Каталог товаров')
-                          : 'Каталог товаров'
-                    }
-                  </span>
-                  <span className="dropdown-arrow">▼</span>
-                </button>
-                {isDropdownOpen && !categoriesLoading && (
-                  <div className="category-dropdown-menu">
-                    {categories.map(category => (
-                      <Link
-                        key={category.id}
-                        to={`/catalog/${category.id}`}
-                        className={`category-dropdown-item${selectedCategory === category.id ? ' active' : ''}`}
-                        style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        {category.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
             {/* Хлебные крошки как на странице продукта */}
             <nav className="breadcrumbs" style={{paddingBottom: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
-              <a href="/">Главная</a>
+              <a href="/opt">Оптовикам</a>
               <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-              <a href="/catalog">Каталог</a>
-              {selectedCategory && (
-                <>
-                  <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-                  <span style={{color:'#1a2236', fontWeight:500}}>{categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory)}</span>
-                </>
-              )}
+              <a href="/opt/catalog">Каталог</a>
+              <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+              <span style={{color:'#1a2236', fontWeight:500}}>{getCategoryDisplayName()}</span>
             </nav>
-            <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0, marginTop: 0}}>
+            <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               {categoriesLoading 
                 ? 'Каталог товаров' 
-                : location.pathname === '/catalog'
-                  ? 'Каталог товаров'
-                  : selectedCategory 
-                    ? (categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory) || 'Каталог товаров')
-                    : 'Каталог товаров'
+                : getCategoryDisplayName()
               }
             </h1>
             {loading ? (
               <div style={{padding: 32}}>Загрузка...</div>
             ) : error ? (
               <div style={{color: 'red', padding: 32}}>{error}</div>
-            ) : (
-            <div className="catalog-products-grid" style={{gap: 0}}>
-              {currentProducts.map(product => (
-                <Link
-                  to={getCardLink(product)}
-                  key={product._id}
-                  style={{ textDecoration: 'none', color: 'inherit' }}
-                >
-                  <div
-                    className="product-card kaspi-style mini-product-card"
-                    style={{ cursor: 'pointer', minHeight: 'auto', position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', border: '1px solid #e3e6ea', margin: '-1px' }}
-                  >
-                    <div className="product-image" style={{height: '160px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                      <picture style={{width: '100%', height: '100%'}}>
-                        <source 
-                          srcSet={getOptimalImage(product, 'webp')} 
-                          type="image/webp"
-                        />
-                        <img 
-                          src={getOptimalImage(product, 'medium')} 
-                          alt={product.name} 
-                          style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
-                          loading="lazy"
-                          width="260"
-                          height="160"
-                        />
-                      </picture>
-                    </div>
-                    <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 0 auto', alignSelf:'center'}}></div>
-                    <div className="product-info" style={{padding: '0 8px 6px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '20px'}}>
-                          <span style={{fontSize: '1rem', fontWeight: 700, color: '#1a2236', margin: '0', lineHeight: 1.2, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%', marginTop: '2px'}}>
-                            {product.productGroup ? product.productGroup.name : (product.category ? product.category : product.name)}
-                          </span>
-                    </div>
-                  </div>
+            ) : filteredProducts.length === 0 ? (
+              <div style={{padding: 32, textAlign: 'center', color: '#666'}}>
+                <h2>Товары не найдены</h2>
+                <p>В данной категории пока нет товаров.</p>
+                <Link to="/opt/catalog" style={{ color: '#007bff', textDecoration: 'none' }}>
+                  ← Вернуться в каталог
                 </Link>
+          </div>
+            ) : (
+              <div className="catalog-products-grid" style={{gap: 0}}>
+                {currentProducts.map(product => (
+                  <Link
+                    to={product.slug ? `/opt/catalog/${category}/${product.slug}` : `/opt/product/${product._id}`}
+                    key={product._id}
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    <div
+                      className="product-card kaspi-style mini-product-card"
+                      style={{ cursor: 'pointer', minHeight: 'auto', position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', border: '1px solid #e3e6ea', margin: '-1px' }}
+                    >
+                      <div className="product-image" style={{height: '160px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <picture style={{width: '100%', height: '100%'}}>
+                          <source 
+                            srcSet={getOptimalImage(product, 'webp')} 
+                            type="image/webp"
+                          />
+                          <img 
+                            src={getOptimalImage(product, 'medium')} 
+                            alt={product.name} 
+                            style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
+                            loading="lazy"
+                            width="260"
+                            height="160"
+                          />
+                        </picture>
+          </div>
+                      <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 2px auto', alignSelf:'center'}}></div>
+                      <div className="product-info" style={{padding: '0 8px 6px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: 'auto'}}>
+                        <span style={{fontSize: '1rem', fontWeight: 700, color: '#1a2236', margin: 0, lineHeight: 1.2, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{getProductDisplayName(product)}</span>
+                      </div>
+                    </div>
+                  </Link>
               ))}
             </div>
             )}
@@ -707,7 +620,6 @@ const Catalog = () => {
                 </button>
               </div>
             )}
-            
           </div>
         </div>
       </main>
@@ -716,4 +628,4 @@ const Catalog = () => {
   );
 };
 
-export default Catalog; 
+export default OptCategory;

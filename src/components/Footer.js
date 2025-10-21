@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { trackPhoneClick } from '../utils/analytics';
 import '../styles/Footer.css';
 
 const Footer = () => {
@@ -50,7 +51,11 @@ const Footer = () => {
           <ul>
             <li>
               <img src="/icons/telephone.svg" alt="Телефон" width={16} height={16} style={{display:'inline-block', marginRight:'8px', verticalAlign:'middle'}} />
-              <a href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} style={{color: 'inherit', textDecoration: 'none'}}>
+              <a 
+                href={`tel:${siteSettings.contactInfo.phone.replace(/\s/g, '')}`} 
+                style={{color: 'inherit', textDecoration: 'none'}}
+                onClick={() => trackPhoneClick(siteSettings.contactInfo.phone, 'footer')}
+              >
                 {siteSettings.contactInfo.phone}
               </a>
             </li>

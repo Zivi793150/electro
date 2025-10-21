@@ -4,9 +4,11 @@ import Footer from '../components/Footer';
 // import DeliveryInfo from '../components/DeliveryInfo';
 import '../styles/Product.css';
 import '../styles/Checkout.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { trackFormSubmit, trackPurchaseComplete } from '../utils/analytics';
 
 const Checkout = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const product = location.state?.product;
   const [payment, setPayment] = useState('cashless');
@@ -72,6 +74,7 @@ const Checkout = () => {
     
     // Сохраняем заказ в БД и отправляем в Telegram
     (async () => {
+      let orderId = null;
       try {
         const resp = await fetch('https://electro-1-vjdu.onrender.com/api/orders', {
           method: 'POST',
@@ -90,8 +93,10 @@ const Checkout = () => {
         });
         const data = await resp.json();
         if (!data.success) throw new Error('Ошибка сохранения заказа');
+        orderId = data.orderId || Date.now().toString();
       } catch (err) {
         console.log('Ошибка сохранения заказа:', err.message);
+        orderId = Date.now().toString(); // fallback ID
       }
       try {
         await fetch('https://electro-1-vjdu.onrender.com/api/send-telegram', {
@@ -100,13 +105,29 @@ const Checkout = () => {
           body: JSON.stringify({
             name: form.firstName,
             phone: form.phone,
-            message: `Заказ через форму\nТовар: ${product?.name || ''}\nДоставка: ${orderDetails.deliveryType}${deliveryType==='delivery' ? `, адрес: ${form.address}`:''}\nОплата: ${orderDetails.payment}${payment==='cashless' ? `, способ: ${orderDetails.paymentMethod}`:''}\nСумма: ${Number(finalTotal).toFixed(0)} ₸\nКомментарий: ${form.comment || ''}`
+            message: `Заказ через форму\nТовар: ${product?.name || ''}\nДоставка: ${orderDetails.deliveryType}${deliveryType==='delivery' ? `, адрес: ${form.address}` : ''}\nОплата: ${orderDetails.payment}${payment==='cashless' ? `, способ: ${orderDetails.paymentMethod}` : ''}\nСумма: ${Number(finalTotal).toFixed(0)} ₸\nКомментарий: ${form.comment || ''}`
           })
         });
       } catch (err) {
         console.log('Ошибка отправки в Telegram:', err.message);
       }
-      alert('Спасибо! Заказ принят. Мы свяжемся для подтверждения.');
+      
+      // Отслеживаем завершение покупки
+      if (product) {
+        trackPurchaseComplete(
+          orderId,
+          product._id,
+          product.name,
+          finalTotal,
+          'checkout_page'
+        );
+      }
+      
+      // Отслеживаем отправку формы
+      trackFormSubmit('checkout_form', product?._id);
+      
+      // Переходим на страницу благодарности
+      navigate('/thanks');
     })();
   };
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
+import { trackSocialClick, trackPhoneClick } from '../utils/analytics';
 import '../styles/Contacts.css';
 
 const Contacts = () => {
@@ -19,7 +20,10 @@ const Contacts = () => {
       TikTok: 'https://www.tiktok.com/@eltok.kz'
     };
     const url = urls[platform];
-    if (url) window.open(url, '_blank');
+    if (url) {
+      trackSocialClick(platform, 'contacts_page', url);
+      window.open(url, '_blank');
+    }
   };
 
   useEffect(() => {
@@ -388,7 +392,15 @@ const Contacts = () => {
             <div className="contacts-grid">
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/telephone.svg" alt="Телефон" width={24} height={24} loading="lazy" /></span><span>Телефоны</span></div>
-                <div className="contact-card-content">+7 747 477 79 89</div>
+                <div className="contact-card-content">
+                  <a 
+                    href="tel:+77474777989" 
+                    style={{color: 'inherit', textDecoration: 'none'}}
+                    onClick={() => trackPhoneClick('+7 747 477 79 89', 'contacts_page')}
+                  >
+                    +7 747 477 79 89
+                  </a>
+                </div>
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon">✉</span><span>Email</span></div>

@@ -201,15 +201,16 @@ body, html {
 }
 .product-image img { width: 100%; height: 100%; object-fit: cover; }
 .product-info { 
-  padding: 6px !important; 
+  padding: 0 6px 6px 6px !important; 
   display: flex !important; 
   flex-direction: column !important; 
   flex: 1 1 auto !important; 
-  justify-content: flex-end !important; 
-  min-height: 80px !important;
+  justify-content: flex-start !important; 
+  min-height: 20px !important;
 }
 .product-name { 
-  font-size: 0.9rem !important; 
+  font-size: 1rem !important; 
+  font-weight: 700 !important;
   color: #222 !important; 
   margin: 0 0 4px 0 !important; 
   min-height: 20px !important; 
@@ -294,15 +295,16 @@ body, html {
     max-height: none !important;
   }
   .product-info {
-    padding: 6px !important;
+    padding: 0 6px 6px 6px !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 1 auto !important;
-    justify-content: flex-end !important;
-    min-height: 80px !important;
+    justify-content: flex-start !important;
+    min-height: 20px !important;
   }
   .product-name {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
     color: #222 !important;
     margin: 0 0 4px 0 !important;
     min-height: 20px !important;
@@ -363,14 +365,16 @@ body, html {
     max-height: 180px;
   }
     .product-info {
-    padding: 4px !important;
-    min-height: 60px !important;
-  } 
+    padding: 0 4px 4px 4px !important;
+    min-height: 20px !important;
+    justify-content: flex-start !important;
+  }
     .product-name {
-    font-size: 0.95rem;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
     word-wrap: break-word;
     hyphens: auto;
-  } 
+  }
   .seo-description { 
     padding: 8px; 
     margin-top: 8px; 
@@ -449,15 +453,16 @@ body, html {
     max-height: none !important;
   }
   .product-info {
-    padding: 6px !important;
+    padding: 0 6px 6px 6px !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 1 auto !important;
-    justify-content: flex-end !important;
-    min-height: 80px !important;
+    justify-content: flex-start !important;
+    min-height: 20px !important;
   }
   .product-name {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
     color: #222 !important;
     margin: 0 0 4px 0 !important;
     min-height: 20px !important;
@@ -554,15 +559,16 @@ body, html {
     max-height: none !important;
   }
   .product-info {
-    padding: 6px !important;
+    padding: 0 6px 6px 6px !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 1 auto !important;
-    justify-content: flex-end !important;
-    min-height: 80px !important;
+    justify-content: flex-start !important;
+    min-height: 20px !important;
   }
   .product-name {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
     color: #222 !important;
     margin: 0 0 4px 0 !important;
     min-height: 20px !important;
@@ -659,15 +665,16 @@ body, html {
     max-height: none !important;
   }
   .product-info {
-    padding: 6px !important;
+    padding: 0 6px 6px 6px !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 1 auto !important;
-    justify-content: flex-end !important;
-    min-height: 80px !important;
+    justify-content: flex-start !important;
+    min-height: 20px !important;
   }
   .product-name {
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
     color: #222 !important;
     margin: 0 0 4px 0 !important;
     min-height: 20px !important;
@@ -741,9 +748,9 @@ body, html {
   padding: 12px 16px 0 16px;
 }
 .product-name {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   color: #222;
-  font-weight: 500;
+  font-weight: 700;
   margin: 0 0 8px 0;
   min-height: 40px;
   word-wrap: break-word;
@@ -793,7 +800,8 @@ body, html {
     object-fit: cover;
   }
   .product-name {
-    font-size: 0.95rem;
+    font-size: 1rem;
+    font-weight: 700;
     min-height: 32px;
   }
   .product-price {
@@ -814,7 +822,8 @@ body, html {
     max-height: none;
   }
   .product-name {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     min-height: 16px;
   }
   .product-price {
@@ -841,7 +850,8 @@ body, html {
     max-height: none;
   }
   .product-name {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 700;
     min-height: 12px;
   }
   .product-price {
@@ -868,7 +878,8 @@ body, html {
     max-height: none;
   }
   .product-name {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
     min-height: 10px;
   }
   .product-price {
@@ -1006,7 +1017,7 @@ body, html {
 .catalog-mini-catalog-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
 .product-card.catalog-mini-product-card { min-width: 0; max-width: 100%; border: none; border-radius: 0; background: #fff; display: flex; flex-direction: column; height: 100%; padding: 0; position: relative; min-height: 100px; }
 .catalog-mini-product-divider { width: 600px; max-width: 700px; border-top: 1px solid #bdbdbd; margin: 0 auto 0.15em auto; align-self: center; }
-.product-info { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 8px 1px 8px; }
+.product-info { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 2px 8px 1px 8px; }
 .catalog-mini-product-name { font-size: 0.95rem; font-weight: 600; color: #1976d2; margin: 20px 0 0 0; min-height: 32px; line-height: 1.18; text-align: center; width: 100%; display: block; }
 .product-card.catalog-mini-product-card .product-info {
     flex: unset !important;
@@ -1337,12 +1348,14 @@ body, html {
 }
 
 .catalog .catalog-content .catalog-products-grid .product-card .product-info {
-  padding: 6px !important;
-  min-height: 80px !important;
+  padding: 0 6px 6px 6px !important;
+  min-height: 20px !important;
+  justify-content: flex-start !important;
 }
 
 .catalog .catalog-content .catalog-products-grid .product-card .product-name {
-  font-size: 0.9rem !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
   min-height: 20px !important;
   line-height: 1.2 !important;
   margin-bottom: 4px !important;
@@ -1386,12 +1399,14 @@ body, html {
   }
   
   .catalog .catalog-content .catalog-products-grid .product-card .product-info {
-    padding: 8px !important;
-    min-height: 80px !important;
+    padding: 0 8px 6px 8px !important;
+    min-height: 20px !important;
+    justify-content: flex-start !important;
   }
   
   .catalog .catalog-content .catalog-products-grid .product-card .product-name {
-    font-size: 0.8rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
     min-height: 16px !important;
     line-height: 1.1 !important;
     margin-bottom: 2px !important;

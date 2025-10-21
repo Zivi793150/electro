@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { formatTenge } from '../utils/price';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { trackPageView } from '../utils/analytics';
-import { fetchWithCache } from '../utils/cache';
-import '../styles/Catalog.css';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import { trackPageView } from '../../utils/analytics';
+import { fetchWithCache } from '../../utils/cache';
+import '../../styles/Catalog.css';
 import { Link, useLocation } from 'react-router-dom';
 
-// fetchWithRetry не используется — удалено для тишины линтера
-
-const Catalog = () => {
+const OptCatalog = () => {
   // Функция для получения оптимального размера изображения
   const getOptimalImage = (product, preferredSize = 'medium') => {
     // Сначала проверяем обложку вариации, если товар является базовым для группы
@@ -18,15 +15,13 @@ const Catalog = () => {
     }
     
     // Затем проверяем coverPhoto или обычное фото
-    const mainImage = product.coverPhoto || product.image;
-    
     if (product.imageVariants && product.imageVariants[preferredSize]) {
       return product.imageVariants[preferredSize];
     }
     if (product.imageVariants && product.imageVariants.webp) {
-      return product.imageVariants.webp;
+      return product.imageVariants[preferredSize];
     }
-    return mainImage || '/images/products/placeholder.png';
+    return product.image || '/images/products/placeholder.png';
   };
 
   // Функция для преобразования кириллического названия категории в латинский ID
@@ -56,7 +51,9 @@ const Catalog = () => {
       'точильный станок': 'bench-grinder',
       'ударная дрель': 'impact-drill',
       'фекальный насос': 'fecal-pump',
+      'периферийные насосы': 'peripheral-pump',
       'периферийный насос': 'peripheral-pump',
+      'центробежные насосы': 'centrifugal-pump',
       'центробежный насос': 'centrifugal-pump',
       'насосы': 'nasosy',
       'насос': 'nasosy',
@@ -180,6 +177,8 @@ const Catalog = () => {
     { id: 'generators', name: 'Генераторы' },
     { id: 'diesel-generators', name: 'Дизельные генераторы' },
     { id: 'nasosy', name: 'Насосы' },
+    { id: 'peripheral-pump', name: 'Периферийный насос' },
+    { id: 'centrifugal-pump', name: 'Центробежный насос' },
     { id: 'measuring', name: 'Измерители' },
     // Новые категории
     { id: 'impact-wrench', name: 'Гайковерт ударный' },
@@ -205,8 +204,8 @@ const Catalog = () => {
   const getCategoryFromQuery = () => {
     // Извлекаем категорию из URL пути
     const pathParts = location.pathname.split('/');
-    if (pathParts.length > 2 && pathParts[1] === 'catalog') {
-      return pathParts[2]; // Возвращаем название категории из URL
+    if (pathParts.length > 3 && pathParts[1] === 'opt' && pathParts[2] === 'catalog') {
+      return pathParts[3]; // Возвращаем название категории из URL
     }
     return null; // По умолчанию не выбрана категория - показываем все
   };
@@ -243,7 +242,7 @@ const Catalog = () => {
     };
   }, [isDropdownOpen]);
 
-          const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
 
   // Загрузка товаров с кэшированием
   useEffect(() => {
@@ -263,7 +262,7 @@ const Catalog = () => {
 
   // Отслеживаем просмотр страницы каталога
   useEffect(() => {
-    trackPageView('catalog');
+    trackPageView('opt_catalog');
   }, []);
 
   // Извлечение категорий из товаров
@@ -364,8 +363,8 @@ const Catalog = () => {
       });
       
       infos.forEach(info => {
-        info.style.padding = '0 8px 4px';
-        info.style.minHeight = 'auto';
+        info.style.padding = '6px';
+        info.style.minHeight = '80px';
       });
     };
 
@@ -436,7 +435,7 @@ const Catalog = () => {
     }
   };
 
-  // При загрузке /catalog показываем сгруппированные товары, при выборе категории - все товары
+  // При загрузке /opt/catalog показываем сгруппированные товары, при выборе категории - все товары
   const filteredProducts = getGroupedProducts(products);
 
   // Пагинация
@@ -476,11 +475,11 @@ const Catalog = () => {
     // Ведём на категорию товара. Если есть categorySlug в документе — используем его,
     // иначе маппим текст категории в id (как в мини-каталоге на главной)
     if (product && product.categorySlug) {
-      return `/catalog/${product.categorySlug}`;
+      return `/opt/catalog/${product.categorySlug}`;
     }
     const catId = product && product.category ? categoryToId(String(product.category).trim()) : '';
-    if (catId) return `/catalog/${catId}`;
-    return `/catalog`; // Если категории нет, ведём в общий каталог
+    if (catId) return `/opt/catalog/${catId}`;
+    return `/opt/catalog`; // Если категории нет, ведём в общий каталог
   };
 
   return (
@@ -499,7 +498,7 @@ const Catalog = () => {
                 {categories.map(category => (
                   <li key={category.id}>
                     <Link
-                      to={`/catalog/${category.id}`}
+                      to={`/opt/catalog/${category.id}`}
                       className={`sidebar-category-btn${selectedCategory === category.id ? ' active' : ''}`}
                       style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
                     >
@@ -521,7 +520,7 @@ const Catalog = () => {
                   <span>
                     {categoriesLoading 
                       ? 'Загрузка...' 
-                      : location.pathname === '/catalog'
+                      : location.pathname === '/opt/catalog'
                         ? 'Каталог товаров'
                         : selectedCategory 
                           ? (categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory) || 'Каталог товаров')
@@ -535,7 +534,7 @@ const Catalog = () => {
                     {categories.map(category => (
                       <Link
                         key={category.id}
-                        to={`/catalog/${category.id}`}
+                        to={`/opt/catalog/${category.id}`}
                         className={`category-dropdown-item${selectedCategory === category.id ? ' active' : ''}`}
                         style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
                         onClick={() => setIsDropdownOpen(false)}
@@ -549,9 +548,9 @@ const Catalog = () => {
             </div>
             {/* Хлебные крошки как на странице продукта */}
             <nav className="breadcrumbs" style={{paddingBottom: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
-              <a href="/">Главная</a>
+              <a href="/opt">Оптовикам</a>
               <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-              <a href="/catalog">Каталог</a>
+              <a href="/opt/catalog">Каталог</a>
               {selectedCategory && (
                 <>
                   <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
@@ -559,10 +558,10 @@ const Catalog = () => {
                 </>
               )}
             </nav>
-            <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0, marginTop: 0}}>
+            <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0}}>
               {categoriesLoading 
                 ? 'Каталог товаров' 
-                : location.pathname === '/catalog'
+                : location.pathname === '/opt/catalog'
                   ? 'Каталог товаров'
                   : selectedCategory 
                     ? (categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory) || 'Каталог товаров')
@@ -603,9 +602,7 @@ const Catalog = () => {
                     </div>
                     <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 0 auto', alignSelf:'center'}}></div>
                     <div className="product-info" style={{padding: '0 8px 6px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, minHeight: '20px'}}>
-                          <span style={{fontSize: '1rem', fontWeight: 700, color: '#1a2236', margin: '0', lineHeight: 1.2, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%', marginTop: '2px'}}>
-                            {product.productGroup ? product.productGroup.name : (product.category ? product.category : product.name)}
-                          </span>
+                      <span style={{fontSize: '1rem', fontWeight: 700, color: '#1a2236', margin: '0', lineHeight: 1.2, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%', marginTop: '2px'}}>{getProductDisplayName(product)}</span>
                     </div>
                   </div>
                 </Link>
@@ -716,4 +713,4 @@ const Catalog = () => {
   );
 };
 
-export default Catalog; 
+export default OptCatalog;

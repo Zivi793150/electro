@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { formatTenge } from '../utils/price';
+import { formatTenge } from '../../utils/price';
 import { useParams, useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import Modal from '../components/Modal';
-// import DeliveryInfo from '../components/DeliveryInfo';
-import { trackProductView, trackButtonClick, trackPurchaseStart } from '../utils/analytics';
-import { fetchWithCache } from '../utils/cache';
-import '../styles/Product.css';
-import '../styles/ProductVariations.css';
-import '../components/ImageModal.css';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+import Modal from '../../components/Modal';
+import { trackProductView, trackButtonClick, trackPurchaseStart } from '../../utils/analytics';
+import { fetchWithCache } from '../../utils/cache';
+import '../../styles/Product.css';
+import '../../styles/ProductVariations.css';
+import '../../components/ImageModal.css';
 
 // Надёжный fetch с повторами и таймаутом
 const fetchWithRetry = async (url, options = {}, retries = 2, backoffMs = 800, timeoutMs = 12000) => {
@@ -44,7 +43,7 @@ const categories = [
   { id: 'measuring', name: 'Измерители' }
 ];
 
-const Product = () => {
+const OptProduct = () => {
   const { id, slug } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -74,9 +73,7 @@ const Product = () => {
   const [productGroup, setProductGroup] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedParameters, setSelectedParameters] = useState({});
-  
 
-  
   const [detectingCity, setDetectingCity] = useState(false);
   
   // Функция для автоматического определения города
@@ -217,7 +214,7 @@ const Product = () => {
             setProductGroup(groupData);
             
              // Инициализация выбранной вариации
-            if (groupData.baseProductId?._id === productData._id) {
+             if (groupData.baseProductId?._id === productData._id) {
                // Открыли страницу базового товара
                setSelectedVariant(null);
                setSelectedParameters({});
@@ -265,9 +262,6 @@ const Product = () => {
       });
   }, []);
   
-  // Инициализируем выбранный город из localStorage и автоматически определяем город
-  // Блок определения города более не используется на странице товара
-
   // Сбрасываем активное изображение при смене товара
   useEffect(() => {
     setActiveImage(0);
@@ -283,7 +277,7 @@ const Product = () => {
         <main className="product-main">
           <div className="container" style={{padding: '48px 0', textAlign: 'center'}}>
             <h1>Товар не найден</h1>
-            <p>Проверьте правильность ссылки или вернитесь в <a href="/catalog">каталог</a>.</p>
+            <p>Проверьте правильность ссылки или вернитесь в <a href="/opt/catalog">каталог</a>.</p>
           </div>
         </main>
         <Footer />
@@ -317,10 +311,10 @@ const Product = () => {
       currentProduct._id, 
       currentProduct.name, 
       currentPrice, 
-      'product_page'
+      'opt_product_page'
     );
     
-    navigate('/checkout', { 
+    navigate('/opt/checkout', { 
       state: { 
         product: currentProduct,
         selectedVariant,
@@ -437,14 +431,14 @@ const Product = () => {
   // Модалка фото
   const handleImageClick = () => setShowImageModal(true);
   const handleCloseImageModal = () => setShowImageModal(false);
-  const handlePrevImage = (e) => {
-    e.stopPropagation();
-    const images = getAllImages();
-    setActiveImage((prev) => {
-      const newIndex = (prev - 1 + images.length) % images.length;
-      return newIndex >= 0 && newIndex < images.length ? newIndex : 0;
-    });
-  };
+   const handlePrevImage = (e) => {
+     e.stopPropagation();
+     const images = getAllImages();
+     setActiveImage((prev) => {
+       const newIndex = (prev - 1 + images.length) % images.length;
+       return newIndex >= 0 && newIndex < images.length ? newIndex : 0;
+     });
+   };
   const handleNextImage = (e) => {
     e.stopPropagation();
     const images = getAllImages();
@@ -457,8 +451,6 @@ const Product = () => {
   const handleCityChange = () => {};
 
   const fetchDeliveryInfo = async () => {};
-  
-
 
   const shortDesc = getCurrentProduct()['Short description'] || 'краткое описание';
 
@@ -474,7 +466,7 @@ const Product = () => {
       return product.imageVariants[preferredSize];
     }
     if (product.imageVariants && product.imageVariants.webp) {
-      return product.imageVariants.webp;
+      return product.imageVariants[preferredSize];
     }
     return product.image || '/images/products/placeholder.png';
   };
@@ -485,13 +477,13 @@ const Product = () => {
       <main className="product-main">
         <div className="product-container">
           <nav className="breadcrumbs" style={{paddingBottom: '18px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
-            <a href="/">Главная</a>
+            <a href="/opt">Оптовикам</a>
             <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-            <a href="/catalog">Каталог</a>
+            <a href="/opt/catalog">Каталог</a>
             {categoryName && (
               <>
                 <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-                <a href={`/catalog?category=${product.category}`}>{categoryName}</a>
+                <a href={`/opt/catalog?category=${product.category}`}>{categoryName}</a>
               </>
             )}
             <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
@@ -679,8 +671,6 @@ const Product = () => {
                         </div>
                       );
                     })}
-                    
-
                   </div>
                 )}
                 {productGroup && productGroup.parameters.length > 0 && (
@@ -690,7 +680,7 @@ const Product = () => {
                 <div className="product-buy-row">
                   <div className="product-price-block">
                     <div className="product-price-label-value">
-                      <div className="product-price-label">Цена</div>
+                      <div className="product-price-label">Оптовая цена</div>
                       <div className="product-price-value">
                         {formatTenge(getCurrentPrice())}
                         <span className="product-currency">₸</span>
@@ -720,20 +710,20 @@ const Product = () => {
                     <button 
                       className="product-btn-ask" 
                       onClick={() => {
-                        trackButtonClick('Задать вопрос', 'product_page', id);
+                        trackButtonClick('Задать вопрос', 'opt_product_page', id);
                         handleOpenModal();
                       }}
-                      data-analytics-context="product_page"
+                      data-analytics-context="opt_product_page"
                     >
-                      Задать вопрос
+                      Запросить прайс
                     </button>
                     <div className="product-btns-divider"></div>
                     <button 
                       className="product-btn-buy" 
                       onClick={handleBuy}
-                      data-analytics-context="product_page"
+                      data-analytics-context="opt_product_page"
                     >
-                      Купить
+                      Заказать
                     </button>
                   </div>
                 </div>
@@ -745,8 +735,8 @@ const Product = () => {
           {/* Вкладки снизу */}
           <div className="product-tabs-wrap">
             <Tabs product={getCurrentProduct()} />
-                </div>
-            </div>
+          </div>
+        </div>
       </main>
       {/* Мини-каталог популярных товаров */}
       <section className="mini-catalog-section">
@@ -760,7 +750,7 @@ const Product = () => {
               <div
                 key={`first-${product._id}`}
                 className="product-card catalog-mini-product-card"
-                onClick={() => window.location.href = `/product/${product._id}`}
+                onClick={() => window.location.href = `/opt/product/${product._id}`}
                 style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
               >
                 <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -782,22 +772,15 @@ const Product = () => {
                 <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto', alignSelf:'center'}}></div>
                 <div className="product-info" style={{padding: '0 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
                   <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: '0 0 2px 0', lineHeight: 1.15, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  <div style={{width:'100%', textAlign:'left', margin:0, lineHeight:1}}>
-                    <span style={{color:'#888', fontSize:'0.78rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
                   </div>
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:0, justifyContent:'flex-start', width:'100%', lineHeight:1}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                    <span style={{height:'1.2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 6px',verticalAlign:'middle'}}></span>
                   </div>
-                </div>
-              </div>
             ))}
             {/* Дублированный набор карточек для бесконечной прокрутки */}
             {miniProducts.map(product => (
               <div
                 key={`second-${product._id}`}
                 className="product-card catalog-mini-product-card"
-                onClick={() => window.location.href = `/product/${product._id}`}
+                onClick={() => window.location.href = `/opt/product/${product._id}`}
                 style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
               >
                 <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -819,13 +802,6 @@ const Product = () => {
                 <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto', alignSelf:'center'}}></div>
                 <div className="product-info" style={{padding: '0 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
                   <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: '0 0 2px 0', lineHeight: 1.15, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  <div style={{width:'100%', textAlign:'left', margin:0, lineHeight:1}}>
-                    <span style={{color:'#888', fontSize:'0.78rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
-                  </div>
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:0, justifyContent:'flex-start', width:'100%', lineHeight:1}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                    <span style={{height:'1.2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 6px',verticalAlign:'middle'}}></span>
-                  </div>
                 </div>
               </div>
             ))}
@@ -1038,4 +1014,4 @@ function Tabs({product}) {
   );
 }
 
-export default Product; 
+export default OptProduct;

@@ -18,6 +18,12 @@ const Policy = lazy(() => import('./pages/Policy'));
 const Cooperation = lazy(() => import('./pages/Cooperation'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
+// Lazy loading для оптовых страниц
+const OptHome = lazy(() => import('./pages/opt/Home'));
+const OptCatalog = lazy(() => import('./pages/opt/Catalog'));
+const OptCategory = lazy(() => import('./pages/opt/Category'));
+const OptProduct = lazy(() => import('./pages/opt/Product'));
+
 // Fallback компонент для загрузки
 const LoadingFallback = () => (
   <div style={{ 
@@ -55,6 +61,12 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/thanks" element={<Thanks />} />
           <Route path="/admin/*" element={<AdminApp />} />
+          {/* Оптовые страницы */}
+          <Route path="/opt" element={<OptHome />} />
+          <Route path="/opt/catalog" element={<OptCatalog />} />
+          <Route path="/opt/catalog/:category" element={<OptCategory />} />
+          <Route path="/opt/catalog/:category/:slug" element={<OptProduct />} />
+          <Route path="/opt/product/:id" element={<OptProduct />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
