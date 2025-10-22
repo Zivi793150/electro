@@ -82,6 +82,8 @@ const Header = () => {
           <span className="nav-sep" />
           <Link to="/catalog">Каталог</Link>
           <span className="nav-sep" />
+          <Link to="/rental">Аренда</Link>
+          <span className="nav-sep" />
           <Link to="/cooperation">Сотрудничество</Link>
           <span className="nav-sep" />
           <Link to="/about">О компании</Link>
@@ -174,6 +176,7 @@ const Header = () => {
           <nav className="mobile-nav">
             <Link to="/" onClick={closeMenu}>Главная</Link>
             <Link to="/catalog" onClick={closeMenu}>Каталог</Link>
+            <Link to="/rental" onClick={closeMenu}>Аренда</Link>
             <Link to="/cooperation" onClick={closeMenu}>Сотрудничество</Link>
             <Link to="/about" onClick={closeMenu}>О компании</Link>
             <Link to="/contacts" onClick={closeMenu}>Контакты</Link>

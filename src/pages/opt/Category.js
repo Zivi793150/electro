@@ -183,8 +183,6 @@ const OptCategory = () => {
     { id: 'generators', name: 'Генераторы' },
     { id: 'diesel-generators', name: 'Дизельные генераторы' },
     { id: 'nasosy', name: 'Насосы' },
-    { id: 'peripheral-pump', name: 'Периферийный насос' },
-    { id: 'centrifugal-pump', name: 'Центробежный насос' },
     { id: 'measuring', name: 'Измерители' },
     // Новые категории
     { id: 'impact-wrench', name: 'Гайковерт ударный' },
@@ -203,6 +201,37 @@ const OptCategory = () => {
   ];
 
   const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+
+  // Фильтруем товары по категории (перенесено наверх)
+  const filteredProducts = products.filter(product => {
+    // Сначала проверяем готовый categorySlug из MongoDB
+    if (product.categorySlug) {
+      return product.categorySlug === category;
+    }
+    
+    // Fallback: если categorySlug нет, используем старую логику
+    if (!product.category) return false;
+    const productCategoryId = categoryToId(product.category.trim());
+    
+    // Спец-обработка для насосов: жёстко делим периферийные/центробежные
+    if (category === 'peripheral-pump') {
+      const t = product.category.toLowerCase();
+      return t.includes('перифер') && !t.includes('центробеж');
+    }
+    if (category === 'centrifugal-pump') {
+      const t = product.category.toLowerCase();
+      return t.includes('центробеж');
+    }
+
+    // Общая группа «насосы»: включаем все товары, где в человеко-читаемой категории встречается «насос»
+    if (category === 'nasosy') {
+      const t = product.category.toLowerCase();
+      return t.includes('насос');
+    }
+
+    // Прямое сравнение ID категорий
+    return productCategoryId === category;
+  });
 
   // Загрузка товаров с кэшированием
   useEffect(() => {
@@ -223,9 +252,11 @@ const OptCategory = () => {
   // Отслеживаем просмотр страницы категории
   useEffect(() => {
     trackPageView(`opt_category_${category}`);
-    
-    // Отслеживаем просмотр категории с количеством товаров
-    if (filteredProducts.length > 0) {
+  }, [category]);
+  
+  // Отслеживаем просмотр категории с количеством товаров (отдельный useEffect)
+  useEffect(() => {
+    if (filteredProducts.length > 0 && categories.length > 0) {
       const categoryName = categories.find(cat => cat.id === category)?.name || idToCategory(category);
       trackCategoryView(categoryName + ' (Опт)', category, filteredProducts.length);
     }
@@ -354,41 +385,6 @@ const OptCategory = () => {
     };
   }, [products]);
 
-  // Фильтруем товары по категории
-  const filteredProducts = products.filter(product => {
-    // Сначала проверяем готовый categorySlug из MongoDB
-    if (product.categorySlug) {
-      return product.categorySlug === category;
-    }
-    
-    // Fallback: если categorySlug нет, используем старую логику
-    if (!product.category) return false;
-    const productCategoryId = categoryToId(product.category.trim());
-    
-    // Отладочная информация (можно убрать после тестирования)
-    if (category === 'drills' && product.category.toLowerCase().includes('дрел')) {
-      console.log(`Debug: product.category="${product.category}", productCategoryId="${productCategoryId}", target category="${category}"`);
-    }
-    
-    // Спец-обработка для насосов: жёстко делим периферийные/центробежные
-    if (category === 'peripheral-pump') {
-      const t = product.category.toLowerCase();
-      return t.includes('перифер') && !t.includes('центробеж');
-    }
-    if (category === 'centrifugal-pump') {
-      const t = product.category.toLowerCase();
-      return t.includes('центробеж');
-    }
-
-    // Общая группа «насосы»: включаем все товары, где в человеко-читаемой категории встречается «насос»
-    if (category === 'nasosy') {
-      const t = product.category.toLowerCase();
-      return t.includes('насос');
-    }
-
-    // Прямое сравнение ID категорий
-    return productCategoryId === category;
-  });
 
   // Пагинация
   const indexOfLastProduct = currentPage * productsPerPage;

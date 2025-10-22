@@ -11,6 +11,8 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   const [article, setArticle] = useState(initialData?.article || '');
   const [image, setImage] = useState(initialData?.image || '');
   const [coverPhoto, setCoverPhoto] = useState(initialData?.coverPhoto || '');
+  const [rentalAvailable, setRentalAvailable] = useState(initialData?.rentalAvailable || false);
+  const [rentalPrice, setRentalPrice] = useState(initialData?.rentalPrice !== undefined ? String(initialData.rentalPrice) : '');
   
   // Динамические поля для фото
   const [additionalPhotos, setAdditionalPhotos] = useState(() => {
@@ -313,6 +315,15 @@ function ProductForm({ onClose, onSuccess, initialData }) {
     const imageVariants = localStorage.getItem('lastUploadedImageVariants');
     const parsedVariants = imageVariants ? JSON.parse(imageVariants) : null;
     
+    // Проверяем цену аренды, если аренда доступна
+    let parsedRentalPrice = null;
+    if (rentalAvailable) {
+      const rentalPriceStr = String(rentalPrice).replace(',', '.');
+      if (rentalPriceStr && !isNaN(Number(rentalPriceStr))) {
+        parsedRentalPrice = Number(rentalPriceStr);
+      }
+    }
+    
     try {
       let payload = { 
         name, 
@@ -329,7 +340,9 @@ function ProductForm({ onClose, onSuccess, initialData }) {
         equipment, 
         article,
         slug: slug || transliterate(name),
-        categorySlug: categorySlug || transliterate(category)
+        categorySlug: categorySlug || transliterate(category),
+        rentalAvailable: rentalAvailable,
+        rentalPrice: parsedRentalPrice
       };
       
       // Добавляем варианты изображений, если они есть
@@ -412,11 +425,44 @@ function ProductForm({ onClose, onSuccess, initialData }) {
             <input value={category} onChange={e=>setCategory(e.target.value)} placeholder="Например: Электроинструменты" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
           </div>
           
-          <div style={{marginBottom:0}}>
+          <div style={{marginBottom:10}}>
             <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Артикул</label>
             <input value={article} onChange={e=>setArticle(e.target.value)} placeholder="Например: 119356208" style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} />
             <small style={{color:'#6c757d',fontSize:12}}>Уникальный код товара</small>
           </div>
+        </div>
+
+        {/* Аренда */}
+        <div style={{background:'#fff3cd',border:'1px solid #ffc107',borderRadius:10,padding:16,marginBottom:16}}>
+          <h4 style={{margin:'0 0 12px 0',fontSize:16,fontWeight:600,color:'#856404'}}>🏠 Аренда</h4>
+          
+          <div style={{marginBottom:10}}>
+            <label style={{display:'flex',alignItems:'center',gap:8,cursor:'pointer'}}>
+              <input 
+                type="checkbox" 
+                checked={rentalAvailable} 
+                onChange={e=>setRentalAvailable(e.target.checked)} 
+                style={{width:18,height:18,cursor:'pointer'}}
+              />
+              <span style={{fontWeight:500,color:'#333',fontSize:14}}>Доступен для аренды</span>
+            </label>
+          </div>
+          
+          {rentalAvailable && (
+            <div>
+              <label style={{display:'block',marginBottom:4,fontWeight:500,color:'#333',fontSize:14}}>Цена аренды (в сутки, ₸)</label>
+              <input 
+                type="text" 
+                value={rentalPrice} 
+                onChange={e=>setRentalPrice(e.target.value)} 
+                placeholder="Например: 5000" 
+                style={{width:'100%',padding:10,borderRadius:6,border:'1px solid #ced4da',fontSize:14}} 
+              />
+              <small style={{color:'#856404',fontSize:12,marginTop:4,display:'block'}}>
+                Укажите стоимость аренды на 1 сутки в тенге
+              </small>
+            </div>
+          )}
         </div>
 
         {/* Изображения */}

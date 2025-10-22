@@ -10,6 +10,7 @@ import { initPageTracking } from './utils/analytics';
 const Home = lazy(() => import('./pages/Home'));
 const Catalog = lazy(() => import('./pages/Catalog'));
 const Category = lazy(() => import('./pages/Category'));
+const Rental = lazy(() => import('./pages/Rental'));
 const Product = lazy(() => import('./pages/Product'));
 const About = lazy(() => import('./pages/About'));
 const Contacts = lazy(() => import('./pages/Contacts'));
@@ -53,6 +54,8 @@ function App() {
           <Route path="/catalog" element={<Catalog />} />
           <Route path="/catalog/:category" element={<Category />} />
           <Route path="/catalog/:category/:slug" element={<Product />} />
+          <Route path="/rental" element={<Rental />} />
+          <Route path="/rental/:category" element={<Rental />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/about" element={<About />} />
           <Route path="/contacts" element={<Contacts />} />

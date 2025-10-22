@@ -759,12 +759,12 @@ const Product = () => {
             {miniProducts.map(product => (
               <div
                 key={`first-${product._id}`}
-                className="product-card catalog-mini-product-card"
+                className="product-card"
                 onClick={() => window.location.href = `/product/${product._id}`}
-                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
+                style={{ cursor: 'pointer' }}
               >
-                <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <picture style={{width: '100%', height: '100%'}}>
+                <div className="product-image">
+                  <picture>
                     <source 
                       srcSet={getOptimalImage(product, 'thumb')} 
                       type="image/webp"
@@ -772,23 +772,15 @@ const Product = () => {
                     <img 
                       src={getOptimalImage(product, 'thumb')} 
                       alt={product.name} 
-                      style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
                       loading="lazy"
                       width="200"
-                      height="120"
+                      height="160"
                     />
                   </picture>
                 </div>
-                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '0 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
-                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: '0 0 2px 0', lineHeight: 1.15, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  <div style={{width:'100%', textAlign:'left', margin:0, lineHeight:1}}>
-                    <span style={{color:'#888', fontSize:'0.78rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
-                  </div>
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:0, justifyContent:'flex-start', width:'100%', lineHeight:1}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                    <span style={{height:'1.2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 6px',verticalAlign:'middle'}}></span>
-                  </div>
+                <div className="product-info">
+                  <div className="product-name">{product.name}</div>
+                  <div className="product-price">{product.price ? formatTenge(product.price) + ' ₸' : ''}</div>
                 </div>
               </div>
             ))}
@@ -796,12 +788,12 @@ const Product = () => {
             {miniProducts.map(product => (
               <div
                 key={`second-${product._id}`}
-                className="product-card catalog-mini-product-card"
+                className="product-card"
                 onClick={() => window.location.href = `/product/${product._id}`}
-                style={{ cursor: 'pointer', minHeight: 0, position: 'relative', fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 400, background: '#fff', minWidth: 200, maxWidth: 220, margin: '0 4px', border: '1px solid #e3e6ea', borderRadius: 0 }}
+                style={{ cursor: 'pointer' }}
               >
-                <div className="product-image" style={{height: '120px', padding: 0, margin: 0, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <picture style={{width: '100%', height: '100%'}}>
+                <div className="product-image">
+                  <picture>
                     <source 
                       srcSet={getOptimalImage(product, 'thumb')} 
                       type="image/webp"
@@ -809,23 +801,15 @@ const Product = () => {
                     <img 
                       src={getOptimalImage(product, 'thumb')} 
                       alt={product.name} 
-                      style={{width: '100%', height: '100%', objectFit: 'contain', display: 'block', background:'#fff'}} 
                       loading="lazy"
                       width="200"
-                      height="120"
+                      height="160"
                     />
                   </picture>
                 </div>
-                <div className="catalog-mini-product-divider" style={{width:'90%',maxWidth:'200px',borderTop:'1px solid #bdbdbd',margin:'0 auto', alignSelf:'center'}}></div>
-                <div className="product-info" style={{padding: '0 6px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
-                  <span style={{fontSize: '0.9rem', fontWeight: 500, color: '#1a2236', margin: '0 0 2px 0', lineHeight: 1.15, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%'}}>{product.name}</span>
-                  <div style={{width:'100%', textAlign:'left', margin:0, lineHeight:1}}>
-                    <span style={{color:'#888', fontSize:'0.78rem', fontWeight:400, letterSpacing:0.2}}>Цена</span>
-                  </div>
-                  <div style={{display: 'flex', alignItems: 'center', marginTop: 0, marginBottom:0, justifyContent:'flex-start', width:'100%', lineHeight:1}}>
-                    <span className="product-price" style={{color:'#FFB300',fontWeight:'bold',fontSize:'1rem',letterSpacing:0.3}}>{product.price ? formatTenge(product.price) + ' ₸' : ''}</span>
-                    <span style={{height:'1.2em',width:'1px',background:'#bdbdbd',display:'inline-block',margin:'0 0 0 6px',verticalAlign:'middle'}}></span>
-                  </div>
+                <div className="product-info">
+                  <div className="product-name">{product.name}</div>
+                  <div className="product-price">{product.price ? formatTenge(product.price) + ' ₸' : ''}</div>
                 </div>
               </div>
             ))}
