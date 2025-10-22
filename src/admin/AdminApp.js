@@ -7,6 +7,7 @@ import '../styles/Admin.css';
 // Lazy loading для админских компонентов
 const AdminLogin = lazy(() => import('./Login'));
 const AdminProductList = lazy(() => import('./ProductList'));
+const RentalList = lazy(() => import('./RentalList'));
 const SiteSettings = lazy(() => import('./SiteSettings'));
 const PickupPoints = lazy(() => import('./PickupPoints'));
 const ProductVariations = lazy(() => import('./ProductVariations'));
@@ -45,6 +46,7 @@ const AdminApp = () => {
       <Routes>
         <Route path="/login" element={<AdminLogin onLogin={handleLogin} />} />
         <Route path="/products" element={isAuth ? <AdminProductList onLogout={handleLogout} /> : <Navigate to="/login" />} />
+        <Route path="/rental" element={isAuth ? <RentalList onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/orders" element={isAuth ? <Orders onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/variations" element={isAuth ? <ProductVariations onLogout={handleLogout} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={isAuth ? <SiteSettings onLogout={handleLogout} /> : <Navigate to="/login" />} />

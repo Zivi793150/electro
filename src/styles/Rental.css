@@ -6,15 +6,6 @@
   min-height: 320px !important;
 }
 
-.rental-page .product-link {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  text-decoration: none;
-  color: inherit;
-  min-height: 0;
-}
-
 .rental-page .product-image {
   height: 160px !important;
   min-height: 160px !important;

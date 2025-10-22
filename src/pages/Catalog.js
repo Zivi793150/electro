@@ -252,7 +252,9 @@ const Catalog = () => {
     
     fetchWithCache(API_URL, {}, 10 * 60 * 1000) // Кэш на 10 минут
       .then(data => {
-        setProducts(data);
+        // Фильтруем товары - показываем только доступные для продажи
+        const saleProducts = data.filter(p => p.saleAvailable !== false);
+        setProducts(saleProducts);
         setLoading(false);
       })
       .catch(err => {

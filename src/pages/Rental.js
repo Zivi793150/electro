@@ -211,30 +211,8 @@ const Rental = () => {
     <div className="catalog rental-page">
       <Header />
       <main className="catalog-main">
-        <div className="container catalog-layout">
-          <aside className="catalog-sidebar desktop-sidebar">
-            <h3 className="sidebar-title">Категории</h3>
-            {categoriesLoading ? (
-              <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
-                Загрузка категорий...
-              </div>
-            ) : (
-              <ul className="sidebar-categories">
-                {categories.map(cat => (
-                  <li key={cat.id}>
-                    <Link
-                      to={`/rental/${cat.id}`}
-                      className={category === cat.id ? 'active' : ''}
-                    >
-                      {cat.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </aside>
-          
-          <div className="catalog-content">
+        <div className="container">
+          <div className="catalog-content" style={{ maxWidth: '100%', margin: '0 auto' }}>
             <h1 className="catalog-title">
               {category ? getCategoryDisplayName() : 'Аренда инструмента'}
             </h1>
@@ -256,24 +234,22 @@ const Rental = () => {
                 <div className="catalog-products-grid">
                   {currentProducts.map(product => (
                     <div key={product._id} className="product-card rental-card">
-                      <Link to={`/product/${product._id}`} className="product-link">
-                        <div className="product-image">
-                          <picture>
-                            <source
-                              srcSet={getOptimalImage(product, 'medium')}
-                              type="image/webp"
-                            />
-                            <img
-                              src={getOptimalImage(product, 'medium')}
-                              alt={getProductDisplayName(product)}
-                              loading="lazy"
-                            />
-                          </picture>
-                        </div>
-                        <div className="product-info">
-                          <div className="product-name">{getProductDisplayName(product)}</div>
-                        </div>
-                      </Link>
+                      <div className="product-image">
+                        <picture>
+                          <source
+                            srcSet={getOptimalImage(product, 'medium')}
+                            type="image/webp"
+                          />
+                          <img
+                            src={getOptimalImage(product, 'medium')}
+                            alt={getProductDisplayName(product)}
+                            loading="lazy"
+                          />
+                        </picture>
+                      </div>
+                      <div className="product-info">
+                        <div className="product-name">{getProductDisplayName(product)}</div>
+                      </div>
                       <div className="rental-footer">
                         <div className="product-price">
                           {product.rentalPrice ? formatTenge(product.rentalPrice) + ' ₸/сутки' : 'Цена по запросу'}
@@ -283,7 +259,7 @@ const Rental = () => {
                           className="rental-btn"
                           onClick={(e) => handleRentClick(e, product)}
                         >
-                          Арендовать
+                          Аренда
                         </button>
                       </div>
                     </div>
