@@ -267,6 +267,27 @@ const Catalog = () => {
   useEffect(() => {
     trackPageView('catalog');
   }, []);
+  
+  // Слушаем уведомления об обновлении цен
+  useEffect(() => {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('price_update');
+      
+      channel.onmessage = (event) => {
+        if (event.data.type === 'prices_updated') {
+          console.log('🔄 Получено уведомление об обновлении цен. Перезагружаем страницу...');
+          // Перезагружаем страницу через 1 секунду
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }
+      };
+      
+      return () => {
+        channel.close();
+      };
+    }
+  }, []);
 
   // Извлечение категорий из товаров
   useEffect(() => {

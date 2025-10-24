@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiCache } from '../utils/cache';
 
 const API_URL = 'https://electro-1-vjdu.onrender.com/api/information';
 
@@ -83,8 +84,24 @@ const SiteSettings = ({ onLogout }) => {
         if (data.success) {
           console.log('Ответ сервера:', data);
           console.log('Сохраненный процент наценки:', data.information?.markupPercentage);
-          setMessage('✅ Настройки сохранены! Цены успешно пересчитаны.');
-          setTimeout(() => setMessage(''), 5000);
+          
+          // Очищаем весь кэш товаров, чтобы цены обновились
+          apiCache.clear();
+          console.log('🗑️ Кэш товаров очищен');
+          
+          // Уведомляем все открытые вкладки об изменении цен
+          try {
+            if (typeof BroadcastChannel !== 'undefined') {
+              const channel = new BroadcastChannel('price_update');
+              channel.postMessage({ type: 'prices_updated', timestamp: Date.now() });
+              channel.close();
+            }
+          } catch (e) {
+            console.log('Не удалось отправить BroadcastChannel:', e);
+          }
+          
+          setMessage('✅ Настройки сохранены! Цены пересчитаны. Обновите страницы каталога (F5) для просмотра новых цен.');
+          setTimeout(() => setMessage(''), 8000);
         } else {
           throw new Error(data.error || 'Ошибка сохранения');
         }
