@@ -11,6 +11,14 @@ function RentalList({ onLogout }) {
   const [rentalProducts, setRentalProducts] = useState([]);
   const [saleProducts, setSaleProducts] = useState([]);
   const [activeTab, setActiveTab] = useState('rental'); // 'rental' или 'available'
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    image: '',
+    rentalPrice: '',
+    category: ''
+  });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -101,6 +109,81 @@ function RentalList({ onLogout }) {
     }
   };
 
+  const handleFileUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+    
+    setUploadingImage(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('image', files[0]);
+      
+      const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки файла');
+      }
+      
+      const result = await response.json();
+      
+      if (result.webp) {
+        setNewProduct({ ...newProduct, image: result.webp.path });
+        alert('✅ Изображение успешно загружено!');
+      } else {
+        setNewProduct({ ...newProduct, image: result.original.path });
+        alert('✅ Файл успешно загружен!');
+      }
+    } catch (err) {
+      alert('Ошибка загрузки файла: ' + err.message);
+    } finally {
+      setUploadingImage(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleCreateRentalProduct = async (e) => {
+    e.preventDefault();
+    
+    if (!newProduct.name || !newProduct.rentalPrice) {
+      alert('Заполните название и цену аренды');
+      return;
+    }
+
+    try {
+      const response = await fetch(PRODUCTS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newProduct.name,
+          image: newProduct.image || '/images/products/placeholder.png',
+          priceUSD: '0',
+          category: newProduct.category || 'Аренда',
+          rentalAvailable: true,
+          rentalPrice: parseFloat(newProduct.rentalPrice),
+          saleAvailable: false,
+          description: '',
+          characteristics: '',
+          slug: newProduct.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+          categorySlug: (newProduct.category || 'аренда').toLowerCase().replace(/[^a-z0-9]/g, '-')
+        })
+      });
+
+      if (response.ok) {
+        fetchProducts();
+        setShowAddForm(false);
+        setNewProduct({ name: '', image: '', rentalPrice: '', category: '' });
+        alert('Товар для аренды добавлен!');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+      alert('Ошибка при создании товара');
+    }
+  };
+
   const filteredRentalProducts = rentalProducts.filter(p =>
     p.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -115,6 +198,21 @@ function RentalList({ onLogout }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700' }}>🏠 Управление арендой</h1>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button
+            onClick={() => setShowAddForm(true)}
+            style={{
+              padding: '10px 20px',
+              background: '#28a745',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '14px'
+            }}
+          >
+            + Добавить товар для аренды
+          </button>
           <Link to="/admin/products" style={{ textDecoration: 'none', color: '#1e88e5', fontWeight: '500' }}>
             ← К товарам
           </Link>
@@ -293,6 +391,184 @@ function RentalList({ onLogout }) {
             </div>
           )}
         </>
+      )}
+
+      {/* Add Product Form Modal */}
+      {showAddForm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: '12px',
+            padding: '24px',
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>Добавить товар для аренды</h2>
+              <button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setNewProduct({ name: '', image: '', rentalPrice: '', category: '' });
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateRentalProduct}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '14px' }}>
+                  Название товара *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newProduct.name}
+                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                  placeholder="Например: Перфоратор Makita"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '14px' }}>
+                  Цена аренды (₸/сутки) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={newProduct.rentalPrice}
+                  onChange={(e) => setNewProduct({ ...newProduct, rentalPrice: e.target.value })}
+                  placeholder="5000"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '14px' }}>
+                  Категория
+                </label>
+                <input
+                  type="text"
+                  value={newProduct.category}
+                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                  placeholder="Например: Перфораторы"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', fontSize: '14px' }}>
+                  Главное фото
+                </label>
+                <input
+                  type="text"
+                  value={newProduct.image}
+                  onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+                  placeholder="URL главного изображения"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    marginBottom: '8px'
+                  }}
+                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    disabled={uploadingImage}
+                    style={{ flex: 1, fontSize: '14px' }}
+                  />
+                  {uploadingImage && (
+                    <span style={{ color: '#1e88e5', fontSize: '14px' }}>Загрузка...</span>
+                  )}
+                </div>
+                <small style={{ color: '#666', fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                  💡 Загрузите файл или вставьте URL. Если не указано - placeholder
+                </small>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setNewProduct({ name: '', image: '', rentalPrice: '', category: '' });
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: '#f5f5f5',
+                    color: '#333',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '500'
+                  }}
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: '#28a745',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  Создать
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

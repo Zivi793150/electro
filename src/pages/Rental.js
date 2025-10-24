@@ -213,7 +213,7 @@ const Rental = () => {
       <main className="catalog-main">
         <div className="container">
           <div className="catalog-content" style={{ maxWidth: '100%', margin: '0 auto' }}>
-            <h1 className="catalog-title">
+            <h1 className="catalog-title" style={{ textAlign: 'center' }}>
               {category ? getCategoryDisplayName() : 'Аренда инструмента'}
             </h1>
             

@@ -14,7 +14,7 @@ const Contacts = () => {
   const handleSubmitForm = () => {};
   const handleSocialClick = (platform) => {
     const urls = {
-      WhatsApp: `https://wa.me/${'+77474777989'.replace(/\s/g, '')}`,
+      WhatsApp: `https://wa.me/${'+77075177385'.replace(/\\s/g, '')}`,
       Instagram: 'https://www.instagram.com/eltok.kz_official',
       Facebook: 'https://www.facebook.com/profile.php?id=61580230661013',
       TikTok: 'https://www.tiktok.com/@eltok.kz'
@@ -136,8 +136,7 @@ const Contacts = () => {
                 📍 Танкер Тулс
               </div>
               <div style="font-size: 14px; color: #666; margin-bottom: 8px;">
-                г. Алматы, Аймусин улица, 1в<br>
-                Достык М-Н, Ауэзовский район
+                г. Алматы, ул. Аймусин 1в
               </div>
               <div style="font-size: 12px; color: #888;">
                 Координаты: 43.233801, 76.816602
@@ -278,8 +277,7 @@ const Contacts = () => {
                 Танкер Тулс
               </h3>
               <p style="margin-bottom: 25px; color: #666; line-height: 1.6; font-size: 16px;">
-                г. Алматы, Аймусин улица, 1в<br>
-                Достык М-Н, Ауэзовский район
+                г. Алматы, ул. Аймусин 1в
               </p>
               
               <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
@@ -394,11 +392,11 @@ const Contacts = () => {
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/telephone.svg" alt="Телефон" width={24} height={24} loading="lazy" /></span><span>Телефоны</span></div>
                 <div className="contact-card-content">
                   <a 
-                    href="tel:+77474777989" 
+                    href="tel:+77075177385" 
                     style={{color: 'inherit', textDecoration: 'none'}}
-                    onClick={() => trackPhoneClick('+7 747 477 79 89', 'contacts_page')}
+                    onClick={() => trackPhoneClick('+7 707 517 73 85', 'contacts_page')}
                   >
-                    +7 747 477 79 89
+                    +7 707 517 73 85
                   </a>
                 </div>
               </div>
@@ -408,11 +406,11 @@ const Contacts = () => {
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/map.svg" alt="Адрес" width={24} height={24} loading="lazy" /></span><span>Адрес</span></div>
-                <div className="contact-card-content">г. Алматы, Аймусин улица, 1в<br />Достык М-Н, Ауэзовский район</div>
+                <div className="contact-card-content">г. Алматы, ул. Аймусин 1в</div>
               </div>
               <div className="contact-card">
                 <div className="contact-card-header"><span className="contact-card-icon"><img src="/icons/clock.svg" alt="Часы" width={24} height={24} loading="lazy" /></span><span>Режим работы</span></div>
-                <div className="contact-card-content">Пн-Пт: 9:00 - 18:00<br />Сб: 10:00 - 16:00<br />Вс: выходной</div>
+                <div className="contact-card-content">Пн-Пт: 9:00 - 18:00<br />Сб: 10:00 - 16:00</div>
               </div>
             </div>
             <div className="contact-form">

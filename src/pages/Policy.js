@@ -18,35 +18,43 @@ const Policy = () => {
             <div className="details-grid">
               <div className="detail-item">
                 <span className="detail-label">Название:</span>
-                <span className="detail-value">ТОО "Танкер Тулс"</span>
+                <span className="detail-value">A-Market</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">БИН:</span>
-                <span className="detail-value">123456789000</span>
+                <span className="detail-value">940727401776</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">ИИК:</span>
-                <span className="detail-value">KZ123456789</span>
+                <span className="detail-value">KZ04722S000042260245</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">КБЕ:</span>
-                <span className="detail-value">17</span>
+                <span className="detail-value">19</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Банк:</span>
+                <span className="detail-value">АО «Kaspi Bank»</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">БИК:</span>
+                <span className="detail-value">CASPKZKA</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Юридический адрес:</span>
-                <span className="detail-value">г. Алматы, ул. Примерная 1, Бизнес-центр "Танкер", офис 205</span>
+                <span className="detail-value">г. Алматы, ул. Аймусин 1в</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Фактический адрес:</span>
-                <span className="detail-value">г. Алматы, ул. Примерная 1, Бизнес-центр "Танкер", офис 205</span>
+                <span className="detail-value">г. Алматы, ул. Аймусин 1в</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Телефон:</span>
-                <span className="detail-value">+7 (777) 777-77-77</span>
+                <span className="detail-value">+7 (707) 517-73-85</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Email:</span>
-                <span className="detail-value">info@tankertools.kz</span>
+                <span className="detail-value">info@eltok.kz</span>
               </div>
             </div>
           </section>
@@ -103,13 +111,13 @@ const Policy = () => {
               <ul>
                 <li>Стоимость доставки: от 3 000 ₸ (зависит от расстояния)</li>
                 <li>Время доставки: на следующий день после заказа</li>
-                <li>Доставка в города: Талдыкорган, Капчагай, Уштобе</li>
+                <li>Доставка в города: Регионы Казахстана</li>
               </ul>
               
               <h3>📦 Самовывоз</h3>
               <ul>
-                <li>Адрес: г. Алматы, ул. Примерная 1, БЦ "Танкер", офис 205</li>
-                <li>Время работы: Пн-Пт 9:00-18:00, Сб 10:00-16:00</li>
+                <li>Адрес: г. Алматы, ул. Аймусин 1в</li>
+                <li>Время работы: Без выходных</li>
                 <li>Бесплатно</li>
               </ul>
             </div>
@@ -174,22 +182,19 @@ const Policy = () => {
             <div className="contact-grid">
               <div className="contact-item">
                 <h3>📞 Телефоны</h3>
-                <p>+7 (777) 777-77-77</p>
-                <p>+7 (727) 777-77-77</p>
+                <p>+7 (707) 517-73-85</p>
               </div>
               <div className="contact-item">
-                <h3>✉ Email</h3>
+                <h3>✉️ Email</h3>
                 <p>info@eltok.kz</p>
               </div>
               <div className="contact-item">
                 <h3>📍 Адрес</h3>
-                <p>г. Алматы, ул. Примерная 1</p>
-                <p>БЦ "Eltok", офис 205</p>
+                <p>г. Алматы, ул. Аймусин 1в</p>
               </div>
               <div className="contact-item">
                 <h3>🕒 Режим работы</h3>
-                <p>Пн-Пт: 9:00-18:00</p>
-                <p>Сб: 10:00-16:00</p>
+                <p>Без выходных</p>
               </div>
             </div>
           </section>

@@ -513,6 +513,18 @@ const Catalog = () => {
             )}
           </aside>
           <div className="catalog-content">
+            {/* Хлебные крошки как на странице продукта */}
+            <nav className="breadcrumbs" style={{paddingBottom: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
+              <a href="/">Главная</a>
+              <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+              <a href="/catalog">Каталог</a>
+              {selectedCategory && (
+                <>
+                  <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
+                  <span style={{color:'#1a2236', fontWeight:500}}>{categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory)}</span>
+                </>
+              )}
+            </nav>
             <div className="category-dropdown-container mobile-dropdown">
               <div className={`category-dropdown ${isDropdownOpen ? 'open' : ''}`}>
                 <button 
@@ -549,18 +561,6 @@ const Catalog = () => {
                 )}
               </div>
             </div>
-            {/* Хлебные крошки как на странице продукта */}
-            <nav className="breadcrumbs" style={{paddingBottom: '12px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px'}}>
-              <a href="/">Главная</a>
-              <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-              <a href="/catalog">Каталог</a>
-              {selectedCategory && (
-                <>
-                  <span style={{margin: '0 8px', color: '#bdbdbd', fontSize: '18px'}}>&rarr;</span>
-                  <span style={{color:'#1a2236', fontWeight:500}}>{categories.find(cat => cat.id === selectedCategory)?.name || idToCategory(selectedCategory)}</span>
-                </>
-              )}
-            </nav>
             <h1 className="catalog-title" style={{textAlign: 'left', marginLeft: 0, marginTop: 0}}>
               {categoriesLoading 
                 ? 'Каталог товаров' 

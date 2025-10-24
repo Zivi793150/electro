@@ -269,6 +269,33 @@
             });
         });
       }
+      
+      // Дополнительная защита изображений на уровне страницы
+      document.addEventListener('DOMContentLoaded', function() {
+        // Блокировка контекстного меню на изображениях
+        document.addEventListener('contextmenu', function(e) {
+          if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+          }
+        });
+        
+        // Блокировка PrintScreen
+        document.addEventListener('keyup', function(e) {
+          if (e.key === 'PrintScreen') {
+            navigator.clipboard.writeText('');
+            console.log('Скриншоты отключены');
+          }
+        });
+        
+        // Блокировка перетаскивания
+        document.addEventListener('dragstart', function(e) {
+          if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+          }
+        });
+      });
     </script>
   </head>
   <body>

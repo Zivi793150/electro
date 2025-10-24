@@ -68,6 +68,9 @@ const SiteSettings = ({ onLogout }) => {
     console.log('Отправляем данные на сохранение:', information);
     console.log('Процент наценки:', information.markupPercentage);
     
+    // Показываем уведомление о пересчёте цен
+    setMessage('🔄 Сохранение настроек и пересчёт цен...');
+    
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -80,8 +83,8 @@ const SiteSettings = ({ onLogout }) => {
         if (data.success) {
           console.log('Ответ сервера:', data);
           console.log('Сохраненный процент наценки:', data.information?.markupPercentage);
-          setMessage('✅ Информация успешно сохранена!');
-          setTimeout(() => setMessage(''), 3000);
+          setMessage('✅ Настройки сохранены! Цены успешно пересчитаны.');
+          setTimeout(() => setMessage(''), 5000);
         } else {
           throw new Error(data.error || 'Ошибка сохранения');
         }
@@ -193,7 +196,7 @@ const SiteSettings = ({ onLogout }) => {
               placeholder="20"
               style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14}}
             />
-            <small style={{color: '#6c757d', fontSize: 12}}>Процент наценки при конвертации цен из USD в KZT (по умолчанию: 20%)</small>
+            <small style={{color: '#6c757d', fontSize: 12}}>Процент наценки при конвертации цен из USD в KZT. При изменении все цены будут автоматически пересчитаны.</small>
           </div>
           
           <div style={{marginBottom: 0}}>

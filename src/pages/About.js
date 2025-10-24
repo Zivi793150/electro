@@ -22,10 +22,10 @@ const About = () => (
           <section className="about-experience">
             <h2>Наш опыт</h2>
             <div className="experience-grid">
-            <div className="experience-item"><div className="experience-number">10+</div><div className="experience-text">Лет на рынке</div></div>
+            <div className="experience-item"><div className="experience-number">3</div><div className="experience-text">Года на рынке</div></div>
             <div className="experience-item"><div className="experience-number">5000+</div><div className="experience-text">Довольных клиентов</div></div>
             <div className="experience-item"><div className="experience-number">1000+</div><div className="experience-text">Товаров в каталоге</div></div>
-            <div className="experience-item"><div className="experience-number">24/7</div><div className="experience-text">Поддержка клиентов</div></div>
+            <div className="experience-item"><div className="experience-number">12 часов</div><div className="experience-text">Поддержка клиентов</div></div>
             </div>
           </section>
           <section className="about-history">

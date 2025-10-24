@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { trackSocialClick, trackPhoneClick } from '../utils/analytics';
 import '../styles/Header.css';
 
 const Header = () => {
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [siteSettings, setSiteSettings] = useState({
-    contactInfo: {
-      phone: '+7 747 477 79 89',
-      email: 'info@eltok.kz',
-      address: 'Аймусина 1в'
-    },
-    city: 'Алматы'
-  });
+  
+  // Загружаем данные из localStorage или используем значения по умолчанию
+  const getInitialSettings = () => {
+    const cached = localStorage.getItem('siteSettings');
+    if (cached) {
+      try {
+        return JSON.parse(cached);
+      } catch (e) {
+        console.error('Ошибка парсинга сохраненных настроек:', e);
+      }
+    }
+    return {
+      contactInfo: {
+        phone: '+7 747 477 79 89',
+        email: 'info@eltok.kz',
+        address: 'Аймусина 1в'
+      },
+      city: 'Алматы'
+    };
+  };
+  
+  const [siteSettings, setSiteSettings] = useState(getInitialSettings);
 
   useEffect(() => {
     const handleEscape = (e) => {
@@ -25,7 +40,7 @@ const Header = () => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isMenuOpen]);
 
-  // Загружаем информацию сайта
+  // Загружаем информацию сайта при монтировании компонента
   useEffect(() => {
     fetch('https://electro-1-vjdu.onrender.com/api/information')
       .then(res => res.json())
@@ -33,6 +48,8 @@ const Header = () => {
         if (data.information) {
           console.log('Header: Загруженные данные из БД:', data.information);
           setSiteSettings(data.information);
+          // Сохраняем в localStorage для быстрого доступа при следующих загрузках
+          localStorage.setItem('siteSettings', JSON.stringify(data.information));
         }
       })
       .catch(error => {

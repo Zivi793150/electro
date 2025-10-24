@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { trackPhoneClick } from '../utils/analytics';
 import '../styles/Footer.css';
 
 const Footer = () => {
+  const location = useLocation();
   const [siteSettings, setSiteSettings] = useState({
     city: 'Алматы',
     contactInfo: {
-      phone: '+77474777989',
+      phone: '+7 707 517 73 85',
       email: 'info@eltok.kz',
       address: 'Аймусина 1в'
     },
@@ -19,7 +20,7 @@ const Footer = () => {
     }
   });
 
-  // Загружаем информацию сайта
+  // Загружаем информацию сайта при монтировании и изменении роута
   useEffect(() => {
     fetch('https://electro-1-vjdu.onrender.com/api/information')
       .then(res => res.json())
@@ -32,7 +33,7 @@ const Footer = () => {
       .catch(error => {
         console.log('Ошибка загрузки информации в Footer, используются значения по умолчанию:', error);
       });
-  }, []);
+  }, [location.pathname]);
   return (
     <footer className="footer">
       <div className="footer-grid">

@@ -1,10 +1,12 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+import './styles/ImageProtection.css';
 import Checkout from './pages/Checkout';
 import AdminApp from './admin/AdminApp';
 import FloatingButtons from './components/FloatingButtons';
 import { initPageTracking } from './utils/analytics';
+import { initImageProtection } from './utils/imageProtection';
 
 // Lazy loading для всех страниц
 const Home = lazy(() => import('./pages/Home'));
@@ -43,6 +45,9 @@ function App() {
   useEffect(() => {
     // Инициализируем отслеживание аналитики
     initPageTracking();
+    
+    // Инициализируем защиту изображений
+    initImageProtection();
   }, []);
 
   return (

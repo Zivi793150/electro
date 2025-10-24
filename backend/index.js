@@ -438,14 +438,14 @@ app.post('/api/products', async (req, res) => {
       const rate = await fetchUsdKztRate();
       
       // Получаем настраиваемый процент наценки
-      let markupPercentage = 20; // по умолчанию
+      let markupPercentage = 0; // по умолчанию
       try {
         const information = await Information.findOne();
         if (information && information.markupPercentage !== undefined) {
           markupPercentage = information.markupPercentage;
         }
       } catch (e) {
-        console.log('Ошибка получения процента наценки, используется 20%:', e.message);
+        console.log('Ошибка получения процента наценки, используется 0%:', e.message);
       }
       
       const markupMultiplier = 1 + (markupPercentage / 100);
@@ -486,14 +486,14 @@ app.put('/api/products/:id', async (req, res) => {
       const rate = await fetchUsdKztRate();
       
       // Получаем настраиваемый процент наценки
-      let markupPercentage = 20; // по умолчанию
+      let markupPercentage = 0; // по умолчанию
       try {
         const information = await Information.findOne();
         if (information && information.markupPercentage !== undefined) {
           markupPercentage = information.markupPercentage;
         }
       } catch (e) {
-        console.log('Ошибка получения процента наценки, используется 20%:', e.message);
+        console.log('Ошибка получения процента наценки, используется 0%:', e.message);
       }
       
       const markupMultiplier = 1 + (markupPercentage / 100);
@@ -541,7 +541,7 @@ app.get('/api/information', async (req, res) => {
       // Миграция: добавляем поле markupPercentage если его нет
       if (information.markupPercentage === undefined) {
         console.log('Добавляем поле markupPercentage к существующей записи');
-        information.markupPercentage = 20;
+        information.markupPercentage = 0;
         await information.save();
       }
     }
@@ -569,6 +569,9 @@ app.post('/api/information', async (req, res) => {
     let existingInformation = await Information.findOne();
     console.log('Существующая информация в БД:', existingInformation ? 'найдена' : 'не найдена');
     
+    const oldMarkup = existingInformation ? existingInformation.markupPercentage : null;
+    const newMarkup = information.markupPercentage;
+    
     if (existingInformation) {
       console.log('Старый процент наценки:', existingInformation.markupPercentage);
       // Обновляем существующую информацию
@@ -581,6 +584,44 @@ app.post('/api/information', async (req, res) => {
       // Создаем новую информацию
       existingInformation = new Information(information);
       await existingInformation.save();
+    }
+    
+    // Если процент наценки изменился, пересчитываем все цены
+    if (oldMarkup !== null && oldMarkup !== newMarkup) {
+      console.log(`Процент наценки изменился с ${oldMarkup}% на ${newMarkup}%. Пересчитываем цены...`);
+      
+      try {
+        const rate = await fetchUsdKztRate();
+        
+        // Находим все товары с priceUSD
+        const products = await Product.find({ priceUSD: { $exists: true, $ne: null, $ne: '' } });
+        console.log(`Найдено ${products.length} товаров с ценой в USD`);
+        
+        let updatedCount = 0;
+        for (const product of products) {
+          const usd = parseFloat(String(product.priceUSD).replace(',', '.'));
+          if (!isNaN(usd)) {
+            const markupMultiplier = 1 + (newMarkup / 100);
+            const newPrice = Math.round(usd * rate * markupMultiplier);
+            
+            product.price = newPrice;
+            product.meta = { 
+              ...(product.meta || {}), 
+              usdKztRateUsed: rate, 
+              margin: newMarkup / 100,
+              lastPriceUpdate: new Date()
+            };
+            
+            await product.save();
+            updatedCount++;
+          }
+        }
+        
+        console.log(`Успешно обновлено цен: ${updatedCount}`);
+      } catch (priceUpdateError) {
+        console.error('Ошибка при обновлении цен:', priceUpdateError);
+        // Не возвращаем ошибку, чтобы настройки всё равно сохранились
+      }
     }
     
     console.log('Финальный процент наценки в ответе:', existingInformation.markupPercentage);
