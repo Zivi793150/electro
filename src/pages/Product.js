@@ -746,7 +746,13 @@ const Product = () => {
                     marginBottom: 6,
                     fontWeight: 500,
                     marginTop: 12,
-                    lineHeight: 1.3
+                    lineHeight: 1.3,
+                    wordWrap: 'break-word',
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word',
+                    whiteSpace: 'normal',
+                    maxWidth: '100%',
+                    width: '100%'
                   }}>
                     {siteSettings.productPageText}
                   </div>

@@ -311,6 +311,18 @@
   justify-content: flex-start;
   box-sizing: border-box;
 }
+
+/* Стили для текста под кнопкой купить */
+.product-page-text {
+  word-wrap: break-word !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
 .product-tabs {
   background: #fff;
   border-radius: 12px;
