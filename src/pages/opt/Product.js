@@ -525,7 +525,7 @@ const OptProduct = () => {
             {/* Инфо и цена справа */}
             <div className="product-info-block">
               <>
-                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 4, wordBreak: 'break-word', marginTop: 8, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
+                <h1 className="product-title" style={{fontWeight: 700, fontSize: '1.4rem', maxWidth: 320, marginBottom: 4, wordBreak: 'break-word', marginTop: 0, lineHeight: 1.2}}>{getCurrentProduct().name}</h1>
                 <div className="product-short-desc" style={{fontSize: '1rem', color: '#222', marginBottom: 6, fontWeight: 500, marginTop: 0, lineHeight: 1.3}}>{shortDesc}</div>
                 <div className="product-subtitle" style={{width: '100%', maxWidth: 'none'}}>{getCurrentProduct().subtitle}</div>
                 <div className="product-divider"></div>
@@ -726,20 +726,21 @@ const OptProduct = () => {
                     >
                       Заказать
                     </button>
-                    {siteSettings.productPageText && (
-                      <div className="product-page-text" style={{
-                        marginTop: '12px',
-                        fontSize: '0.95rem',
-                        color: '#666',
-                        lineHeight: 1.4,
-                        textAlign: 'left'
-                      }}>
-                        {siteSettings.productPageText}
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="product-divider"></div>
+                {siteSettings.productPageText && (
+                  <div className="product-page-text" style={{
+                    fontSize: '1rem',
+                    color: '#222',
+                    marginBottom: 6,
+                    fontWeight: 500,
+                    marginTop: 12,
+                    lineHeight: 1.3
+                  }}>
+                    {siteSettings.productPageText}
+                  </div>
+                )}
                 {/* Блок доставки скрыт по требованию */}
               </>
             </div>
