@@ -10,6 +10,7 @@ const SiteSettings = ({ onLogout }) => {
     city: 'Алматы',
     markupPercentage: 20,
     showPromoCode: false,
+    productPageText: '',
     deliveryInfo: {
       freeDelivery: 'Бесплатная доставка по городу',
       freeDeliveryNote: 'Сегодня — БЕСПЛАТНО',
@@ -216,7 +217,7 @@ const SiteSettings = ({ onLogout }) => {
             <small style={{color: '#6c757d', fontSize: 12}}>Процент наценки при конвертации цен из USD в KZT. При изменении все цены будут автоматически пересчитаны.</small>
           </div>
           
-          <div style={{marginBottom: 0}}>
+          <div style={{marginBottom: 16}}>
             <label style={{display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500, color: '#333', fontSize: 14}}>
               <input 
                 type="checkbox"
@@ -227,6 +228,18 @@ const SiteSettings = ({ onLogout }) => {
               Показывать поле промокода на странице оформления заказа
             </label>
             <small style={{color: '#6c757d', fontSize: 12}}>Включите, чтобы пользователи могли вводить промокоды при оформлении заказа</small>
+          </div>
+          
+          <div style={{marginBottom: 0}}>
+            <label style={{display: 'block', marginBottom: 6, fontWeight: 500, color: '#333', fontSize: 14}}>Текст под кнопкой "Купить"</label>
+            <textarea 
+              value={information.productPageText} 
+              onChange={(e) => setInformation(prev => ({...prev, productPageText: e.target.value}))}
+              placeholder="Введите текст, который будет отображаться под кнопкой купить на всех страницах товаров"
+              rows={3}
+              style={{width: '100%', padding: 10, borderRadius: 6, border: '1px solid #ced4da', fontSize: 14, resize: 'vertical'}}
+            />
+            <small style={{color: '#6c757d', fontSize: 12}}>Этот текст будет отображаться под кнопкой "Купить" на всех страницах товаров. Стиль будет такой же, как у описания товара.</small>
           </div>
         </div>
 

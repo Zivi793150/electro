@@ -229,6 +229,8 @@ const ProductGroup = mongoose.model('ProductGroup', productGroupSchema);
 const informationSchema = new mongoose.Schema({
   city: { type: String, default: 'Алматы' },
   markupPercentage: { type: Number, default: 20, min: 0, max: 100 },
+  showPromoCode: { type: Boolean, default: false },
+  productPageText: { type: String, default: '' },
   deliveryInfo: {
     freeDelivery: { type: String, default: 'Бесплатная доставка по городу' },
     freeDeliveryNote: { type: String, default: 'Сегодня — БЕСПЛАТНО' },
@@ -538,10 +540,28 @@ app.get('/api/information', async (req, res) => {
       information = new Information();
       await information.save();
     } else {
-      // Миграция: добавляем поле markupPercentage если его нет
+      // Миграция: добавляем поля если их нет
+      let needsSave = false;
+      
       if (information.markupPercentage === undefined) {
         console.log('Добавляем поле markupPercentage к существующей записи');
-        information.markupPercentage = 0;
+        information.markupPercentage = 20;
+        needsSave = true;
+      }
+      
+      if (information.showPromoCode === undefined) {
+        console.log('Добавляем поле showPromoCode к существующей записи');
+        information.showPromoCode = false;
+        needsSave = true;
+      }
+      
+      if (information.productPageText === undefined) {
+        console.log('Добавляем поле productPageText к существующей записи');
+        information.productPageText = '';
+        needsSave = true;
+      }
+      
+      if (needsSave) {
         await information.save();
       }
     }
