@@ -111,7 +111,7 @@ const Footer = () => {
       </div>
       
       <div className="footer-bottom">
-        <p>&copy; {siteSettings.copyrightYear || '2020-2025'} {siteSettings.companyInfo.name}. Все права защищены.</p>
+        <p>&copy; 2020-{new Date().getFullYear()} {siteSettings.companyInfo.name}. Все права защищены.</p>
       </div>
     </footer>
   );
