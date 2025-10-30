@@ -47,10 +47,17 @@ const OrderSchema = new mongoose.Schema(
       status: { type: String },
       changedAt: { type: Date, default: Date.now },
       changedBy: { type: String, default: 'system' }
-    }]
+    }],
+    // Метка для автоудаления: если заказ отменён или выполнен,
+    // устанавливаем дату удаления через 3 дня. TTL-индекс ниже.
+    deleteAfterAt: { type: Date, default: null, index: true }
   },
   { timestamps: true }
 );
+
+// TTL индекс: документы удаляются, когда наступает deleteAfterAt
+// В MongoDB TTL задаётся через expireAfterSeconds: 0 для точной даты в поле
+OrderSchema.index({ deleteAfterAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model('Order', OrderSchema);
 

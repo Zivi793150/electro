@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 // Простой автономный слайдер без внешних зависимостей
 // Поддерживает авто-пролистывание, стрелки и точки
-function SimpleSlider({ images = [], intervalMs = 4000, height = 380, radius = 8 }) {
+function SimpleSlider({ images = [], intervalMs = 10000, height = 380, radius = 8 }) {
 	const [index, setIndex] = useState(0);
 	const timerRef = useRef(null);
 
@@ -30,7 +30,7 @@ function SimpleSlider({ images = [], intervalMs = 4000, height = 380, radius = 8
 	}
 
 	return (
-		<div style={{ position: 'relative', width: '100%', overflow: 'hidden', borderRadius: radius }}>
+		<div style={{ position: 'relative', width: '100%', height, overflow: 'hidden', borderRadius: radius }}>
 			<div
 				style={{
 					display: 'flex',

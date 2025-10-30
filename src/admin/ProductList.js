@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/admin/products'; // Используем админский endpoint для получения всех товаров
-  const PRODUCTS_API_URL = 'https://electro-1-vjdu.onrender.com/api/products'; // Для создания/обновления/удаления товаров
+  const API_URL = '/api/admin/products'; // Используем админский endpoint для получения всех товаров
+  const PRODUCTS_API_URL = '/api/products'; // Для создания/обновления/удаления товаров
 
 function ProductForm({ onClose, onSuccess, initialData }) {
   const [name, setName] = useState(initialData?.name || '');
@@ -29,7 +29,6 @@ function ProductForm({ onClose, onSuccess, initialData }) {
   });
   const [description, setDescription] = useState(initialData?.description || '');
   const [shortDescription, setShortDescription] = useState(initialData?.['Short description'] || '');
-  const [characteristics, setCharacteristics] = useState(initialData?.characteristics || '');
   const [equipment, setEquipment] = useState(initialData?.equipment || '');
   const [slug, setSlug] = useState(initialData?.slug || '');
   const [categorySlug, setCategorySlug] = useState(initialData?.categorySlug || '');
@@ -46,12 +45,12 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       (async () => {
         try {
           // Получаем курс валют
-          const r = await fetch('https://electro-1-vjdu.onrender.com/api/rate/usd-kzt');
+          const r = await fetch('/api/rate/usd-kzt');
           const j = await r.json();
           if (mounted && j && j.rate) setRate(j.rate);
           
           // Получаем процент наценки
-          const infoResponse = await fetch('https://electro-1-vjdu.onrender.com/api/information');
+          const infoResponse = await fetch('/api/information');
           const infoData = await infoResponse.json();
           if (mounted && infoData.information && infoData.information.markupPercentage !== undefined) {
             setMarkupPercentage(infoData.information.markupPercentage);
@@ -142,7 +141,7 @@ function ProductForm({ onClose, onSuccess, initialData }) {
       const formData = new FormData();
       formData.append('image', files[0]); // Изменили 'file' на 'image'
       
-      const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
@@ -716,7 +715,7 @@ const ProductList = ({ onLogout }) => {
     setLoading(true);
     Promise.all([
       fetch(API_URL),
-       fetch('https://electro-1-vjdu.onrender.com/api/product-groups')
+       fetch('/api/product-groups')
     ])
       .then(responses => Promise.all(responses.map(res => res.json())))
       .then(([productsData, groupsData]) => {
@@ -875,24 +874,6 @@ const ProductList = ({ onLogout }) => {
         return false;
       })
     );
-  };
-
-  // Функция для получения информации о группе вариаций
-  const getVariantGroupInfo = (productId) => {
-    if (!productId || !Array.isArray(productGroups)) return null;
-    const group = productGroups.find(group => 
-      Array.isArray(group.variants) && group.variants.some(variant => {
-        if (!variant.productId) return false;
-        if (typeof variant.productId === 'string') {
-          return variant.productId === productId;
-        }
-        if (variant.productId && variant.productId._id) {
-          return variant.productId._id === productId;
-        }
-        return false;
-      })
-    );
-    return group;
   };
 
   const [duplicateProduct, setDuplicateProduct] = useState(null);

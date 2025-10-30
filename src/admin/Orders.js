@@ -54,7 +54,7 @@ const Orders = ({ onLogout }) => {
     setLoading(true);
     setError('');
     try {
-      const r = await fetch('https://electro-1-vjdu.onrender.com/api/orders');
+      const r = await fetch('/api/orders');
       const j = await r.json();
       if (j && j.success && Array.isArray(j.orders)) {
         setOrders(j.orders);
@@ -73,7 +73,7 @@ const Orders = ({ onLogout }) => {
   const updateOrderStatus = async (orderId, newStatus) => {
     setUpdatingStatus(orderId);
     try {
-      const response = await fetch(`https://electro-1-vjdu.onrender.com/api/orders/${orderId}/status`, {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

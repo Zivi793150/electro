@@ -14,16 +14,18 @@ const Checkout = () => {
   const [payment, setPayment] = useState('cashless');
   const [paymentMethod, setPaymentMethod] = useState('remote'); // remote, qr, transfer
   const [deliveryType, setDeliveryType] = useState('pickup'); // pickup, delivery
-  const [selectedCity, setSelectedCity] = useState('Алматы');
-  const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [form, setForm] = useState({ firstName: '', phone: '', address: '', comment: '' });
   const [promo, setPromo] = useState('');
   const [siteSettings, setSiteSettings] = useState({ showPromoCode: false });
+  // eslint-disable-next-line no-unused-vars
+  const [selectedCity, setSelectedCity] = useState('Алматы');
+  // eslint-disable-next-line no-unused-vars
+  const [selectedDelivery, setSelectedDelivery] = useState(null);
 
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
-        const response = await fetch('https://electro-1-vjdu.onrender.com/api/information');
+        const response = await fetch('/api/information');
         if (response.ok) {
           const data = await response.json();
           if (data.information) {
@@ -76,7 +78,7 @@ const Checkout = () => {
     (async () => {
       let orderId = null;
       try {
-        const resp = await fetch('https://electro-1-vjdu.onrender.com/api/orders', {
+        const resp = await fetch('/api/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -99,7 +101,7 @@ const Checkout = () => {
         orderId = Date.now().toString(); // fallback ID
       }
       try {
-        await fetch('https://electro-1-vjdu.onrender.com/api/send-telegram', {
+        await fetch('/api/send-telegram', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

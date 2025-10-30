@@ -1,5 +1,5 @@
 /* global ym, gtag */
-const API_BASE = 'https://electro-1-vjdu.onrender.com';
+const API_BASE = window.location.origin;
 
 // Генерируем уникальный sessionId для анонимных пользователей
 const getSessionId = () => {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { trackPageView } from '../utils/analytics';
@@ -198,10 +197,7 @@ const Catalog = () => {
   ];
 
   const location = useLocation();
-  // На мобильных при переходе иногда сохраняется старая позиция — принудительно поднимаем наверх
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, []);
+  
   const getCategoryFromQuery = () => {
     // Извлекаем категорию из URL пути
     const pathParts = location.pathname.split('/');
@@ -210,7 +206,21 @@ const Catalog = () => {
     }
     return null; // По умолчанию не выбрана категория - показываем все
   };
-  const [selectedCategory, setSelectedCategory] = useState(getCategoryFromQuery());
+  
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  
+  // Отслеживаем изменения URL для определения активной категории
+  useEffect(() => {
+    const categoryFromUrl = getCategoryFromQuery();
+    setSelectedCategory(categoryFromUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, location.pathname]);
+  
+  // На мобильных при переходе иногда сохраняется старая позиция — принудительно поднимаем наверх
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+  
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -224,7 +234,7 @@ const Catalog = () => {
   useEffect(() => {
     const categoryFromUrl = getCategoryFromQuery();
     setSelectedCategory(categoryFromUrl);
-  }, [location.search, location.pathname]);
+  }, [location.search, location.pathname, getCategoryFromQuery]);
 
   // Закрытие выпадающего списка при клике вне его
   useEffect(() => {
@@ -243,7 +253,7 @@ const Catalog = () => {
     };
   }, [isDropdownOpen]);
 
-          const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+          const API_URL = '/api/products';
 
   // Загрузка товаров с кэшированием
   useEffect(() => {
@@ -346,6 +356,7 @@ const Catalog = () => {
       }
       setCategoriesLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
 
   // Принудительное применение стилей для карточек
@@ -476,22 +487,6 @@ const Catalog = () => {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  // Функция для получения названия товара с приоритетом: productGroup -> category -> product name
-  const getProductDisplayName = (product) => {
-    // 1. Проверяем мастер-товар (productGroup)
-    if (product.productGroup && product.productGroup.name) {
-      return product.productGroup.name;
-    }
-    
-    // 2. Проверяем название категории
-    if (product.category) {
-      return product.category;
-    }
-    
-    // 3. Используем название продукта
-    return product.name;
   };
 
   // Определяем целевую ссылку для карточки товара в каталоге

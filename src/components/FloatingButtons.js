@@ -1,5 +1,5 @@
 import React from 'react';
-import { trackButtonClick, trackSocialClick, trackPhoneClick } from '../utils/analytics';
+import { trackSocialClick, trackPhoneClick } from '../utils/analytics';
 import '../styles/FloatingButtons.css';
 
 const FloatingButtons = () => {

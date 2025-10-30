@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Modal from '../components/Modal';
 import AboutCompanySection from '../components/AboutCompanySection';
+// SimpleSlider временно отключён по требованию: возвращаем статичное изображение
 import { fetchWithCache } from '../utils/cache';
 import '../styles/Home.css';
 
@@ -13,49 +14,63 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [miniProducts, setMiniProducts] = useState([]);
   const [slideIndex, setSlideIndex] = useState(0);
+  // Слайдер отключён — состояния для карусели не нужны
   const navigate = useNavigate();
 
-  // Функция для получения оптимального размера изображения
+  // Универсально получаем URL картинки товара
   const getOptimalImage = (product, preferredSize = 'medium') => {
-    // Сначала проверяем обложку вариации, если товар является базовым для группы
-    if (product.productGroup && product.productGroup.coverImage) {
-      return product.productGroup.coverImage;
+    const pick = (url) => (typeof url === 'string' && url.trim() ? url : null);
+
+    // 1) обложка группы
+    if (product.productGroup && pick(product.productGroup.coverImage)) return product.productGroup.coverImage;
+
+    // 2) массив изображений
+    if (Array.isArray(product.images) && product.images.length) {
+      return pick(product.images[0]) || '/images/products/placeholder.png';
     }
-    
-    // Затем проверяем обычные изображения товара
-    if (product.imageVariants && product.imageVariants[preferredSize]) {
-      return product.imageVariants[preferredSize];
+
+    // 3) варианты размеров
+    if (product.imageVariants) {
+      if (pick(product.imageVariants[preferredSize])) return product.imageVariants[preferredSize];
+      if (pick(product.imageVariants.webp)) return product.imageVariants.webp;
+      if (pick(product.imageVariants.original)) return product.imageVariants.original;
     }
-    if (product.imageVariants && product.imageVariants.webp) {
-      return product.imageVariants.webp;
-    }
-    return product.image || '/images/products/placeholder.png';
+
+    // 4) одиночные поля
+    return pick(product.image) || pick(product.imageUrl) || '/images/products/placeholder.png';
   };
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = '/api/products';
+
+  // Слайдер отключён
 
   useEffect(() => {
     fetchWithCache(API_URL, {}, 5 * 60 * 1000) // кэш на 5 минут, загружаем все товары
       .then(data => {
-        if (Array.isArray(data)) setMiniProducts(data);
+        if (Array.isArray(data)) {
+          setMiniProducts(data);
+        }
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Фильтруем товары для мини-каталога - показываем все товары как в каталоге
+  const filteredMiniProducts = miniProducts.filter(p => p.saleAvailable !== false);
 
   // Автопрокрутка каждые 10 секунд
   useEffect(() => {
-    if (!miniProducts || miniProducts.length <= 8) return;
-    const totalSlides = Math.ceil(miniProducts.length / 8);
+    if (filteredMiniProducts.length <= 8) return;
+    const totalSlides = Math.ceil(filteredMiniProducts.length / 8);
     const id = setInterval(() => {
       setSlideIndex(prev => (prev + 1) % totalSlides);
     }, 10000);
     return () => clearInterval(id);
-  }, [miniProducts]);
+  }, [filteredMiniProducts]);
 
-  const totalSlides = Math.ceil(miniProducts.length / 8);
+  const totalSlides = Math.ceil(filteredMiniProducts.length / 8);
   const nextSlide = () => setSlideIndex(prev => (prev + 1) % totalSlides);
   const prevSlide = () => setSlideIndex(prev => (prev - 1 + totalSlides) % totalSlides);
-
-  const visibleProducts = miniProducts.slice(slideIndex * 8, slideIndex * 8 + 8);
+  const visibleProducts = filteredMiniProducts.slice(slideIndex * 8, slideIndex * 8 + 8);
 
 
 
@@ -176,19 +191,13 @@ const Home = () => {
       <section className="main-maket-section">
         <div className="main-maket-container">
           <div className="main-maket-left">
-            <picture>
-              <source 
-                srcSet="/images/hero/hero-main.webp" 
-                type="image/webp"
-              />
-              <img 
-                src="/images/hero/hero-main.jpg" 
-                alt="Электроинструменты для профессионалов" 
-                className="main-maket-image" 
-                fetchPriority="high"
-                width="380"
-                height="380"
-                style={{width: '100%', height: 'auto', maxWidth: '380px'}}
+            <picture style={{ display: 'block', width: '100%' }}>
+              <source srcSet="/images/hero/hero-main.webp" type="image/webp" />
+              <img
+                src="/images/hero/hero-main.webp"
+                alt="Электроинструменты — главный баннер"
+                style={{ width: '100%', height: 'auto', objectFit: 'contain', borderRadius: 8, display: 'block' }}
+                loading="eager"
               />
             </picture>
           </div>
@@ -252,7 +261,9 @@ const Home = () => {
                   </div>
                   <div style={{width:'90%',maxWidth:'260px',borderTop:'1px solid #bdbdbd',margin:'0 auto 4px auto', alignSelf:'center'}}></div>
                   <div className="product-info" style={{padding: '2px 8px 18px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, flex: 'none', height: '60px', minHeight: '60px', maxHeight: '60px', margin: 0, border: 'none', background: '#fff'}}>
-                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: '8px 0 0 0', padding: 0, lineHeight: 1.18, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%', minHeight: 'auto', maxHeight: 'none'}}>{product.name}</span>
+                    <span style={{fontSize: '1.05rem', fontWeight: 500, color: '#1a2236', margin: '8px 0 0 0', padding: 0, lineHeight: 1.18, textDecoration:'none',cursor:'pointer',display:'block', textAlign:'center', width:'100%', minHeight: 'auto', maxHeight: 'none'}}>
+                      {product.productGroup ? product.productGroup.name : product.name}
+                    </span>
                   </div>
                 </div>
               </div>

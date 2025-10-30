@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -74,6 +74,7 @@ const Rental = () => {
     return categoryId;
   };
 
+  // eslint-disable-next-line no-unused-vars
   const staticCategories = [
     { id: 'drills', name: 'Дрели' },
     { id: 'bolgarki', name: 'Болгарки' },
@@ -86,7 +87,7 @@ const Rental = () => {
     { id: 'measuring', name: 'Измерители' },
   ];
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = '/api/products';
 
   const filteredProducts = category 
     ? products.filter(product => {

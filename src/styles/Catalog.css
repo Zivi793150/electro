@@ -274,6 +274,17 @@ body, html {
   margin: 0 !important; 
   font-weight: bold !important;
 }
+
+/* Выделение цены аренды рамкой в карточках аренды */
+.rental-card .product-price {
+  color: #FF6B00 !important;
+  border: 2px solid #FF6B00;
+  border-radius: 8px;
+  padding: 4px 8px;
+  line-height: 1.1;
+  display: inline-block;
+  background: #fff;
+}
 .seo-description { background: #fff; padding: 16px; margin-top: 16px; }
 .seo-description h2 { font-size: 1.2rem; margin-bottom: 10px; color: #222; }
 .seo-description p { font-size: 0.95rem; line-height: 1.5; color: #555; margin-bottom: 8px; }

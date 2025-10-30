@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'https://electro-1-vjdu.onrender.com/api';
-const PRODUCTS_URL = `${API_URL}/admin/products`; // Используем админский endpoint для получения всех товаров
-const GROUPS_URL = `${API_URL}/product-groups`;
+const PRODUCTS_URL = '/api/admin/products'; // Используем админский endpoint для получения всех товаров
+const GROUPS_URL = '/api/product-groups';
 
 // Поисковый селект для выбора товара(ов)
 function SearchableProductSelect({ products, value, onChange, multiple = false, placeholder = 'Выберите товар' }) {
@@ -106,6 +105,7 @@ function ProductVariations() {
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -359,7 +359,7 @@ function ProductVariations() {
       const formData = new FormData();
       formData.append('image', files[0]);
       
-      const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });

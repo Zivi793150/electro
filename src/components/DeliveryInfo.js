@@ -6,7 +6,7 @@ const DeliveryInfo = ({ city, onDeliverySelect, compact = false, selectedDeliver
   const [error, setError] = useState('');
   // Убрано неиспользуемое состояние (опции отображения)
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/pickup-points';
+  const API_URL = '/api/pickup-points';
 
   useEffect(() => {
     if (city) {

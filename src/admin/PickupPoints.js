@@ -11,7 +11,7 @@ const PickupPoints = ({ onLogout }) => {
 
   const navigate = useNavigate();
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/pickup-points';
+  const API_URL = '/api/pickup-points';
 
   // Начальное состояние формы
   const initialFormState = {
@@ -346,11 +346,11 @@ const PickupPoints = ({ onLogout }) => {
               
               try {
                 // Сначала проверим основной API
-                const productsResponse = await fetch('https://electro-1-vjdu.onrender.com/api/products');
+                const productsResponse = await fetch('/api/products');
                 console.log('API продуктов статус:', productsResponse.status);
                 
                 // Затем проверим тестовый endpoint API пунктов самовывоза
-                const testResponse = await fetch('https://electro-1-vjdu.onrender.com/api/pickup-points/test');
+                const testResponse = await fetch('/api/pickup-points/test');
                 console.log('Тестовый API статус:', testResponse.status);
                 
                 if (testResponse.ok) {
@@ -360,7 +360,7 @@ const PickupPoints = ({ onLogout }) => {
                   fetchPickupPoints();
                 } else {
                   // Если тестовый endpoint не работает, проверим основной
-                  const pickupResponse = await fetch('https://electro-1-vjdu.onrender.com/api/pickup-points');
+                  const pickupResponse = await fetch('/api/pickup-points');
                   console.log('API пунктов самовывоза статус:', pickupResponse.status);
                   
                   if (pickupResponse.ok) {

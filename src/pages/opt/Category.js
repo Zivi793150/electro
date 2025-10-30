@@ -200,7 +200,7 @@ const OptCategory = () => {
     { id: 'electric-planers', name: 'Электрорубанок' }
   ];
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = '/api/products';
 
   // Фильтруем товары по категории (перенесено наверх)
   const filteredProducts = products.filter(product => {
@@ -260,6 +260,7 @@ const OptCategory = () => {
       const categoryName = categories.find(cat => cat.id === category)?.name || idToCategory(category);
       trackCategoryView(categoryName + ' (Опт)', category, filteredProducts.length);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, filteredProducts.length, categories]);
 
   // Извлечение категорий из товаров
@@ -319,6 +320,7 @@ const OptCategory = () => {
       }
       setCategoriesLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
 
   // Принудительное применение стилей для карточек

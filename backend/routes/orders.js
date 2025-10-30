@@ -77,15 +77,19 @@ router.patch('/:id/status', async (req, res) => {
       changedBy: changedBy
     };
 
-    // Обновляем заказ
-    const updatedOrder = await Order.findByIdAndUpdate(
-      id,
-      { 
-        status: status,
-        $push: { statusHistory: statusHistoryEntry }
-      },
-      { new: true }
-    );
+  // Формируем обновление, включая метку автоудаления
+  const update = {
+    status: status,
+    $push: { statusHistory: statusHistoryEntry }
+  };
+  if (status === 'completed' || status === 'cancelled') {
+    const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+    update.deleteAfterAt = new Date(Date.now() + threeDaysMs);
+  } else {
+    update.deleteAfterAt = null;
+  }
+
+  const updatedOrder = await Order.findByIdAndUpdate(id, update, { new: true });
 
     res.json({ success: true, order: updatedOrder });
   } catch (err) {

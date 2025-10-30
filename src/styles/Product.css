@@ -317,7 +317,7 @@
   word-wrap: break-word !important;
   word-break: break-word !important;
   overflow-wrap: break-word !important;
-  white-space: normal !important;
+  white-space: pre-wrap !important;
   max-width: 100% !important;
   width: 100% !important;
   box-sizing: border-box !important;
@@ -376,7 +376,7 @@
 .mini-catalog-section .product-image img {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
+  object-fit: contain !important; /* чтобы картинка не "наезжала" на текст */
 }
 
 .mini-catalog-section .product-info {
@@ -386,6 +386,9 @@
   flex: 1 1 auto !important;
   justify-content: space-between !important;
   min-height: 90px !important;
+  background: #fff !important; /* гарантируем белый фон под названием */
+  position: relative !important;
+  z-index: 2 !important; /* поднимаем над изображением на всякий случай */
 }
 
 .mini-catalog-section .product-name {

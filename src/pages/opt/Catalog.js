@@ -223,6 +223,7 @@ const OptCatalog = () => {
   useEffect(() => {
     const categoryFromUrl = getCategoryFromQuery();
     setSelectedCategory(categoryFromUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search, location.pathname]);
 
   // Закрытие выпадающего списка при клике вне его
@@ -242,7 +243,7 @@ const OptCatalog = () => {
     };
   }, [isDropdownOpen]);
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = '/api/products';
 
   // Загрузка товаров с кэшированием
   useEffect(() => {
@@ -322,6 +323,7 @@ const OptCatalog = () => {
       }
       setCategoriesLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
 
   // Принудительное применение стилей для карточек

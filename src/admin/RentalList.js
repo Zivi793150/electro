@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const API_URL = 'https://electro-1-vjdu.onrender.com/api/admin/products';
-const PRODUCTS_API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+const API_URL = '/api/admin/products';
+const PRODUCTS_API_URL = '/api/products';
 
 function RentalList({ onLogout }) {
   const [products, setProducts] = useState([]);
@@ -19,6 +19,8 @@ function RentalList({ onLogout }) {
     category: ''
   });
   const [uploadingImage, setUploadingImage] = useState(false);
+  // Черновики для редактирования товаров аренды
+  const [drafts, setDrafts] = useState({}); // { [productId]: { name, image, rentalPrice } }
 
   useEffect(() => {
     fetchProducts();
@@ -30,6 +32,17 @@ function RentalList({ onLogout }) {
     const sale = products.filter(p => !p.rentalAvailable && p.saleAvailable !== false);
     setRentalProducts(rental);
     setSaleProducts(sale);
+    // Инициализируем черновики по текущим данным
+    const nextDrafts = {};
+    products.forEach(p => {
+      if (!p || !p._id) return;
+      nextDrafts[p._id] = {
+        name: (p.name || ''),
+        image: (p.image || ''),
+        rentalPrice: (p.rentalPrice ?? '')
+      };
+    });
+    setDrafts(nextDrafts);
   }, [products]);
 
   const fetchProducts = async () => {
@@ -109,6 +122,48 @@ function RentalList({ onLogout }) {
     }
   };
 
+  const setDraftField = (productId, field, value) => {
+    setDrafts(prev => ({
+      ...prev,
+      [productId]: {
+        ...(prev[productId] || {}),
+        [field]: value
+      }
+    }));
+  };
+
+  const saveRentalDraft = async (product) => {
+    const d = drafts[product._id] || {};
+    const fields = {
+      name: d.name ?? product.name,
+      image: d.image ?? product.image,
+      rentalPrice: d.rentalPrice === '' ? null : Number(d.rentalPrice)
+    };
+    await handleUpdateRentalFields(product, fields);
+  };
+
+  // Обновление произвольных полей для арендуемого товара (например, имя/фото)
+  const handleUpdateRentalFields = async (product, fields) => {
+    try {
+      const response = await fetch(`${PRODUCTS_API_URL}/${product._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...product,
+          ...fields
+        })
+      });
+      if (response.ok) {
+        fetchProducts();
+      } else {
+        alert('Не удалось сохранить изменения');
+      }
+    } catch (e) {
+      console.error('Ошибка сохранения полей аренды:', e);
+      alert('Ошибка сохранения');
+    }
+  };
+
   const handleFileUpload = async (event) => {
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
@@ -119,7 +174,7 @@ function RentalList({ onLogout }) {
       const formData = new FormData();
       formData.append('image', files[0]);
       
-      const response = await fetch('https://electro-1-vjdu.onrender.com/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
@@ -306,15 +361,36 @@ function RentalList({ onLogout }) {
                         alt={product.name}
                         style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '6px', marginBottom: '12px' }}
                       />
-                      <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>{product.name}</h3>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>{product.name}</h3>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr', gap:8, marginBottom:12 }}>
+                    <div>
+                      <label style={{ display:'block', fontSize:13, color:'#666', marginBottom:4 }}>Название</label>
+                      <input
+                        type="text"
+                        value={(drafts[product._id]?.name) ?? product.name}
+                        onChange={(e)=> setDraftField(product._id, 'name', e.target.value)}
+                        style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:4, fontSize:14 }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display:'block', fontSize:13, color:'#666', marginBottom:4 }}>Фото (URL)</label>
+                      <input
+                        type="text"
+                        value={(drafts[product._id]?.image) ?? (product.image || '')}
+                        onChange={(e)=> setDraftField(product._id, 'image', e.target.value)}
+                        placeholder="https://..."
+                        style={{ width:'100%', padding:8, border:'1px solid #ddd', borderRadius:4, fontSize:14 }}
+                      />
+                    </div>
+                  </div>
                       <div style={{ marginBottom: '12px' }}>
                         <label style={{ display: 'block', fontSize: '13px', color: '#666', marginBottom: '4px' }}>
                           Цена аренды (₸/сутки):
                         </label>
                         <input
                           type="number"
-                          defaultValue={product.rentalPrice || ''}
-                          onBlur={(e) => handleUpdateRentalPrice(product, e.target.value)}
+                          value={(drafts[product._id]?.rentalPrice) ?? (product.rentalPrice || '')}
+                          onChange={(e) => setDraftField(product._id, 'rentalPrice', e.target.value)}
                           placeholder="Цена не указана"
                           style={{
                             width: '100%',
@@ -325,6 +401,22 @@ function RentalList({ onLogout }) {
                           }}
                         />
                       </div>
+                      <button
+                        onClick={() => saveRentalDraft(product)}
+                        style={{
+                          width: '100%',
+                          padding: '10px',
+                          background: '#FF6B00',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          marginBottom: '10px'
+                        }}
+                      >
+                        Сохранить
+                      </button>
                       <button
                         onClick={() => handleRemoveFromRental(product)}
                         style={{

@@ -64,21 +64,10 @@ const OptProduct = () => {
     }
   });
   
-  // Раздел доставки отключён по требованию — связанные состояния скрыты
-  const [selectedCity] = useState('Алматы');
-  const [selectedDelivery] = useState(null);
-  const [deliveryInfo] = useState(null);
-  const [isCityChanging] = useState(false);
-  
   // Состояние для вариаций товара
   const [productGroup, setProductGroup] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedParameters, setSelectedParameters] = useState({});
-
-  const [detectingCity, setDetectingCity] = useState(false);
-  
-  // Функция для автоматического определения города
-  const detectUserCity = () => {};
   
   // Список городов Казахстана
   const cities = [
@@ -165,7 +154,7 @@ const OptProduct = () => {
   
   const navigate = useNavigate();
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = '/api/products';
 
   useEffect(() => {
     setLoading(true);
@@ -209,7 +198,7 @@ const OptProduct = () => {
         
         // Загружаем группу вариаций для этого товара
         try {
-         const groupRes = await fetchWithRetry(`https://electro-1-vjdu.onrender.com/api/product-groups/by-product/${productData._id}`);
+         const groupRes = await fetchWithRetry(`/api/product-groups/by-product/${productData._id}`);
           if (groupRes.ok) {
             const groupData = await groupRes.json();
             setProductGroup(groupData);
@@ -251,7 +240,7 @@ const OptProduct = () => {
 
   // Загружаем информацию сайта
   useEffect(() => {
-   fetchWithRetry('https://electro-1-vjdu.onrender.com/api/information')
+   fetchWithRetry('/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {
@@ -289,13 +278,6 @@ const OptProduct = () => {
   // Найти категорию для хлебных крошек
   const categoryObj = categories.find(cat => cat.id === product.category);
   const categoryName = categoryObj ? categoryObj.name : '';
-
-  // Преимущества — если есть в product, иначе дефолтные
-  const productAdvantages = product.advantages || [
-    'Высокий крутящий момент и мощность',
-    'Долговечный литий-ионный аккумулятор',
-    'Компактный и лёгкий корпус для работы одной рукой'
-  ];
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -448,10 +430,6 @@ const OptProduct = () => {
       return newIndex >= 0 && newIndex < images.length ? newIndex : 0;
     });
   };
-  
-  const handleCityChange = () => {};
-
-  const fetchDeliveryInfo = async () => {};
 
   const shortDesc = getCurrentProduct()['Short description'] || 'краткое описание';
 
@@ -729,24 +707,24 @@ const OptProduct = () => {
                   </div>
                 </div>
                 <div className="product-divider"></div>
-                {siteSettings.productPageText && (
-                  <div className="product-page-text" style={{
-                    fontSize: '1rem',
-                    color: '#222',
-                    marginBottom: 6,
-                    fontWeight: 500,
-                    marginTop: 12,
-                    lineHeight: 1.3,
-                    wordWrap: 'break-word',
-                    wordBreak: 'break-word',
-                    overflowWrap: 'break-word',
-                    whiteSpace: 'normal',
-                    maxWidth: '100%',
-                    width: '100%'
-                  }}>
-                    {siteSettings.productPageText}
-                  </div>
-                )}
+                 {siteSettings.productPageText && (
+                   <div className="product-page-text" style={{
+                     fontSize: '1rem',
+                     color: '#222',
+                     marginBottom: 6,
+                     fontWeight: 500,
+                     marginTop: 12,
+                     lineHeight: 1.3,
+                     wordWrap: 'break-word',
+                     wordBreak: 'break-word',
+                     overflowWrap: 'break-word',
+                     whiteSpace: 'pre-wrap',
+                     maxWidth: '100%',
+                     width: '100%'
+                   }}>
+                     {siteSettings.productPageText}
+                   </div>
+                 )}
                 {/* Блок доставки скрыт по требованию */}
               </>
             </div>

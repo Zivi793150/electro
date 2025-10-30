@@ -22,7 +22,7 @@ const Footer = () => {
 
   // Загружаем информацию сайта при монтировании и изменении роута
   useEffect(() => {
-    fetch('https://electro-1-vjdu.onrender.com/api/information')
+    fetch('/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {

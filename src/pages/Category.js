@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { formatTenge } from '../utils/price';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { trackPageView, trackCategoryView } from '../utils/analytics';
@@ -201,7 +200,7 @@ const Category = () => {
     { id: 'electric-planers', name: 'Электрорубанок' }
   ];
 
-  const API_URL = 'https://electro-1-vjdu.onrender.com/api/products';
+  const API_URL = '/api/products';
 
   // Фильтруем товары по категории (перенесено наверх)
   const filteredProducts = products.filter(product => {
@@ -263,6 +262,7 @@ const Category = () => {
       const categoryName = categories.find(cat => cat.id === category)?.name || idToCategory(category);
       trackCategoryView(categoryName, category, filteredProducts.length);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, filteredProducts.length, categories]);
 
   // Извлечение категорий из товаров
@@ -322,6 +322,7 @@ const Category = () => {
       }
       setCategoriesLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
 
   // Принудительное применение стилей для карточек

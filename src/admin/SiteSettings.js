@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiCache } from '../utils/cache';
 
-const API_URL = 'https://electro-1-vjdu.onrender.com/api/information';
+const API_URL = '/api/information';
 
 const SiteSettings = ({ onLogout }) => {
   const navigate = useNavigate();

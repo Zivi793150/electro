@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { trackSocialClick, trackPhoneClick } from '../utils/analytics';
 import '../styles/Header.css';
 
 const Header = () => {
-  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Загружаем данные из localStorage или используем значения по умолчанию
@@ -42,7 +41,7 @@ const Header = () => {
 
   // Загружаем информацию сайта при монтировании компонента
   useEffect(() => {
-    fetch('https://electro-1-vjdu.onrender.com/api/information')
+    fetch('/api/information')
       .then(res => res.json())
       .then(data => {
         if (data.information) {

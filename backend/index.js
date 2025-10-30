@@ -177,7 +177,8 @@ app.use((req, res, next) => {
   next();
 });
 
-const mongoUri = process.env.MONGO_URI || 'mongodb+srv://electro:electro123@cluster0.mongodb.net/Tanker_products?retryWrites=true&w=majority';
+// Поддержка как локальной, так и облачной БД
+const mongoUri = process.env.MONGO_URI || 'mongodb://tanker_user:tanker_password_2024@localhost:27017/tanker_products';
 const PORT = process.env.PORT || 5000;
 
 // Более устойчивое подключение к MongoDB
@@ -667,7 +668,7 @@ app.use((error, req, res, next) => {
 });
 
 // Роуты для пунктов самовывоза
-const uri = process.env.MONGO_URI || 'mongodb+srv://electro:electro123@cluster0.mongodb.net/Tanker_products?retryWrites=true&w=majority';
+const uri = process.env.MONGO_URI || 'mongodb://tanker_user:tanker_password_2024@localhost:27017/tanker_products';
 
 // Тестовый endpoint для проверки подключения
 app.get('/api/pickup-points/test', async (req, res) => {
@@ -675,7 +676,7 @@ app.get('/api/pickup-points/test', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('Tanker_products');
+    const database = client.db('tanker_products');
     const collections = await database.listCollections().toArray();
     
     await client.close();
@@ -698,7 +699,7 @@ app.get('/api/pickup-points', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('Tanker_products');
+    const database = client.db('tanker_products');
     const collection = database.collection('pickup_points');
     
     // Проверяем, существует ли коллекция, если нет - создаем
@@ -741,7 +742,7 @@ app.post('/api/pickup-points', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('Tanker_products');
+    const database = client.db('tanker_products');
     const collection = database.collection('pickup_points');
     
     const newPickupPoint = {
@@ -796,7 +797,7 @@ app.put('/api/pickup-points/:id', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('Tanker_products');
+    const database = client.db('tanker_products');
     const collection = database.collection('pickup_points');
     
     const updateData = {
@@ -841,7 +842,7 @@ app.delete('/api/pickup-points/:id', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('Tanker_products');
+    const database = client.db('tanker_products');
     const collection = database.collection('pickup_points');
     
     const result = await collection.deleteOne({ _id: new ObjectId(id) });
@@ -866,7 +867,7 @@ app.get('/api/pickup-points/delivery/:city', async (req, res) => {
     const client = new MongoClient(uri);
     await client.connect();
     
-    const database = client.db('Tanker_products');
+    const database = client.db('tanker_products');
     const collection = database.collection('pickup_points');
     
     // Проверяем, есть ли пункты самовывоза в городе
